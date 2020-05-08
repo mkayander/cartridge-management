@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
 
+    <script type="text/javascript">
+        var django_data = {{ cartridges_json|safe ***REMOVED******REMOVED***;
+    </script>
+
 ***REMOVED***% load static %***REMOVED***
     <link rel="stylesheet" href="{% static "css/bootstrap.css" %***REMOVED***">
-    <script src="{% static "js/bootstrap.js" %***REMOVED***"></script>
+    <script src={% static "js/main.js" %***REMOVED***></script>
+***REMOVED***#    <script src="{% static "js/bootstrap.js" %***REMOVED***"></script>#***REMOVED***
 
     <title>Title</title>
 
@@ -18,27 +23,38 @@
 </header>
 
 <body>
+{#<div class="container pt-5">#***REMOVED***
+{#    <div class="row">#***REMOVED***
+{#        <div class="col-sm">#***REMOVED***
+{#            <select class="custom-select" id="cartridges_select">#***REMOVED***
+{#            ***REMOVED***% for cartridge in cartridges %***REMOVED***#***REMOVED***
+{#                    <option value="{{ cartridge.id ***REMOVED******REMOVED***">{{ cartridge.name ***REMOVED******REMOVED***</option>#***REMOVED***
+{#            ***REMOVED***% endfor %***REMOVED***#***REMOVED***
+{#            </select>#***REMOVED***
+{#        </div>#***REMOVED***
+{#        <div class="col-sm">#***REMOVED***
+{#            <label id="count">count</label>#***REMOVED***
+{#        </div>#***REMOVED***
+{#        <div class="col-sm">#***REMOVED***
+{#            <label id="data">data</label>#***REMOVED***
+{#        </div>#***REMOVED***
+{#    </div>#***REMOVED***
+{#</div>#***REMOVED***
 <div class="container pt-5">
-    <div class="row">
-        <div class="col-sm">
-            <select class="custom-select" id="cartridges_select">
-            ***REMOVED***% for cartridge in cartridges %***REMOVED***
-                    <option id="{{ cartridge.name ***REMOVED******REMOVED***">{{ cartridge.name ***REMOVED******REMOVED***</option>
-            ***REMOVED***% endfor %***REMOVED***
-            </select>
+***REMOVED***% for cartridge in cartridges %***REMOVED***
+        <div class="row">
+            <div class="col-sm">
+                 <label id="{{ cartridge.manufacturer ***REMOVED******REMOVED***">{{ cartridge.manufacturer ***REMOVED******REMOVED***</label>
+            </div>
+            <div class="col-sm">
+                 <label id="{{ cartridge.name ***REMOVED******REMOVED***">{{ cartridge.name ***REMOVED******REMOVED***</label>
+            </div>
+            <div class="col-sm">
+                <label id="{{ cartridge.count ***REMOVED******REMOVED***">{{ cartridge.count ***REMOVED******REMOVED***</label>
+            </div>
         </div>
-        <div class="col-sm">
-            <input class="form-control" id="count">
-        </div>
-        <div class="col-sm">
-            One of three columns
-        </div>
-    </div>
+***REMOVED***% endfor %***REMOVED***
 </div>
 </body>
-
-<script>
-    var input1 = document.getElementById('cartridges_select').innerHTML = {{ cartridges.count ***REMOVED******REMOVED***
-</script>
 
 </html>
