@@ -41,19 +41,49 @@
 {#    </div>#}
 {#</div>#}
 <div class="container pt-5">
-    {% for cartridge in cartridges %}
-        <div class="row">
-            <div class="col-sm">
-                 <label id="{{ cartridge.manufacturer }}">{{ cartridge.manufacturer }}</label>
-            </div>
-            <div class="col-sm">
-                 <label id="{{ cartridge.name }}">{{ cartridge.name }}</label>
-            </div>
-            <div class="col-sm">
-                <label id="{{ cartridge.count }}">{{ cartridge.count }}</label>
-            </div>
-        </div>
-    {% endfor %}
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Наименование</th>
+            <th scope="col">Количество</th>
+            <th scope="col">Тип</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for cartridge in cartridges %}
+            <tr>
+                <th scope="row">{{ cartridge.id }}</th>
+                <td><label id="{{ cartridge.manufacturer }}">{{ cartridge.manufacturer }}</label></td>
+                <td><label id="{{ cartridge.name }}">{{ cartridge.name }}</label></td>
+                <td><label id="{{ cartridge.count }}">{{ cartridge.count }}</label></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="container pt-5">
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Наименование</th>
+            <th scope="col">Количество</th>
+            <th scope="col">Тип</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for cartridge in cartridges %}
+            <tr>
+                <th scope="row">{{ cartridge.id }}</th>
+                <td><label id="{{ cartridge.manufacturer }}">{{ cartridge.manufacturer }}</label></td>
+                <td><label id="{{ cartridge.name }}">{{ cartridge.name }}</label></td>
+                <td><label id="{{ cartridge.count }}">{{ cartridge.count }}</label></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
 </body>
 
