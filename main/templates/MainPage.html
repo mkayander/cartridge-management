@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
 
+    <script type="text/javascript">
+        var django_data = {{ cartridges_json|safe }};
+    </script>
+
     {% load static %}
     <link rel="stylesheet" href="{% static "css/bootstrap.css" %}">
-    <script src="{% static "js/bootstrap.js" %}"></script>
+    <script src={% static "js/main.js" %}></script>
+    {#    <script src="{% static "js/bootstrap.js" %}"></script>#}
 
     <title>Title</title>
 
@@ -18,27 +23,38 @@
 </header>
 
 <body>
+{#<div class="container pt-5">#}
+{#    <div class="row">#}
+{#        <div class="col-sm">#}
+{#            <select class="custom-select" id="cartridges_select">#}
+{#                {% for cartridge in cartridges %}#}
+{#                    <option value="{{ cartridge.id }}">{{ cartridge.name }}</option>#}
+{#                {% endfor %}#}
+{#            </select>#}
+{#        </div>#}
+{#        <div class="col-sm">#}
+{#            <label id="count">count</label>#}
+{#        </div>#}
+{#        <div class="col-sm">#}
+{#            <label id="data">data</label>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
 <div class="container pt-5">
-    <div class="row">
-        <div class="col-sm">
-            <select class="custom-select" id="cartridges_select">
-                {% for cartridge in cartridges %}
-                    <option id="{{ cartridge.name }}">{{ cartridge.name }}</option>
-                {% endfor %}
-            </select>
+    {% for cartridge in cartridges %}
+        <div class="row">
+            <div class="col-sm">
+                 <label id="{{ cartridge.manufacturer }}">{{ cartridge.manufacturer }}</label>
+            </div>
+            <div class="col-sm">
+                 <label id="{{ cartridge.name }}">{{ cartridge.name }}</label>
+            </div>
+            <div class="col-sm">
+                <label id="{{ cartridge.count }}">{{ cartridge.count }}</label>
+            </div>
         </div>
-        <div class="col-sm">
-            <input class="form-control" id="count">
-        </div>
-        <div class="col-sm">
-            One of three columns
-        </div>
-    </div>
+    {% endfor %}
 </div>
 </body>
-
-<script>
-    var input1 = document.getElementById('cartridges_select').innerHTML = {{ cartridges.count }}
-</script>
 
 </html>

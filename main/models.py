@@ -1,8 +1,9 @@
 from django.db import models
+from main import choices
 
 
 class Cartridge(models.Model):
-    manufacturer = models.CharField(max_length=30)
+    manufacturer = models.CharField(max_length=30, choices=choices.MANUFACTURER_CHOICES, default="HP")
     name = models.CharField(max_length=30)
     count = models.PositiveIntegerField()
 
