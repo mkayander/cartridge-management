@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+***REMOVED***% load static %***REMOVED***
+    <link rel="stylesheet" href="{% static "css/bootstrap.css" %***REMOVED***">
+    <script src="{% static "js/bootstrap.js" %***REMOVED***"></script>
+
+    <title>Title</title>
+
+</head>
+
+<header>
+    <nav class="navbar navbar-dark bg-primary">
+        <span class="navbar-brand mb-0 h1">Cartridges</span>
+    </nav>
+</header>
+
+<body>
+<div class="container pt-5">
+    <div class="row">
+        <div class="col-sm">
+            <select class="custom-select" id="cartridges_select">
+            ***REMOVED***% for cartridge in cartridges %***REMOVED***
+                    <option id="{{ cartridge.name ***REMOVED******REMOVED***">{{ cartridge.name ***REMOVED******REMOVED***</option>
+            ***REMOVED***% endfor %***REMOVED***
+            </select>
+        </div>
+        <div class="col-sm">
+            <input class="form-control" id="count">
+        </div>
+        <div class="col-sm">
+            One of three columns
+        </div>
+    </div>
+</div>
+</body>
+
+<script>
+    var input1 = document.getElementById('cartridges_select').innerHTML = {{ cartridges.count ***REMOVED******REMOVED***
+</script>
+
+</html>
