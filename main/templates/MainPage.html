@@ -41,19 +41,49 @@
 {#    </div>#***REMOVED***
 {#</div>#***REMOVED***
 <div class="container pt-5">
-***REMOVED***% for cartridge in cartridges %***REMOVED***
-        <div class="row">
-            <div class="col-sm">
-                 <label id="{{ cartridge.manufacturer ***REMOVED******REMOVED***">{{ cartridge.manufacturer ***REMOVED******REMOVED***</label>
-            </div>
-            <div class="col-sm">
-                 <label id="{{ cartridge.name ***REMOVED******REMOVED***">{{ cartridge.name ***REMOVED******REMOVED***</label>
-            </div>
-            <div class="col-sm">
-                <label id="{{ cartridge.count ***REMOVED******REMOVED***">{{ cartridge.count ***REMOVED******REMOVED***</label>
-            </div>
-        </div>
-***REMOVED***% endfor %***REMOVED***
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Наименование</th>
+            <th scope="col">Количество</th>
+            <th scope="col">Тип</th>
+        </tr>
+        </thead>
+        <tbody>
+    ***REMOVED***% for cartridge in cartridges %***REMOVED***
+            <tr>
+                <th scope="row">{{ cartridge.id ***REMOVED******REMOVED***</th>
+                <td><label id="{{ cartridge.manufacturer ***REMOVED******REMOVED***">{{ cartridge.manufacturer ***REMOVED******REMOVED***</label></td>
+                <td><label id="{{ cartridge.name ***REMOVED******REMOVED***">{{ cartridge.name ***REMOVED******REMOVED***</label></td>
+                <td><label id="{{ cartridge.count ***REMOVED******REMOVED***">{{ cartridge.count ***REMOVED******REMOVED***</label></td>
+            </tr>
+    ***REMOVED***% endfor %***REMOVED***
+        </tbody>
+    </table>
+</div>
+
+<div class="container pt-5">
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Наименование</th>
+            <th scope="col">Количество</th>
+            <th scope="col">Тип</th>
+        </tr>
+        </thead>
+        <tbody>
+    ***REMOVED***% for cartridge in cartridges %***REMOVED***
+            <tr>
+                <th scope="row">{{ cartridge.id ***REMOVED******REMOVED***</th>
+                <td><label id="{{ cartridge.manufacturer ***REMOVED******REMOVED***">{{ cartridge.manufacturer ***REMOVED******REMOVED***</label></td>
+                <td><label id="{{ cartridge.name ***REMOVED******REMOVED***">{{ cartridge.name ***REMOVED******REMOVED***</label></td>
+                <td><label id="{{ cartridge.count ***REMOVED******REMOVED***">{{ cartridge.count ***REMOVED******REMOVED***</label></td>
+            </tr>
+    ***REMOVED***% endfor %***REMOVED***
+        </tbody>
+    </table>
 </div>
 </body>
 
