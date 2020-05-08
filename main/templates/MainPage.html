@@ -45,9 +45,9 @@
         <thead class="thead-dark">
         <tr>
             <th scope="col">#</th>
+            <th scope="col">Производитель</th>
             <th scope="col">Наименование</th>
             <th scope="col">Количество</th>
-            <th scope="col">Тип</th>
         </tr>
         </thead>
         <tbody>
@@ -68,19 +68,31 @@
         <thead class="thead-dark">
         <tr>
             <th scope="col">#</th>
+            <th scope="col">Время</th>
             <th scope="col">Наименование</th>
             <th scope="col">Количество</th>
-            <th scope="col">Тип</th>
+            <th scope="col">Выдача</th>
         </tr>
         </thead>
         <tbody>
-    ***REMOVED***% for cartridge in cartridges %***REMOVED***
-            <tr>
-                <th scope="row">{{ cartridge.id ***REMOVED******REMOVED***</th>
-                <td><label id="{{ cartridge.manufacturer ***REMOVED******REMOVED***">{{ cartridge.manufacturer ***REMOVED******REMOVED***</label></td>
-                <td><label id="{{ cartridge.name ***REMOVED******REMOVED***">{{ cartridge.name ***REMOVED******REMOVED***</label></td>
-                <td><label id="{{ cartridge.count ***REMOVED******REMOVED***">{{ cartridge.count ***REMOVED******REMOVED***</label></td>
-            </tr>
+    ***REMOVED***% for suppl in supply %***REMOVED***
+        ***REMOVED***% if suppl.out %***REMOVED***
+                <tr class="alert-danger">
+                    <th scope="row">{{ suppl.id ***REMOVED******REMOVED***</th>
+                    <td><label id="{{ suppl.date ***REMOVED******REMOVED***">{{ suppl.date ***REMOVED******REMOVED***</label></td>
+                    <td><label id="{{ suppl.cartridge ***REMOVED******REMOVED***">{{ suppl.cartridge ***REMOVED******REMOVED***</label></td>
+                    <td><label id="{{ suppl.count ***REMOVED******REMOVED***">-{{ suppl.count ***REMOVED******REMOVED***</label></td>
+                    <td><label id="{{ suppl.out ***REMOVED******REMOVED***">{{ suppl.out ***REMOVED******REMOVED***</label></td>
+                </tr>
+        ***REMOVED***% else %***REMOVED***
+                <tr class="alert-success">
+                    <th scope="row">{{ suppl.id ***REMOVED******REMOVED***</th>
+                    <td><label id="{{ suppl.date ***REMOVED******REMOVED***">{{ suppl.date ***REMOVED******REMOVED***</label></td>
+                    <td><label id="{{ suppl.cartridge ***REMOVED******REMOVED***">{{ suppl.cartridge ***REMOVED******REMOVED***</label></td>
+                    <td><label id="{{ suppl.count ***REMOVED******REMOVED***">{{ suppl.count ***REMOVED******REMOVED***</label></td>
+                    <td><label id="{{ suppl.out ***REMOVED******REMOVED***">{{ suppl.out ***REMOVED******REMOVED***</label></td>
+                </tr>
+        ***REMOVED***% endif %***REMOVED***
     ***REMOVED***% endfor %***REMOVED***
         </tbody>
     </table>
