@@ -26,6 +26,7 @@ SECRET_KEY = 'p*_150-7s20=!j*ygnr*0w37d!ps1!c-+-4p)b+w^2&aob&niy'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    "127.0.0.1",
     "ps-bykrc.dellin.local"
 ]
 
@@ -34,6 +35,8 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     'main',
+    'api',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,6 +44,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
