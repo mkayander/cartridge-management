@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from api.serializers import CartridgeSerializer
+from main.models import Cartridge
+from rest_framework import viewsets
 
-# Create your views here.
+
+class CartridgeViewSet(viewsets.ModelViewSet):
+    queryset = Cartridge.objects.all()
+    serializer_class = CartridgeSerializer
