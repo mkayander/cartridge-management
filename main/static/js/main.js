@@ -1,9 +1,9 @@
 // const data_cartridges = django_data_cartridges;
 
 window.onload = function () {
-    const cartCount = document.getElementById('count');
-    const cartData = document.getElementById('data');
-    const select1 = document.getElementById('cartridges_select');
+    // const cartCount = document.getElementById('count');
+    // const cartData = document.getElementById('data');
+    // const select1 = document.getElementById('cartridges_select');
 
     // console.log(data_supply);
 
@@ -24,13 +24,59 @@ window.onload = function () {
     // };
 };
 
-function btnChange(id) {
-    $.getJSON('http://ps-bykrc.dellin.local/api/supplies/'+id, (data) => {
-        console.log(data);
-    });
-    console.log(id);
-    // document.getElementById("label" + data_supply[name]["count"]).style.display = "none";
-    // document.getElementById("input" + data_supply[name]["count"]).style.display = "block";
-    // document.getElementById("label" + data_supply[name]["cartridge"]).style.display = "none";
-    // document.getElementById("input" + data_supply[name]["cartridge"]).style.display = "block";
+function btnSupplyChangeOrCancel(id, isCancel) {
+    // let supplyLabelCart = document.getElementById("supplyLabelCart" + id);
+    // supplyLabelCart.style.display = "none";
+    // let supplyInputCart = document.getElementById("supplyInputCart" + id);
+    // supplyInputCart.style.display = "block";
+    let supplyLabelCount = document.getElementById("supplyLabelCount" + id);
+    supplyLabelCount.style.display = "none";
+    let supplyInputCount = document.getElementById("supplyInputCount" + id);
+    supplyInputCount.style.display = "block";
+    let btnSupplyChange = document.getElementById("btnSupplyChange" + id);
+    btnSupplyChange.style.display = "none";
+    let btnSupplySubmit = document.getElementById("btnSupplySubmit" + id);
+    btnSupplySubmit.style.display = "block";
+    let btnSupplyCancel = document.getElementById("btnSupplyCancel" + id);
+    btnSupplyCancel.style.display = "block";
+
+    if (isCancel) {
+        // supplyLabelCart.style.display = "block";
+        // supplyInputCart.style.display = "none";
+        supplyLabelCount.style.display = "block";
+        supplyInputCount.style.display = "none";
+        btnSupplyChange.style.display = "block";
+        btnSupplySubmit.style.display = "none";
+        btnSupplyCancel.style.display = "none";
+    }
 }
+
+function btnSupplySubmit(id, cartridge, out) {
+    const input = document.getElementById("supplyInputCount" + id).value;
+    $.getJSON('http://ps-bykrc.dellin.local/api/supplies/' + id, (data) => {
+        // console.log(data["count"]);
+        // console.log(input);
+        $.ajax({
+            type: 'PATCH',
+            url: 'http://ps-bykrc.dellin.local/api/supplies/' + id + "/",
+            data: {"count": input}
+        });
+    });
+    console.log(cartridge);
+    $.getJSON('http://ps-bykrc.dellin.local/api/cartridges/' + cartridge, (data) => {
+        // console.log(data["count"]);
+        // console.log(input);
+        console.log(out);
+        let rawData = data["count"];
+        // if ()
+        console.log(rawData);
+        $.ajax({
+            type: 'PATCH',
+            url: 'http://ps-bykrc.dellin.local/api/cartridges/' + cartridge + "/",
+            data: {"count": rawData},
+            // success: location.reload()
+        });
+    });
+    // location.reload();
+}
+

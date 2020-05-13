@@ -6,7 +6,8 @@
     {% load static %}
     <link rel="stylesheet" href="{% static "css/bootstrap.css" %}">
     <script src={% static "js/main.js" %}></script>
-{#    <script type="application/javascript" src={% static "js/JQuery.js" %}></script>#}
+    <script src={% static "js/Json2.js" %}></script>
+    {#    <script type="application/javascript" src={% static "js/JQuery.js" %}></script>#}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     {#    <script src="{% static "js/bootstrap.js" %}"></script>#}
 
@@ -68,21 +69,33 @@
             <td><label id="{{ suppl.date }}">{{ suppl.date }}</label></td>
             <td>
                 <div class="input-group">
-                    <label class="input-group-text" id="supplyLabel{{ suppl.cartridge }}">{{ suppl.cartridge }}</label>
-                    <input type="text" class="input-group-text col-3" placeholder="{{ suppl.cartridge }}"
-                           style="display: none;" id="supplyInput{{ suppl.cartridge }}">
+                    <label class="input-group-text" id="supplyLabelCart{{ suppl.id }}">{{ suppl.cartridge }}</label>
+                    {#                    <input type="text" class="input-group-text col-5" placeholder="{{ suppl.cartridge }}"#}
+                    {#                           style="display: none;" id="supplyInputCart{{ suppl.id }}">#}
                 </div>
             </td>
             <td>
                 <div class="input-group">
-                    <label class="input-group-text" id="supplyLabel{{ suppl.count }}">{{ suppl.count }}</label>
+                    <label class="input-group-text" id="supplyLabelCount{{ suppl.id }}">{{ suppl.count }}</label>
                     <input type="text" class="input-group-text col-2" placeholder="{{ suppl.count }}"
-                           style="display: none;" id="supplyInput{{ suppl.count }}">
+                           style="display: none;" id="supplyInputCount{{ suppl.id }}">
                 </div>
             </td>
             <td><label id="{{ suppl.out }}">{{ suppl.out }}</label></td>
             <td>
-                <button type="button" class="btn-sm btn-info" onclick="btnChange('{{ suppl.id }}');">Изменить</button>
+                <div class="btn-group" role="group">
+                    <button id="btnSupplyChange{{ suppl.id }}" type="button" class="btn-sm btn-info"
+                            onclick="btnSupplyChangeOrCancel('{{ suppl.id }}', false);">Изменить
+                    </button>
+                    <button id="btnSupplySubmit{{ suppl.id }}" type="button" style="display: none;"
+                            class="btn-sm btn-success"
+                            onclick="btnSupplySubmit('{{ suppl.id }}', '{{ suppl.cartridge.name }}', '{{ suppl.out }}');">Отправить
+                    </button>
+                    <button id="btnSupplyCancel{{ suppl.id }}" type="button" style="display: none;"
+                            class="btn-sm btn-danger"
+                            onclick="btnSupplyChangeOrCancel('{{ suppl.id }}', true);">Отмена
+                    </button>
+                </div>
             </td>
             </tr>
             {% endfor %}
