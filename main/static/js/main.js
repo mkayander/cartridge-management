@@ -52,31 +52,29 @@ function btnSupplyChangeOrCancel(id, isCancel) {
 ***REMOVED***
 
 function btnSupplySubmit(id, cartridge, out) {
-    const input = document.getElementById("supplyInputCount" + id).value;
+    const input = parseInt(document.getElementById("supplyInputCount" + id).value);
     $.getJSON('http://ps-bykrc.dellin.local/api/supplies/' + id, (data) => {
-        // console.log(data["count"***REMOVED***);
-        // console.log(input);
         $.ajax({
             type: 'PATCH',
             url: 'http://ps-bykrc.dellin.local/api/supplies/' + id + "/",
             data: {"count": input***REMOVED***
         ***REMOVED***);
     ***REMOVED***);
-    console.log(cartridge);
     $.getJSON('http://ps-bykrc.dellin.local/api/cartridges/' + cartridge, (data) => {
-        // console.log(data["count"***REMOVED***);
-        // console.log(input);
-        console.log(out);
-        let rawData = data["count"***REMOVED***;
-        // if ()
-        console.log(rawData);
+        let rawData = parseInt(data["count"***REMOVED***);
+        if (out === 'True'){
+            rawData -= input;
+        ***REMOVED*** else {
+            rawData += input;
+        ***REMOVED***
+        console.log(typeof rawData);
         $.ajax({
             type: 'PATCH',
             url: 'http://ps-bykrc.dellin.local/api/cartridges/' + cartridge + "/",
             data: {"count": rawData***REMOVED***,
-            // success: location.reload()
+            // success: location.reload() на время отладки
         ***REMOVED***);
     ***REMOVED***);
-    // location.reload();
 ***REMOVED***
+
 
