@@ -6,7 +6,8 @@
 ***REMOVED***% load static %***REMOVED***
     <link rel="stylesheet" href="{% static "css/bootstrap.css" %***REMOVED***">
     <script src={% static "js/main.js" %***REMOVED***></script>
-{#    <script type="application/javascript" src={% static "js/JQuery.js" %***REMOVED***></script>#***REMOVED***
+    <script src={% static "js/Json2.js" %***REMOVED***></script>
+***REMOVED***#    <script type="application/javascript" src={% static "js/JQuery.js" %***REMOVED***></script>#***REMOVED***
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 ***REMOVED***#    <script src="{% static "js/bootstrap.js" %***REMOVED***"></script>#***REMOVED***
 
@@ -68,21 +69,33 @@
             <td><label id="{{ suppl.date ***REMOVED******REMOVED***">{{ suppl.date ***REMOVED******REMOVED***</label></td>
             <td>
                 <div class="input-group">
-                    <label class="input-group-text" id="supplyLabel{{ suppl.cartridge ***REMOVED******REMOVED***">{{ suppl.cartridge ***REMOVED******REMOVED***</label>
-                    <input type="text" class="input-group-text col-3" placeholder="{{ suppl.cartridge ***REMOVED******REMOVED***"
-                           style="display: none;" id="supplyInput{{ suppl.cartridge ***REMOVED******REMOVED***">
+                    <label class="input-group-text" id="supplyLabelCart{{ suppl.id ***REMOVED******REMOVED***">{{ suppl.cartridge ***REMOVED******REMOVED***</label>
+                ***REMOVED***#                    <input type="text" class="input-group-text col-5" placeholder="{{ suppl.cartridge ***REMOVED******REMOVED***"#***REMOVED***
+                ***REMOVED***#                           style="display: none;" id="supplyInputCart{{ suppl.id ***REMOVED******REMOVED***">#***REMOVED***
                 </div>
             </td>
             <td>
                 <div class="input-group">
-                    <label class="input-group-text" id="supplyLabel{{ suppl.count ***REMOVED******REMOVED***">{{ suppl.count ***REMOVED******REMOVED***</label>
+                    <label class="input-group-text" id="supplyLabelCount{{ suppl.id ***REMOVED******REMOVED***">{{ suppl.count ***REMOVED******REMOVED***</label>
                     <input type="text" class="input-group-text col-2" placeholder="{{ suppl.count ***REMOVED******REMOVED***"
-                           style="display: none;" id="supplyInput{{ suppl.count ***REMOVED******REMOVED***">
+                           style="display: none;" id="supplyInputCount{{ suppl.id ***REMOVED******REMOVED***">
                 </div>
             </td>
             <td><label id="{{ suppl.out ***REMOVED******REMOVED***">{{ suppl.out ***REMOVED******REMOVED***</label></td>
             <td>
-                <button type="button" class="btn-sm btn-info" onclick="btnChange('{{ suppl.id ***REMOVED******REMOVED***');">Изменить</button>
+                <div class="btn-group" role="group">
+                    <button id="btnSupplyChange{{ suppl.id ***REMOVED******REMOVED***" type="button" class="btn-sm btn-info"
+                            onclick="btnSupplyChangeOrCancel('{{ suppl.id ***REMOVED******REMOVED***', false);">Изменить
+                    </button>
+                    <button id="btnSupplySubmit{{ suppl.id ***REMOVED******REMOVED***" type="button" style="display: none;"
+                            class="btn-sm btn-success"
+                            onclick="btnSupplySubmit('{{ suppl.id ***REMOVED******REMOVED***', '{{ suppl.cartridge.name ***REMOVED******REMOVED***', '{{ suppl.out ***REMOVED******REMOVED***');">Отправить
+                    </button>
+                    <button id="btnSupplyCancel{{ suppl.id ***REMOVED******REMOVED***" type="button" style="display: none;"
+                            class="btn-sm btn-danger"
+                            onclick="btnSupplyChangeOrCancel('{{ suppl.id ***REMOVED******REMOVED***', true);">Отмена
+                    </button>
+                </div>
             </td>
             </tr>
         ***REMOVED***% endfor %***REMOVED***

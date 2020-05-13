@@ -1,0 +1,71 @@
+{
+    "Cartridge": [
+    ***REMOVED***
+            "count": 20,
+            "manufacturer": "HP",
+            "name": "26X"
+        ***REMOVED***,
+    ***REMOVED***
+            "count": 4,
+            "manufacturer": "HP",
+            "name": "78A"
+        ***REMOVED***,
+    ***REMOVED***
+            "count": 4,
+            "manufacturer": "HP",
+            "name": "83X"
+        ***REMOVED***,
+    ***REMOVED***
+            "count": 2,
+            "manufacturer": "HP",
+            "name": "85A"
+        ***REMOVED***,
+    ***REMOVED***
+            "count": 5,
+            "manufacturer": "HP",
+            "name": "81A"
+        ***REMOVED***
+    ***REMOVED***,
+    "Supply": [
+    ***REMOVED***
+            "cartridge_id": "26X",
+            "comment": "",
+            "count": 10,
+            "date": "2020-05-13T12:53:07.627Z",
+            "id": 1,
+            "out": true
+        ***REMOVED***,
+    ***REMOVED***
+            "cartridge_id": "26X",
+            "comment": "",
+            "count": 1,
+            "date": "2020-05-13T08:03:11.140Z",
+            "id": 2,
+            "out": true
+        ***REMOVED***,
+    ***REMOVED***
+            "cartridge_id": "26X",
+            "comment": "",
+            "count": 1,
+            "date": "2020-05-13T08:03:16.897Z",
+            "id": 3,
+            "out": false
+        ***REMOVED***,
+    ***REMOVED***
+            "cartridge_id": "78A",
+            "comment": "",
+            "count": 2,
+            "date": "2020-05-13T08:03:22.045Z",
+            "id": 4,
+            "out": true
+        ***REMOVED***,
+    ***REMOVED***
+            "cartridge_id": "78A",
+            "comment": "",
+            "count": 5,
+            "date": "2020-05-13T12:53:37.127Z",
+            "id": 5,
+            "out": false
+        ***REMOVED***
+    ***REMOVED***
+***REMOVED***
