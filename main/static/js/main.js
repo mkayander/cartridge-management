@@ -1,35 +1,36 @@
+// const data_cartridges = django_data_cartridges;
+
 window.onload = function () {
     const cartCount = document.getElementById('count');
     const cartData = document.getElementById('data');
     const select1 = document.getElementById('cartridges_select');
 
-    const data = django_data;
-    // console.log(data);
+    // console.log(data_supply);
+
+    // console.log(Object.keys(data_cartridges).length);
+
     // console.log(cartCount, cartData, select1);
 
+    // function setupView() {
+    //     const cartridge = data_cartridges[select1.value***REMOVED***;
+    //     cartCount.innerText = data_cartridges[select1.value***REMOVED***["count"***REMOVED***;
+    //     cartData.innerText = data_cartridges[select1.value***REMOVED***["manufacturer"***REMOVED***;
+    // ***REMOVED***
 
-    for (let de in data) {
-        console.log(de);
-        var btnCardCount = document.getElementById("btnCardCount" + de["count"***REMOVED***);
-        console.log(btnCardCount);
-    ***REMOVED***
-
-    btnCardCount.onclick = function () {
-        let spanChange = document.getElementById("span" + data["count"***REMOVED***);
-        console.log(data["count"***REMOVED***);
-        console.log(spanChange);
-        spanChange.style.display = "none";
-    ***REMOVED***;
-
-    function setupView() {
-        const cartridge = data[select1.value***REMOVED***;
-        cartCount.innerText = data[select1.value***REMOVED***["count"***REMOVED***;
-        cartData.innerText = data[select1.value***REMOVED***["manufacturer"***REMOVED***;
-    ***REMOVED***
-
-    setupView();
-
-    select1.onchange = function () {
-        setupView()
-    ***REMOVED***;
+    // setupView();
+    //
+    // select1.onchange = function () {
+    //     setupView()
+    // ***REMOVED***;
 ***REMOVED***;
+
+function btnChange(id) {
+    $.getJSON('http://ps-bykrc.dellin.local/api/supplies/'+id, (data) => {
+        console.log(data);
+    ***REMOVED***);
+    console.log(id);
+    // document.getElementById("label" + data_supply[name***REMOVED***["count"***REMOVED***).style.display = "none";
+    // document.getElementById("input" + data_supply[name***REMOVED***["count"***REMOVED***).style.display = "block";
+    // document.getElementById("label" + data_supply[name***REMOVED***["cartridge"***REMOVED***).style.display = "none";
+    // document.getElementById("input" + data_supply[name***REMOVED***["cartridge"***REMOVED***).style.display = "block";
+***REMOVED***
