@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
 
-    <script type="text/javascript">
-        var django_data = {{ cartridges_json|safe }};
-    </script>
-
     {% load static %}
     <link rel="stylesheet" href="{% static "css/bootstrap.css" %}">
     <script src={% static "js/main.js" %}></script>
+{#    <script type="application/javascript" src={% static "js/JQuery.js" %}></script>#}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     {#    <script src="{% static "js/bootstrap.js" %}"></script>#}
 
     <title>Title</title>
@@ -23,23 +21,6 @@
 </header>
 
 <body>
-{#<div class="container pt-5">#}
-{#    <div class="row">#}
-{#        <div class="col-sm">#}
-{#            <select class="custom-select" id="cartridges_select">#}
-{#                {% for cartridge in cartridges %}#}
-{#                    <option value="{{ cartridge.id }}">{{ cartridge.name }}</option>#}
-{#                {% endfor %}#}
-{#            </select>#}
-{#        </div>#}
-{#        <div class="col-sm">#}
-{#            <label id="count">count</label>#}
-{#        </div>#}
-{#        <div class="col-sm">#}
-{#            <label id="data">data</label>#}
-{#        </div>#}
-{#    </div>#}
-{#</div>#}
 <div class="container-xl pt-5">
     <div class="row">
         <table class="table col-xl mx-3">
@@ -57,23 +38,7 @@
                     {#                <th scope="row">{{ cartridge.id }}</th>#}
                     <td><label id="{{ cartridge.manufacturer }}">{{ cartridge.manufacturer }}</label></td>
                     <td><label id="{{ cartridge.name }}">{{ cartridge.name }}</label></td>
-                    <td>
-                        <div class="input-group input-group-sm mb-3">
-                            <div class="input-group-prepend">
-                                        <span class="input-group-text"
-                                              id="span{{ cartridge.count }}">{{ cartridge.count }}</span>
-                            </div>
-                            <input type="text" class="" style="width:30px; display: none;"
-                                   placeholder="{{ cartridge.count }}" aria-label="Sizing example input"
-                                   aria-describedby="inputGroup-sizing-sm">
-                            <div class="input-group-append">
-                                <button id="btnCardCount{{ cartridge.count }}"
-                                        class="btn btn-outline-secondary"
-                                        type="button">Change
-                                </button>
-                            </div>
-                        </div>
-                    </td>
+                    <td><label id="{{ cartridge.name }}{{ cartridge.count }}">{{ cartridge.count }}</label></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -86,27 +51,40 @@
                 <th scope="col">Наименование</th>
                 <th scope="col">Количество</th>
                 <th scope="col">Выдача</th>
+                <th scope="col">
+                    <button type="button" class="btn-sm btn-success" onclick="">Добавить</button>
+                </th>
             </tr>
             </thead>
             <tbody>
             {% for suppl in supply %}
                 {% if suppl.out %}
                     <tr class="alert-danger">
-                        <th scope="row">{{ suppl.id }}</th>
-                        <td><label id="{{ suppl.date }}">{{ suppl.date }}</label></td>
-                        <td><label id="{{ suppl.cartridge }}">{{ suppl.cartridge }}</label></td>
-                        <td><label id="{{ suppl.count }}">-{{ suppl.count }}</label></td>
-                        <td><label id="{{ suppl.out }}">{{ suppl.out }}</label></td>
-                    </tr>
-                {% else %}
+                        {% else %}
                     <tr class="alert-success">
-                        <th scope="row">{{ suppl.id }}</th>
-                        <td><label id="{{ suppl.date }}">{{ suppl.date }}</label></td>
-                        <td><label id="{{ suppl.cartridge }}">{{ suppl.cartridge }}</label></td>
-                        <td><label id="{{ suppl.count }}">{{ suppl.count }}</label></td>
-                        <td><label id="{{ suppl.out }}">{{ suppl.out }}</label></td>
-                    </tr>
                 {% endif %}
+
+            <th scope="row">{{ suppl.id }}</th>
+            <td><label id="{{ suppl.date }}">{{ suppl.date }}</label></td>
+            <td>
+                <div class="input-group">
+                    <label class="input-group-text" id="supplyLabel{{ suppl.cartridge }}">{{ suppl.cartridge }}</label>
+                    <input type="text" class="input-group-text col-3" placeholder="{{ suppl.cartridge }}"
+                           style="display: none;" id="supplyInput{{ suppl.cartridge }}">
+                </div>
+            </td>
+            <td>
+                <div class="input-group">
+                    <label class="input-group-text" id="supplyLabel{{ suppl.count }}">{{ suppl.count }}</label>
+                    <input type="text" class="input-group-text col-2" placeholder="{{ suppl.count }}"
+                           style="display: none;" id="supplyInput{{ suppl.count }}">
+                </div>
+            </td>
+            <td><label id="{{ suppl.out }}">{{ suppl.out }}</label></td>
+            <td>
+                <button type="button" class="btn-sm btn-info" onclick="btnChange('{{ suppl.id }}');">Изменить</button>
+            </td>
+            </tr>
             {% endfor %}
             </tbody>
         </table>
