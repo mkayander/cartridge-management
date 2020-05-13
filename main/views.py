@@ -9,7 +9,7 @@ def view(request):
     supply = Supply.objects.all().order_by("-date")
     data = {}
     for obj in Cartridge.objects.all().values():
-        data[obj["id"]] = obj
+        data[obj["name"]] = obj
     cartridges_json = simplejson.dumps(data)
     return render(request, "MainPage.html", {
         "cartridges": cartridges,

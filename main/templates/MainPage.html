@@ -40,62 +40,77 @@
 {#        </div>#}
 {#    </div>#}
 {#</div>#}
-<div class="container pt-5">
-    <table class="table">
-        <thead class="thead-dark">
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">Производитель</th>
-            <th scope="col">Наименование</th>
-            <th scope="col">Количество</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for cartridge in cartridges %}
+<div class="container-xl pt-5">
+    <div class="row">
+        <table class="table col-xl mx-3">
+            <thead class="thead-dark">
             <tr>
-                <th scope="row">{{ cartridge.id }}</th>
-                <td><label id="{{ cartridge.manufacturer }}">{{ cartridge.manufacturer }}</label></td>
-                <td><label id="{{ cartridge.name }}">{{ cartridge.name }}</label></td>
-                <td><label id="{{ cartridge.count }}">{{ cartridge.count }}</label></td>
+                {#            <th scope="col">#</th>#}
+                <th scope="col">Производитель</th>
+                <th scope="col">Наименование</th>
+                <th scope="col">Количество</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<div class="container pt-5">
-    <table class="table">
-        <thead class="thead-dark">
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">Время</th>
-            <th scope="col">Наименование</th>
-            <th scope="col">Количество</th>
-            <th scope="col">Выдача</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for suppl in supply %}
-            {% if suppl.out %}
-                <tr class="alert-danger">
-                    <th scope="row">{{ suppl.id }}</th>
-                    <td><label id="{{ suppl.date }}">{{ suppl.date }}</label></td>
-                    <td><label id="{{ suppl.cartridge }}">{{ suppl.cartridge }}</label></td>
-                    <td><label id="{{ suppl.count }}">-{{ suppl.count }}</label></td>
-                    <td><label id="{{ suppl.out }}">{{ suppl.out }}</label></td>
+            </thead>
+            <tbody>
+            {% for cartridge in cartridges %}
+                <tr>
+                    {#                <th scope="row">{{ cartridge.id }}</th>#}
+                    <td><label id="{{ cartridge.manufacturer }}">{{ cartridge.manufacturer }}</label></td>
+                    <td><label id="{{ cartridge.name }}">{{ cartridge.name }}</label></td>
+                    <td>
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                        <span class="input-group-text"
+                                              id="span{{ cartridge.count }}">{{ cartridge.count }}</span>
+                            </div>
+                            <input type="text" class="" style="width:30px; display: none;"
+                                   placeholder="{{ cartridge.count }}" aria-label="Sizing example input"
+                                   aria-describedby="inputGroup-sizing-sm">
+                            <div class="input-group-append">
+                                <button id="btnCardCount{{ cartridge.count }}"
+                                        class="btn btn-outline-secondary"
+                                        type="button">Change
+                                </button>
+                            </div>
+                        </div>
+                    </td>
                 </tr>
-            {% else %}
-                <tr class="alert-success">
-                    <th scope="row">{{ suppl.id }}</th>
-                    <td><label id="{{ suppl.date }}">{{ suppl.date }}</label></td>
-                    <td><label id="{{ suppl.cartridge }}">{{ suppl.cartridge }}</label></td>
-                    <td><label id="{{ suppl.count }}">{{ suppl.count }}</label></td>
-                    <td><label id="{{ suppl.out }}">{{ suppl.out }}</label></td>
-                </tr>
-            {% endif %}
-        {% endfor %}
-        </tbody>
-    </table>
+            {% endfor %}
+            </tbody>
+        </table>
+        <table class="table col-xl mx-3">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Время</th>
+                <th scope="col">Наименование</th>
+                <th scope="col">Количество</th>
+                <th scope="col">Выдача</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for suppl in supply %}
+                {% if suppl.out %}
+                    <tr class="alert-danger">
+                        <th scope="row">{{ suppl.id }}</th>
+                        <td><label id="{{ suppl.date }}">{{ suppl.date }}</label></td>
+                        <td><label id="{{ suppl.cartridge }}">{{ suppl.cartridge }}</label></td>
+                        <td><label id="{{ suppl.count }}">-{{ suppl.count }}</label></td>
+                        <td><label id="{{ suppl.out }}">{{ suppl.out }}</label></td>
+                    </tr>
+                {% else %}
+                    <tr class="alert-success">
+                        <th scope="row">{{ suppl.id }}</th>
+                        <td><label id="{{ suppl.date }}">{{ suppl.date }}</label></td>
+                        <td><label id="{{ suppl.cartridge }}">{{ suppl.cartridge }}</label></td>
+                        <td><label id="{{ suppl.count }}">{{ suppl.count }}</label></td>
+                        <td><label id="{{ suppl.out }}">{{ suppl.out }}</label></td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 </body>
 

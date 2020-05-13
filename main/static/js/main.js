@@ -4,8 +4,22 @@ window.onload = function () {
     const select1 = document.getElementById('cartridges_select');
 
     const data = django_data;
-    console.log(data);
+    // console.log(data);
     // console.log(cartCount, cartData, select1);
+
+
+    for (let de in data) {
+        console.log(de);
+        var btnCardCount = document.getElementById("btnCardCount" + de["count"]);
+        console.log(btnCardCount);
+    }
+
+    btnCardCount.onclick = function () {
+        let spanChange = document.getElementById("span" + data["count"]);
+        console.log(data["count"]);
+        console.log(spanChange);
+        spanChange.style.display = "none";
+    };
 
     function setupView() {
         const cartridge = data[select1.value];
