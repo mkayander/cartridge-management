@@ -3,19 +3,23 @@ from main import choices
 
 
 class Cartridge(models.Model):
-    manufacturer = models.CharField(max_length=30, choices=choices.MANUFACTURER_CHOICES, default="HP")
-    name = models.CharField(max_length=30)
-    count = models.PositiveIntegerField()
+    manufacturer = models.CharField(max_length=30, choices=choices.MANUFACTURER_CHOICES, default="HP",
+                                    verbose_name="Производитель")
+    name = models.CharField(max_length=30, unique=True, primary_key=True, verbose_name="Название картриджа",
+                            help_text="Наименование картриджа должно быть уникальным",
+                            db_column="cartridge_name")
+    count = models.PositiveIntegerField(verbose_name="Количество")
 
     def __str__(self):
-        return self.name
+        return f'{self.manufacturer***REMOVED*** {self.name***REMOVED***'
 
 
 class Supply(models.Model):
-    out = models.BooleanField(default=True)
-    cartridge = models.ForeignKey(Cartridge, related_name="supplies", on_delete=models.CASCADE)
+    out = models.BooleanField(choices=choices.SUPPLY_TYPE_BOOLEAN, default=True, verbose_name="Тип передвижения")
+    cartridge = models.ForeignKey(Cartridge, related_name="supplies", on_delete=models.CASCADE,
+                                  verbose_name="Тип картриджа")
     date = models.DateTimeField(auto_now=True)
-    count = models.PositiveIntegerField()
+    count = models.PositiveIntegerField(verbose_name="Количество")
 
     def __str__(self):
         return str(self.date)

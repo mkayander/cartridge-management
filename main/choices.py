@@ -3,3 +3,8 @@ MANUFACTURER_CHOICES = (
     ("Kyocera", "Kyocera"),
     ("Samsung", "Samsung")
 )
+
+SUPPLY_TYPE_BOOLEAN = (
+    (True, "Выдача"),
+    (False, "Поступление")
+)
