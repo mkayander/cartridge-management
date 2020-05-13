@@ -25,7 +25,10 @@ def view(request):
 
     return render(request, "MainPage.html", {
         "cartridges": cartridges,
-        "cartridges_json": cartridges_json,
-        "supply_json": supply_json,
         "supply": supply
     })
+
+
+def newSupplyView(request):
+    supply = Supply.objects.all().order_by("-date")
+    return render(request, "NewSupply.html", {"supply": supply})

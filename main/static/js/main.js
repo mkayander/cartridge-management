@@ -52,31 +52,29 @@ function btnSupplyChangeOrCancel(id, isCancel) {
 }
 
 function btnSupplySubmit(id, cartridge, out) {
-    const input = document.getElementById("supplyInputCount" + id).value;
+    const input = parseInt(document.getElementById("supplyInputCount" + id).value);
     $.getJSON('http://ps-bykrc.dellin.local/api/supplies/' + id, (data) => {
-        // console.log(data["count"]);
-        // console.log(input);
         $.ajax({
             type: 'PATCH',
             url: 'http://ps-bykrc.dellin.local/api/supplies/' + id + "/",
             data: {"count": input}
         });
     });
-    console.log(cartridge);
     $.getJSON('http://ps-bykrc.dellin.local/api/cartridges/' + cartridge, (data) => {
-        // console.log(data["count"]);
-        // console.log(input);
-        console.log(out);
-        let rawData = data["count"];
-        // if ()
-        console.log(rawData);
+        let rawData = parseInt(data["count"]);
+        if (out === 'True'){
+            rawData -= input;
+        } else {
+            rawData += input;
+        }
+        console.log(typeof rawData);
         $.ajax({
             type: 'PATCH',
             url: 'http://ps-bykrc.dellin.local/api/cartridges/' + cartridge + "/",
             data: {"count": rawData},
-            // success: location.reload()
+            // success: location.reload() на время отладки
         });
     });
-    // location.reload();
 }
+
 
