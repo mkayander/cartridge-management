@@ -20,7 +20,7 @@ class Supply(models.Model):
                                   verbose_name="Тип картриджа")
     date = models.DateTimeField(auto_now=True)
     count = models.PositiveIntegerField(verbose_name="Количество")
-    comment = models.CharField(max_length=150, verbose_name="Комментарий", blank=True)
+    comment = models.TextField(max_length=200, verbose_name="Комментарий", blank=True)
 
     def __str__(self):
         return str(self.date)

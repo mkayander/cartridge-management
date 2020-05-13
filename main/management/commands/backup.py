@@ -22,3 +22,17 @@ class Command(BaseCommand):
             with open("db.json", 'w+') as outfile:
                 json.dump(db, outfile, sort_keys=True, indent=4, cls=DjangoJSONEncoder)
             self.stdout.write(self.style.SUCCESS("Successfully backed up database to db.json"))
+
+        elif "restore" in options["action"***REMOVED***:
+            with open("db.json", 'r') as file:
+                saved_data = json.load(file)
+                for key, values in saved_data.items():
+                    model = globals()[key***REMOVED***
+                    for obj in values:
+                        try:
+                            db_entry = model.objects.get(**obj)
+                        except model.DoesNotExist:
+                            print(f'Restoring -- {obj***REMOVED***')
+                            model.objects.get_or_create(**obj)
+
+                self.stdout.write(self.style.SUCCESS("Successfully restored database from db.json"))
