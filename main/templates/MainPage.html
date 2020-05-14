@@ -1,14 +1,11 @@
-{% extends "BasicPage.html" %***REMOVED***
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-***REMOVED***% block title %***REMOVED***
-        <title>Cartridges</title>
-***REMOVED***% endblock %***REMOVED***
-</head>
+{% extends "Base.html" %***REMOVED***
+
+{% block title %***REMOVED***
+    My title
+{% endblock %***REMOVED***
 
 {% block header %***REMOVED***
+    My header
 {% endblock %***REMOVED***
 
 {% block content %***REMOVED***
@@ -43,7 +40,7 @@
                 <th scope="col">Количество</th>
                 <th scope="col">Выдача</th>
                 <th scope="col">
-                    <a href="{% url 'new_supply' %***REMOVED***" class="btn-sm btn-success" onclick="">Добавить</a>
+                    <a href="{% url 'new_supply' %***REMOVED***" class="btn btn-sm btn-outline-success" onclick="">Добавить</a>
                 </th>
             </tr>
             </thead>
@@ -73,15 +70,15 @@
             <td><label id="{{ suppl.out ***REMOVED******REMOVED***">{{ suppl.out ***REMOVED******REMOVED***</label></td>
             <td>
                 <div class="btn-group" role="group">
-                    <button id="btnSupplyChange{{ suppl.id ***REMOVED******REMOVED***" type="button" class="btn-sm btn-info"
+                    <button id="btnSupplyChange{{ suppl.id ***REMOVED******REMOVED***" type="button" class="btn btn-sm btn-outline-info"
                             onclick="btnSupplyChangeOrCancel('{{ suppl.id ***REMOVED******REMOVED***', false);">Изменить
                     </button>
                     <button id="btnSupplySubmit{{ suppl.id ***REMOVED******REMOVED***" type="button" style="display: none;"
-                            class="btn-sm btn-success"
+                            class="btn btn-sm btn-success"
                             onclick="btnSupplySubmit('{{ suppl.id ***REMOVED******REMOVED***', '{{ suppl.cartridge.name ***REMOVED******REMOVED***', '{{ suppl.out ***REMOVED******REMOVED***');">Отправить
                     </button>
                     <button id="btnSupplyCancel{{ suppl.id ***REMOVED******REMOVED***" type="button" style="display: none;"
-                            class="btn-sm btn-danger"
+                            class="btn btn-sm btn-outline-danger"
                             onclick="btnSupplyChangeOrCancel('{{ suppl.id ***REMOVED******REMOVED***', true);">Отмена
                     </button>
                 </div>
@@ -95,4 +92,3 @@
 </body>
 
 {% endblock %***REMOVED***
-</html>
