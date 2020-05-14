@@ -2,6 +2,7 @@ import simplejson as simplejson
 from django.shortcuts import render
 
 from api.serializers import SupplySerializer
+from main.forms import SupplyForm
 
 from main.models import Cartridge, Supply
 
@@ -31,4 +32,5 @@ def view(request):
 
 def newSupplyView(request):
     supply = Supply.objects.all().order_by("-date")
-    return render(request, "NewSupply.html", {"supply": supply})
+    formSupply = SupplyForm(request)
+    return render(request, "NewSupply.html", {"supply": supply, "formSupply": formSupply})
