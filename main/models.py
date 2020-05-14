@@ -25,12 +25,27 @@ class Supply(models.Model):
     def __str__(self):
         return str(self.date)
 
+    def update_cartridge_count(self, value):
+        print(f"Updating cartridge count: {value} ; {self.out=}")
+        if value is not 0 and not None:
+            if self.out:
+                self.cartridge.count -= value
+            else:
+                self.cartridge.count += value
+
+            self.cartridge.save()
+
     def save(self, *args, **kwargs):
         if self.pk is None:
-            if self.out:
-                self.cartridge.count -= self.count
-                self.cartridge.save()
-            else:
-                self.cartridge.count += self.count
-                self.cartridge.save()
+            # If supply is new
+            self.update_cartridge_count(self.count)
+        else:
+            # If supply exists and got updated
+            prev_count = Supply.objects.get(pk=self.pk).count
+            difference = self.count - prev_count
+            self.update_cartridge_count(difference)
         super().save(*args, **kwargs)
+
+    def delete(self, using=None, keep_parents=False):
+        self.update_cartridge_count(self.count * -1)
+        return super().delete(using, keep_parents)

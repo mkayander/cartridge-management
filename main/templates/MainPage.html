@@ -1,5 +1,7 @@
 {% extends "Base.html" %}
 
+{% load crispy_forms_filters %}
+
 {% block title %}
     My title
 {% endblock %}
@@ -9,86 +11,132 @@
 {% endblock %}
 
 {% block content %}
-<body>
-<div class="container-xl pt-5">
-    <div class="row">
-        <table class="table col-xl mx-3">
-            <thead class="thead-dark">
-            <tr>
-                {#            <th scope="col">#</th>#}
-                <th scope="col">Производитель</th>
-                <th scope="col">Наименование</th>
-                <th scope="col">Количество</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for cartridge in cartridges %}
-                <tr>
-                    {#                <th scope="row">{{ cartridge.id }}</th>#}
-                    <td><label id="{{ cartridge.manufacturer }}">{{ cartridge.manufacturer }}</label></td>
-                    <td><label id="{{ cartridge.name }}">{{ cartridge.name }}</label></td>
-                    <td><label id="{{ cartridge.name }}{{ cartridge.count }}">{{ cartridge.count }}</label></td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        <table class="table col-xl mx-3">
-            <thead class="thead-dark">
-            <tr>
-                <th scope="col">Время</th>
-                <th scope="col">Наименование</th>
-                <th scope="col">Количество</th>
-                <th scope="col">Выдача</th>
-                <th scope="col">
-                    <a href="{% url 'new_supply' %}" class="btn btn-sm btn-outline-success" onclick="">Добавить</a>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for suppl in supply %}
-                {% if suppl.out %}
-                    <tr class="alert-danger">
-                        {% else %}
-                    <tr class="alert-success">
-                {% endif %}
+    <body>
+    <div class="container-xl pt-5">
+        <div class="row">
+            <div class="col-xl">
+                <table class="table table-striped mx-3">
+                    <thead class="thead-dark">
+                    <tr>
+                        {#            <th scope="col">#</th>#}
+                        <th scope="col">Производитель</th>
+                        <th scope="col">Наименование</th>
+                        <th scope="col">Количество</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for cartridge in cartridges %}
+                        <tr>
+                            {#                <th scope="row">{{ cartridge.id }}</th>#}
+                            <td><label id="{{ cartridge.manufacturer }}">{{ cartridge.manufacturer }}</label></td>
+                            <td><label id="{{ cartridge.name }}">{{ cartridge.name }}</label></td>
+                            <td><label id="{{ cartridge.name }}{{ cartridge.count }}">{{ cartridge.count }}</label></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-xl">
+                <table class="table mx-3">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Время</th>
+                        <th scope="col">Наименование</th>
+                        <th scope="col">Количество</th>
+                        <th scope="col">Черкаши</th>
+                        <th scope="col">
+                            <button id="popup" class="btn btn-sm btn-outline-success" style="width: 8rem;">Добавить
+                            </button>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for suppl in supply %}
+                        {% if suppl.out %}
+                            <tr class="table-danger">
+                                {% else %}
+                            <tr class="table-success">
+                        {% endif %}
 
-            <td><label id="{{ suppl.date }}">{{ suppl.date }}</label></td>
-            <td>
-                <div class="input-group">
-                    <label class="input-group-text col-12" id="supplyLabelCart{{ suppl.id }}">{{ suppl.cartridge }}</label>
-                    {#                    <input type="text" class="input-group-text col-5" placeholder="{{ suppl.cartridge }}"#}
-                    {#                           style="display: none;" id="supplyInputCart{{ suppl.id }}">#}
-                </div>
-            </td>
-            <td>
-                <div class="input-group">
-                    <label class="input-group-text" id="supplyLabelCount{{ suppl.id }}">{{ suppl.count }}</label>
-                    <input type="text" class="input-group-text col-2" placeholder="{{ suppl.count }}"
-                           style="display: none;" id="supplyInputCount{{ suppl.id }}">
-                </div>
-            </td>
-            <td><label id="{{ suppl.out }}">{{ suppl.out }}</label></td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button id="btnSupplyChange{{ suppl.id }}" type="button" class="btn btn-sm btn-outline-info"
-                            onclick="btnSupplyChangeOrCancel('{{ suppl.id }}', false);">Изменить
-                    </button>
-                    <button id="btnSupplySubmit{{ suppl.id }}" type="button" style="display: none;"
-                            class="btn btn-sm btn-success"
-                            onclick="btnSupplySubmit('{{ suppl.id }}', '{{ suppl.cartridge.name }}', '{{ suppl.out }}');">Отправить
-                    </button>
-                    <button id="btnSupplyCancel{{ suppl.id }}" type="button" style="display: none;"
-                            class="btn btn-sm btn-outline-danger"
-                            onclick="btnSupplyChangeOrCancel('{{ suppl.id }}', true);">Отмена
-                    </button>
-                </div>
-            </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                    <td><label id="{{ suppl.date }}">{{ suppl.date }}</label></td>
+                    <td>
+                        <div class="input-group">
+                            <label class="col-12"
+                                   id="supplyLabelCart{{ suppl.id }}">{{ suppl.cartridge }}</label>
+                            <select class="form-control" id="supplySelectCart{{ suppl.id }}" style="display: none;"></select>
+                            {#                    <input type="text" class="input-group-text col-5" placeholder="{{ suppl.cartridge }}"#}
+                            {#                           style="display: none;" id="supplyInputCart{{ suppl.id }}">#}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <label class=""
+                                   id="supplyLabelCount{{ suppl.id }}">{{ suppl.count }}</label>
+                            <input type="text" class="input-group-text"  value="{{ suppl.count }}"
+                                   style="display: none; width: 3rem" id="supplyInputCount{{ suppl.id }}">
+                        </div>
+                    </td>
+                    <td><label id="{{ suppl.comment }}">{{ suppl.comment }}</label></td>
+                    <td>
+                        <div class="btn-group-vertical" role="group">
+                            <button id="btnSupplyChange{{ suppl.id }}" style="width: 8rem" type="button"
+                                    class="btn btn-sm btn-outline-info" value="true"
+                                    onclick="btnSupplyChangeOrSubmit('{{ suppl.id }}')">Изменить
+                            </button>
+                            <button id="btnSupplyDelete{{ suppl.id }}" style="width: 8rem" type="button"
+                                    class="btn btn-sm btn-outline-danger" value="true"
+                                    onclick="btnSupplyDeleteOrCancel('{{ suppl.id }}')">Удалить
+                            </button>
+                        </div>
+                    </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
-</body>
+    {#          popup1        #}
+    <div class="modal fade" id="modalPopup" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content p-5">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    {#        {% crispy form form.helper %}#}
+                    <button class="btn btn-outline-primary" type="submit">
+                        <span>Отправить</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-default" data-dismiss="modal">
+                        <span>Закрыть</span>
+                    </button>
+                </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!-- ============= info popup ============= -->
+
+    {#          popup on Delete        #}
+    <div class="modal fade" id="modalOnDelete" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content p-5 btn-toolbar">
+                <h2>Подтверди удаление!</h2>
+                <h2>Будь мужиком!</h2>
+                <div class="btn-group">
+                    <button id="btnConfirmDelete" class="btn btn-outline-danger" type="button"
+                            style="width: 10rem; height:8rem;">
+                        <span>Подтвердить</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-success" data-dismiss="modal"
+                            style="width: 10rem; height:8rem;">
+                        <span>Отмена</span>
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!-- ============= info popup ============= -->
+
+    </body>
 
 {% endblock %}
