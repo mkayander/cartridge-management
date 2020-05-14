@@ -1,5 +1,7 @@
 {% extends "Base.html" %***REMOVED***
 
+{% load crispy_forms_filters %***REMOVED***
+
 {% block title %***REMOVED***
     My title
 {% endblock %***REMOVED***
@@ -9,86 +11,132 @@
 {% endblock %***REMOVED***
 
 {% block content %***REMOVED***
-<body>
-<div class="container-xl pt-5">
-    <div class="row">
-        <table class="table col-xl mx-3">
-            <thead class="thead-dark">
-            <tr>
-            ***REMOVED***#            <th scope="col">#</th>#***REMOVED***
-                <th scope="col">Производитель</th>
-                <th scope="col">Наименование</th>
-                <th scope="col">Количество</th>
-            </tr>
-            </thead>
-            <tbody>
-        ***REMOVED***% for cartridge in cartridges %***REMOVED***
-                <tr>
-                ***REMOVED***#                <th scope="row">{{ cartridge.id ***REMOVED******REMOVED***</th>#***REMOVED***
-                    <td><label id="{{ cartridge.manufacturer ***REMOVED******REMOVED***">{{ cartridge.manufacturer ***REMOVED******REMOVED***</label></td>
-                    <td><label id="{{ cartridge.name ***REMOVED******REMOVED***">{{ cartridge.name ***REMOVED******REMOVED***</label></td>
-                    <td><label id="{{ cartridge.name ***REMOVED******REMOVED***{{ cartridge.count ***REMOVED******REMOVED***">{{ cartridge.count ***REMOVED******REMOVED***</label></td>
-                </tr>
-        ***REMOVED***% endfor %***REMOVED***
-            </tbody>
-        </table>
-        <table class="table col-xl mx-3">
-            <thead class="thead-dark">
-            <tr>
-                <th scope="col">Время</th>
-                <th scope="col">Наименование</th>
-                <th scope="col">Количество</th>
-                <th scope="col">Выдача</th>
-                <th scope="col">
-                    <a href="{% url 'new_supply' %***REMOVED***" class="btn btn-sm btn-outline-success" onclick="">Добавить</a>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-        ***REMOVED***% for suppl in supply %***REMOVED***
-            ***REMOVED***% if suppl.out %***REMOVED***
-                    <tr class="alert-danger">
-                    ***REMOVED***% else %***REMOVED***
-                    <tr class="alert-success">
-            ***REMOVED***% endif %***REMOVED***
+    <body>
+    <div class="container-xl pt-5">
+        <div class="row">
+            <div class="col-xl">
+                <table class="table table-striped mx-3">
+                    <thead class="thead-dark">
+                    <tr>
+                    ***REMOVED***#            <th scope="col">#</th>#***REMOVED***
+                        <th scope="col">Производитель</th>
+                        <th scope="col">Наименование</th>
+                        <th scope="col">Количество</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                ***REMOVED***% for cartridge in cartridges %***REMOVED***
+                        <tr>
+                        ***REMOVED***#                <th scope="row">{{ cartridge.id ***REMOVED******REMOVED***</th>#***REMOVED***
+                            <td><label id="{{ cartridge.manufacturer ***REMOVED******REMOVED***">{{ cartridge.manufacturer ***REMOVED******REMOVED***</label></td>
+                            <td><label id="{{ cartridge.name ***REMOVED******REMOVED***">{{ cartridge.name ***REMOVED******REMOVED***</label></td>
+                            <td><label id="{{ cartridge.name ***REMOVED******REMOVED***{{ cartridge.count ***REMOVED******REMOVED***">{{ cartridge.count ***REMOVED******REMOVED***</label></td>
+                        </tr>
+                ***REMOVED***% endfor %***REMOVED***
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-xl">
+                <table class="table mx-3">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Время</th>
+                        <th scope="col">Наименование</th>
+                        <th scope="col">Количество</th>
+                        <th scope="col">Черкаши</th>
+                        <th scope="col">
+                            <button id="popup" class="btn btn-sm btn-outline-success" style="width: 8rem;">Добавить
+                            </button>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                ***REMOVED***% for suppl in supply %***REMOVED***
+                    ***REMOVED***% if suppl.out %***REMOVED***
+                            <tr class="table-danger">
+                            ***REMOVED***% else %***REMOVED***
+                            <tr class="table-success">
+                    ***REMOVED***% endif %***REMOVED***
 
-            <td><label id="{{ suppl.date ***REMOVED******REMOVED***">{{ suppl.date ***REMOVED******REMOVED***</label></td>
-            <td>
-                <div class="input-group">
-                    <label class="input-group-text col-12" id="supplyLabelCart{{ suppl.id ***REMOVED******REMOVED***">{{ suppl.cartridge ***REMOVED******REMOVED***</label>
-                ***REMOVED***#                    <input type="text" class="input-group-text col-5" placeholder="{{ suppl.cartridge ***REMOVED******REMOVED***"#***REMOVED***
-                ***REMOVED***#                           style="display: none;" id="supplyInputCart{{ suppl.id ***REMOVED******REMOVED***">#***REMOVED***
-                </div>
-            </td>
-            <td>
-                <div class="input-group">
-                    <label class="input-group-text" id="supplyLabelCount{{ suppl.id ***REMOVED******REMOVED***">{{ suppl.count ***REMOVED******REMOVED***</label>
-                    <input type="text" class="input-group-text col-2" placeholder="{{ suppl.count ***REMOVED******REMOVED***"
-                           style="display: none;" id="supplyInputCount{{ suppl.id ***REMOVED******REMOVED***">
-                </div>
-            </td>
-            <td><label id="{{ suppl.out ***REMOVED******REMOVED***">{{ suppl.out ***REMOVED******REMOVED***</label></td>
-            <td>
-                <div class="btn-group" role="group">
-                    <button id="btnSupplyChange{{ suppl.id ***REMOVED******REMOVED***" type="button" class="btn btn-sm btn-outline-info"
-                            onclick="btnSupplyChangeOrCancel('{{ suppl.id ***REMOVED******REMOVED***', false);">Изменить
-                    </button>
-                    <button id="btnSupplySubmit{{ suppl.id ***REMOVED******REMOVED***" type="button" style="display: none;"
-                            class="btn btn-sm btn-success"
-                            onclick="btnSupplySubmit('{{ suppl.id ***REMOVED******REMOVED***', '{{ suppl.cartridge.name ***REMOVED******REMOVED***', '{{ suppl.out ***REMOVED******REMOVED***');">Отправить
-                    </button>
-                    <button id="btnSupplyCancel{{ suppl.id ***REMOVED******REMOVED***" type="button" style="display: none;"
-                            class="btn btn-sm btn-outline-danger"
-                            onclick="btnSupplyChangeOrCancel('{{ suppl.id ***REMOVED******REMOVED***', true);">Отмена
-                    </button>
-                </div>
-            </td>
-            </tr>
-        ***REMOVED***% endfor %***REMOVED***
-            </tbody>
-        </table>
+                    <td><label id="{{ suppl.date ***REMOVED******REMOVED***">{{ suppl.date ***REMOVED******REMOVED***</label></td>
+                    <td>
+                        <div class="input-group">
+                            <label class="col-12"
+                                   id="supplyLabelCart{{ suppl.id ***REMOVED******REMOVED***">{{ suppl.cartridge ***REMOVED******REMOVED***</label>
+                            <select class="form-control" id="supplySelectCart{{ suppl.id ***REMOVED******REMOVED***" style="display: none;"></select>
+                        ***REMOVED***#                    <input type="text" class="input-group-text col-5" placeholder="{{ suppl.cartridge ***REMOVED******REMOVED***"#***REMOVED***
+                        ***REMOVED***#                           style="display: none;" id="supplyInputCart{{ suppl.id ***REMOVED******REMOVED***">#***REMOVED***
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <label class=""
+                                   id="supplyLabelCount{{ suppl.id ***REMOVED******REMOVED***">{{ suppl.count ***REMOVED******REMOVED***</label>
+                            <input type="text" class="input-group-text"  value="{{ suppl.count ***REMOVED******REMOVED***"
+                                   style="display: none; width: 3rem" id="supplyInputCount{{ suppl.id ***REMOVED******REMOVED***">
+                        </div>
+                    </td>
+                    <td><label id="{{ suppl.comment ***REMOVED******REMOVED***">{{ suppl.comment ***REMOVED******REMOVED***</label></td>
+                    <td>
+                        <div class="btn-group-vertical" role="group">
+                            <button id="btnSupplyChange{{ suppl.id ***REMOVED******REMOVED***" style="width: 8rem" type="button"
+                                    class="btn btn-sm btn-outline-info" value="true"
+                                    onclick="btnSupplyChangeOrSubmit('{{ suppl.id ***REMOVED******REMOVED***')">Изменить
+                            </button>
+                            <button id="btnSupplyDelete{{ suppl.id ***REMOVED******REMOVED***" style="width: 8rem" type="button"
+                                    class="btn btn-sm btn-outline-danger" value="true"
+                                    onclick="btnSupplyDeleteOrCancel('{{ suppl.id ***REMOVED******REMOVED***')">Удалить
+                            </button>
+                        </div>
+                    </td>
+                    </tr>
+                ***REMOVED***% endfor %***REMOVED***
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
-</body>
+***REMOVED***#          popup1        #***REMOVED***
+    <div class="modal fade" id="modalPopup" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content p-5">
+                <form method="post">
+                ***REMOVED***% csrf_token %***REMOVED***
+                ***REMOVED***{ form|crispy ***REMOVED******REMOVED***
+                ***REMOVED***#    ***REMOVED***% crispy form form.helper %***REMOVED***#***REMOVED***
+                    <button class="btn btn-outline-primary" type="submit">
+                        <span>Отправить</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-default" data-dismiss="modal">
+                        <span>Закрыть</span>
+                    </button>
+                </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!-- ============= info popup ============= -->
+
+***REMOVED***#          popup on Delete        #***REMOVED***
+    <div class="modal fade" id="modalOnDelete" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content p-5 btn-toolbar">
+                <h2>Подтверди удаление!</h2>
+                <h2>Будь мужиком!</h2>
+                <div class="btn-group">
+                    <button id="btnConfirmDelete" class="btn btn-outline-danger" type="button"
+                            style="width: 10rem; height:8rem;">
+                        <span>Подтвердить</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-success" data-dismiss="modal"
+                            style="width: 10rem; height:8rem;">
+                        <span>Отмена</span>
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!-- ============= info popup ============= -->
+
+    </body>
 
 {% endblock %***REMOVED***

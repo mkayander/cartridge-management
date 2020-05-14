@@ -11,3 +11,7 @@ class CartridgeViewSet(viewsets.ModelViewSet):
 class SupplyViewSet(viewsets.ModelViewSet):
     queryset = Supply.objects.all()
     serializer_class = SupplySerializer
+
+    def initialize_request(self, request, *args, **kwargs):
+        print(request, '\n', request.headers)
+        return super().initialize_request(request, *args, **kwargs)
