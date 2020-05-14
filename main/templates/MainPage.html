@@ -1,14 +1,11 @@
-{% extends "BasicPage.html" %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    {% block title %}
-        <title>Cartridges</title>
-    {% endblock %}
-</head>
+{% extends "Base.html" %}
+
+{% block title %}
+    My title
+{% endblock %}
 
 {% block header %}
+    My header
 {% endblock %}
 
 {% block content %}
@@ -43,7 +40,7 @@
                 <th scope="col">Количество</th>
                 <th scope="col">Выдача</th>
                 <th scope="col">
-                    <a href="{% url 'new_supply' %}" class="btn-sm btn-success" onclick="">Добавить</a>
+                    <a href="{% url 'new_supply' %}" class="btn btn-sm btn-outline-success" onclick="">Добавить</a>
                 </th>
             </tr>
             </thead>
@@ -73,15 +70,15 @@
             <td><label id="{{ suppl.out }}">{{ suppl.out }}</label></td>
             <td>
                 <div class="btn-group" role="group">
-                    <button id="btnSupplyChange{{ suppl.id }}" type="button" class="btn-sm btn-info"
+                    <button id="btnSupplyChange{{ suppl.id }}" type="button" class="btn btn-sm btn-outline-info"
                             onclick="btnSupplyChangeOrCancel('{{ suppl.id }}', false);">Изменить
                     </button>
                     <button id="btnSupplySubmit{{ suppl.id }}" type="button" style="display: none;"
-                            class="btn-sm btn-success"
+                            class="btn btn-sm btn-success"
                             onclick="btnSupplySubmit('{{ suppl.id }}', '{{ suppl.cartridge.name }}', '{{ suppl.out }}');">Отправить
                     </button>
                     <button id="btnSupplyCancel{{ suppl.id }}" type="button" style="display: none;"
-                            class="btn-sm btn-danger"
+                            class="btn btn-sm btn-outline-danger"
                             onclick="btnSupplyChangeOrCancel('{{ suppl.id }}', true);">Отмена
                     </button>
                 </div>
@@ -95,4 +92,3 @@
 </body>
 
 {% endblock %}
-</html>

@@ -1,0 +1,15 @@
+{% extends "Base.html" %}
+
+{% load crispy_forms_filters %}
+
+{% block title %}
+    Картридж
+{% endblock %}
+
+{% block header %}
+    Картридж
+{% endblock %}
+
+{% block content %}
+    {{ form|crispy }}
+{% endblock %}

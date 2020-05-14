@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static "css/bootstrap.css" %}">
+    <script src={% static "js/main.js" %}></script>
+    {#    <script type="application/javascript" src={% static "js/JQuery.js" %}></script>#}
+    <script src={% static "js/Json2.js" %}></script>
+    {#    <script type="application/javascript" src={% static "js/JQuery.js" %}></script>#}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    {#    <script src="{% static "js/bootstrap.js" %}"></script>#}
+
+    <title>
+        {% block title %}
+        {% endblock %}
+    </title>
+
+</head>
+
+<header>
+    <nav class="navbar navbar-dark bg-primary">
+        <span class="navbar-brand mb-0 h1">
+            {% block header %}
+            {% endblock %}
+        </span>
+    </nav>
+</header>
+
+<body>
+<div class="container-xl pt-5">
+    {% block content %}
+    {% endblock %}
+</div>
+</body>
+</html>

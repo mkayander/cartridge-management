@@ -1,5 +1,5 @@
 import simplejson as simplejson
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from api.serializers import SupplySerializer
 from main.forms import SupplyForm
@@ -34,3 +34,16 @@ def newSupplyView(request):
     supply = Supply.objects.all().order_by("-date")
     formSupply = SupplyForm(request)
     return render(request, "NewSupply.html", {"supply": supply, "formSupply": formSupply})
+def supply_view(request):
+    if request.method == "POST":
+        print("supply_view POST!"+'\n', request.POST)
+        form = SupplyForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+
+    elif request.method == "GET":
+        print("supply_view GET!")
+        # supply = Supply.objects.all().order_by("-date")
+        form = SupplyForm()
+        return render(request, "SupplyView.html", {"form": form})
