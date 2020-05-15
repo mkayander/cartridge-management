@@ -1,4 +1,4 @@
-from main.models import Cartridge, Supply
+from main.models import Cartridge, Supply, Order
 from rest_framework import serializers
 
 
@@ -13,4 +13,10 @@ class SupplySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Supply
+        fields = '__all__'
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
         fields = '__all__'

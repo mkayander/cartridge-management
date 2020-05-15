@@ -12,97 +12,155 @@
 
 {% block content %}
     <body>
-    <div class="container-fluid pt-5">
-        <div class="row">
-            <div class="col-xl">
-                <table class="table table-striped mx-3">
-                    <thead class="thead-dark">
+    <div class="row">
+        <div class="col">
+            <h1 class="pl-5">Картриджы в наличии</h1>
+            <table class="table table-striped mx-3">
+                <thead class="thead-dark">
+                <tr>
+                    {#            <th scope="col">#</th>#}
+                    <th scope="col">Производитель</th>
+                    <th scope="col">Наименование</th>
+                    <th scope="col">Количество</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for cartridge in cartridges %}
                     <tr>
-                        {#            <th scope="col">#</th>#}
-                        <th scope="col">Производитель</th>
-                        <th scope="col">Наименование</th>
-                        <th scope="col">Количество</th>
+                        {#                <th scope="row">{{ cartridge.id }}</th>#}
+                        <td><label id="{{ cartridge.manufacturer }}">{{ cartridge.manufacturer }}</label></td>
+                        <td><label id="{{ cartridge.name }}">{{ cartridge.name }}</label></td>
+                        <td><label id="{{ cartridge.name }}{{ cartridge.count }}">{{ cartridge.count }}</label></td>
                     </tr>
-                    </thead>
-                    <tbody>
-                    {% for cartridge in cartridges %}
-                        <tr>
-                            {#                <th scope="row">{{ cartridge.id }}</th>#}
-                            <td><label id="{{ cartridge.manufacturer }}">{{ cartridge.manufacturer }}</label></td>
-                            <td><label id="{{ cartridge.name }}">{{ cartridge.name }}</label></td>
-                            <td><label id="{{ cartridge.name }}{{ cartridge.count }}">{{ cartridge.count }}</label></td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-xl">
-                <table class="table mx-3">
-                    <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">Время</th>
-                        <th scope="col">Наименование</th>
-                        <th scope="col">Количество</th>
-                        <th scope="col">Черкаши</th>
-                        <th scope="col">
-                            <button id="popup" class="btn btn-sm btn-outline-success" style="width: 8rem;">Добавить
-                            </button>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for suppl in supply %}
-                        {% if suppl.out %}
-                            <tr class="table-danger">
-                                {% else %}
-                            <tr class="table-success">
-                        {% endif %}
-
-                    <td><label id="{{ suppl.date }}">{{ suppl.date }}</label></td>
-                    <td>
-                        <div class="input-group">
-                            <label class="col-12"
-                                   id="supplyLabelCart{{ suppl.id }}">{{ suppl.cartridge }}</label>
-                            <select class="form-control" id="supplySelectCart{{ suppl.id }}" style="display: none;"></select>
-                            {#                    <input type="text" class="input-group-text col-5" placeholder="{{ suppl.cartridge }}"#}
-                            {#                           style="display: none;" id="supplyInputCart{{ suppl.id }}">#}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group">
-                            <label class=""
-                                   id="supplyLabelCount{{ suppl.id }}">{{ suppl.count }}</label>
-                            <input type="text" class="input-group-text"  value="{{ suppl.count }}"
-                                   style="display: none; width: 3rem" id="supplyInputCount{{ suppl.id }}">
-                        </div>
-                    </td>
-                    <td><label id="{{ suppl.comment }}">{{ suppl.comment }}</label></td>
-                    <td>
-                        <div class="btn-group-vertical" role="group">
-                            <button id="btnSupplyChange{{ suppl.id }}" style="width: 8rem" type="button"
-                                    class="btn btn-sm btn-outline-info" value="true"
-                                    onclick="btnSupplyChangeOrSubmit('{{ suppl.id }}')">Изменить
-                            </button>
-                            <button id="btnSupplyDelete{{ suppl.id }}" style="width: 8rem" type="button"
-                                    class="btn btn-sm btn-outline-danger" value="true"
-                                    onclick="btnSupplyDeleteOrCancel('{{ suppl.id }}')">Удалить
-                            </button>
-                        </div>
-                    </td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                {% endfor %}
+                </tbody>
+            </table>
+            <h1 class="pl-5">Заявки</h1>
+            <table class="table mx-3 pt-5">
+                <thead class="thead-dark">
+                <tr>
+                    {#            <th scope="col">#</th>#}
+                    <th scope="col">Создана</th>
+                    <th scope="col">Завершена</th>
+                    <th scope="col">Номер</th>
+                    <th scope="col">Заказ</th>
+                    <th scope="col">Количество</th>
+                    <th scope="col">
+                        <button id="btnAddOrder" class="btn btn-sm btn-outline-success" style="width: 8rem;">Добавить
+                        </button>
+                    </th>
+                </tr>
+                </thead>
+                <tbody class="table-info">
+                {% for ord in order %}
+                    {% if ord.finished %}
+                        <tr class="table-success">
+                    {% endif %}
+                <td>
+                    <label id="orderLabelDate{{ ord.id }}">{{ ord.date }}</label>
+                </td>
+                <td><label id="{{ ord.date_finished }}">{{ ord.date_finished }}</label></td>
+                <td>
+                    <label id="orderLabelNumber{{ ord.id }}">{{ ord.number }}</label>
+                    <input type="text" class="input-group-text" value="{{ ord.number }}"
+                           style="display: none; width: 3rem" id="orderInputNumber{{ ord.id }}">
+                </td>
+                <td>
+                    <label id="orderLabelCart{{ ord.id }}">{{ ord.cartridge }}</label>
+                    <select class="form-control" id="orderSelectCart{{ ord.id }}"
+                            style="display: none;"></select>
+                </td>
+                <td>
+                    <label id="orderLabelCount{{ ord.id }}">{{ ord.count }}</label>
+                    <input type="text" class="input-group-text" value="{{ ord.count }}"
+                           style="display: none; width: 3rem" id="orderInputCount{{ ord.id }}">
+                </td>
+                <td>
+                    <div class="btn-group-vertical" role="group">
+                        <button id="btnOrderChange{{ ord.id }}" style="width: 8rem" type="button"
+                                class="btn btn-sm btn-outline-info" value="true"
+                                onclick="btnOrderChangeOrSubmit('{{ ord.id }}')">Изменить
+                        </button>
+                        <button id="btnOrderDelete{{ ord.id }}" style="width: 8rem" type="button"
+                                class="btn btn-sm btn-outline-danger" value="true"
+                                onclick="btnOrderDeleteOrCancel('{{ ord.id }}')">Удалить
+                        </button>
+                    </div>
+                </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
+        <div class="col">
+            <h1 class="pl-5">Выдача или поступление</h1>
+            <table class="table mx-3">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Время</th>
+                    <th scope="col">Наименование</th>
+                    <th scope="col">Количество</th>
+                    <th scope="col">Черкаши</th>
+                    <th scope="col">
+                        <button id="popup" class="btn btn-sm btn-outline-success" style="width: 8rem;">Добавить
+                        </button>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for suppl in supply %}
+                    {% if suppl.out %}
+                        <tr class="table-danger">
+                            {% else %}
+                        <tr class="table-success">
+                    {% endif %}
+
+                <td><label id="{{ suppl.date }}">{{ suppl.date }}</label></td>
+                <td>
+                    <div class="input-group">
+                        <label class="col-12"
+                               id="supplyLabelCart{{ suppl.id }}">{{ suppl.cartridge }}</label>
+                        <select class="form-control" id="supplySelectCart{{ suppl.id }}"
+                                style="display: none;"></select>
+                        {#                    <input type="text" class="input-group-text col-5" placeholder="{{ suppl.cartridge }}"#}
+                        {#                           style="display: none;" id="supplyInputCart{{ suppl.id }}">#}
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <label class=""
+                               id="supplyLabelCount{{ suppl.id }}">{{ suppl.count }}</label>
+                        <input type="text" class="input-group-text" value="{{ suppl.count }}"
+                               style="display: none; width: 3rem" id="supplyInputCount{{ suppl.id }}">
+                    </div>
+                </td>
+                <td><label id="{{ suppl.comment }}">{{ suppl.comment }}</label></td>
+                <td>
+                    <div class="btn-group-vertical" role="group">
+                        <button id="btnSupplyChange{{ suppl.id }}" style="width: 8rem" type="button"
+                                class="btn btn-sm btn-outline-info" value="true"
+                                onclick="btnSupplyChangeOrSubmit('{{ suppl.id }}')">Изменить
+                        </button>
+                        <button id="btnSupplyDelete{{ suppl.id }}" style="width: 8rem" type="button"
+                                class="btn btn-sm btn-outline-danger" value="true"
+                                onclick="btnSupplyDeleteOrCancel('{{ suppl.id }}')">Удалить
+                        </button>
+                    </div>
+                </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
     </div>
-    {#          popup1        #}
+    {#          popup on Supply        #}
     <div class="modal fade" id="modalPopup" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content p-5">
                 <form method="post">
                     {% csrf_token %}
-                    {{ form|crispy }}
+                    {{ formSupply | crispy }}
                     {#        {% crispy form form.helper %}#}
                     <button class="btn btn-outline-primary" type="submit">
                         <span>Отправить</span>
@@ -114,7 +172,25 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-    <!-- ============= info popup ============= -->
+
+    {#          popup on Order       #}
+    <div class="modal fade" id="modalOrder" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content p-5">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ formOrder | crispy }}
+                    {#        {% crispy form form.helper %}#}
+                    <button class="btn btn-outline-primary" type="submit">
+                        <span>Отправить</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-default" data-dismiss="modal">
+                        <span>Закрыть</span>
+                    </button>
+                </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
     {#          popup on Delete        #}
     <div class="modal fade" id="modalOnDelete" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

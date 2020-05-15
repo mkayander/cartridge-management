@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 from main import choices
 
 
@@ -49,3 +50,18 @@ class Supply(models.Model):
     def delete(self, using=None, keep_parents=False):
         self.update_cartridge_count(self.count * -1)
         return super().delete(using, keep_parents)
+
+
+class Order(models.Model):
+    date = models.DateTimeField(auto_now=True)
+    date_finished = models.DateTimeField(blank=True, null=True)
+    number = models.PositiveIntegerField(blank=True, null=True)
+    finished = models.BooleanField(default=False)
+    cartridge = models.ForeignKey(Cartridge, related_name="orders", on_delete=models.CASCADE)
+    supply = models.ForeignKey(Supply, related_name="order", on_delete=models.CASCADE, blank=True, null=True)
+    count = models.PositiveIntegerField()
+
+    def save(self, *args, **kwargs):
+        if self.finished:
+            self.date_finished = datetime.now()
+        super().save(*args, **kwargs)

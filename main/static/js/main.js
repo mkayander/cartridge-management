@@ -7,7 +7,11 @@ window.onload = function () {
         $("#popup").on("click", function () {
             $('#modalPopup').modal(options);
         });
+        $("#btnAddOrder").on("click", function () {
+            $('#modalOrder').modal(options);
+        });
     });
+
 };
 
 function btnSupplySubmit(id, value) {
@@ -21,13 +25,60 @@ function btnSupplySubmit(id, value) {
     });
 }
 
+function confirmDelete(modal, url, id) {
+    const {btnConfirmDelete} = getDomElements(id);
+    let options = {
+        "backdrop": "static",
+        "show": true
+    };
+    modal.modal(options);
+    btnConfirmDelete.onclick = () => {
+        console.log("btnConfirmDelete clicked");
+        $.ajax({
+            type: 'Delete',
+            url: url + id + "/",
+            success: location.reload()
+        });
+    };
+}
+
+function getCartridgeName(select) {
+    $.get('http://ps-bykrc.dellin.local/api/cartridges/', function (data) {
+                    for (let dat in data) {
+                        let opt = document.createElement('option');
+                        opt.innerText = data[dat].name;
+                        opt.value = data[dat].name;
+                        select.append(opt);
+                    }
+                }
+            );
+}
+
+function getDomElements(id) {
+    return {
+        btnSupplyChange: document.getElementById("btnSupplyChange" + id),
+        btnSupplyDelete: document.getElementById("btnSupplyDelete" + id),
+        supplyLabelCount: document.getElementById("supplyLabelCount" + id),
+        supplyInputCount: document.getElementById("supplyInputCount" + id),
+        supplyLabelCart: document.getElementById('supplyLabelCart' + id),
+        supplySelectCart: document.getElementById("supplySelectCart" + id),
+        btnConfirmDelete: document.getElementById("btnConfirmDelete"),
+        btnOrderChange: document.getElementById("btnOrderChange" + id),
+        btnOrderDelete: document.getElementById("btnOrderDelete" + id),
+        orderInputNumber: document.getElementById("orderInputNumber" + id),
+        orderInputCount: document.getElementById("orderInputCount" + id),
+        orderLabelNumber: document.getElementById("orderLabelNumber" + id),
+        orderLabelCount: document.getElementById("orderLabelCount" + id),
+        orderSelectCart: document.getElementById("orderSelectCart" + id),
+        orderLabelCart: document.getElementById("orderLabelCart" + id),
+    }
+}
+
+
 function btnSupplyChangeOrSubmit(id) {
-    let btnSupplyChange = document.getElementById("btnSupplyChange" + id);
-    let btnSupplyDelete = document.getElementById("btnSupplyDelete" + id);
-    let supplyLabelCount = document.getElementById("supplyLabelCount" + id);
-    let supplyInputCount = document.getElementById("supplyInputCount" + id);
-    let supplyLabelCart = document.getElementById('supplyLabelCart' + id);
-    let supplySelectCart = document.getElementById("supplySelectCart" + id);
+    // const els = getDomElements();
+    // console.log(els.btnSupplyChange);
+    const {btnSupplyChange, btnSupplyDelete, supplyLabelCount, supplyInputCount, supplyLabelCart, supplySelectCart} = getDomElements(id);
 
     if (btnSupplyChange.value === 'true') {
         supplySelectCart.style.display = "block";
@@ -47,15 +98,7 @@ function btnSupplyChangeOrSubmit(id) {
         btnSupplyChange.value = "false";
 
         if (supplySelectCart.childElementCount === 0) {
-            $.get('http://ps-bykrc.dellin.local/api/cartridges/', function (data) {
-                    for (let dat in data) {
-                        let opt = document.createElement('option');
-                        opt.innerText = data[dat].name;
-                        opt.value = data[dat].name;
-                        supplySelectCart.append(opt);
-                    }
-                }
-            );
+            getCartridgeName(supplySelectCart);
         }
 
 
@@ -75,26 +118,10 @@ function btnSupplyChangeOrSubmit(id) {
 }
 
 function btnSupplyDeleteOrCancel(id) {
-    let btnSupplyChange = document.getElementById("btnSupplyChange" + id);
-    let btnSupplyDelete = document.getElementById("btnSupplyDelete" + id);
-    let supplyLabelCount = document.getElementById("supplyLabelCount" + id);
-    let supplyInputCount = document.getElementById("supplyInputCount" + id);
-    let supplyLabelCart = document.getElementById('supplyLabelCart' + id);
-    let supplySelectCart = document.getElementById("supplySelectCart" + id);
+    const {btnSupplyChange, btnSupplyDelete, supplyLabelCount, supplyInputCount, supplyLabelCart, supplySelectCart} = getDomElements(id);
 
     if (btnSupplyDelete.value === 'true') {
-        let options = {
-            "backdrop": "static",
-            "show": true
-        };
-        $("#modalOnDelete").modal(options);
-        $("#btnConfirmDelete").on('click', () => {
-            $.ajax({
-                type: 'Delete',
-                url: 'http://ps-bykrc.dellin.local/api/supplies/' + id + "/",
-                success: location.reload()
-            });
-        });
+        confirmDelete($("#modalOnDelete"), 'http://ps-bykrc.dellin.local/api/supplies/', id);
     } else {
         supplySelectCart.style.display = "none";
 
@@ -114,5 +141,58 @@ function btnSupplyDeleteOrCancel(id) {
     }
 }
 
+function btnOrderChangeOrSubmit(id) {
+    const els = getDomElements(id);
+    if (els.btnOrderChange.value === 'true') {
+        els.btnOrderDelete.innerText = "Отмена";
+        els.btnOrderDelete.value = "false";
+
+        els.btnOrderChange.innerText = "Отправить";
+        els.btnOrderChange.classList.add("btn-outline-success");
+        els.btnOrderChange.classList.remove("btn-outline-info");
+        els.btnOrderChange.value = "false";
+
+        els.orderInputNumber.style.display = "block";
+        els.orderInputCount.style.display = "block";
+        els.orderSelectCart.style.display = "block";
+
+        els.orderLabelNumber.style.display = "none";
+        els.orderLabelCount.style.display = "none";
+        els.orderLabelCart.style.display = "none";
+
+        if (els.orderSelectCart.childElementCount === 0) {
+            getCartridgeName(els.orderSelectCart);
+        }
+    } else {
+        els.btnOrderChange.innerText = "Изменить";
+        els.btnOrderChange.classList.remove("btn-outline-success");
+        els.btnOrderChange.classList.add("btn-outline-info");
+    }
+}
+
+function btnOrderDeleteOrCancel(id) {
+    const els = getDomElements(id);
+
+    if (els.btnOrderDelete.value === 'true') {
+        confirmDelete($("#modalOnDelete"), 'http://ps-bykrc.dellin.local/api/orders/', id);
+    } else {
+        els.btnOrderDelete.innerText = "Удалить";
+        els.btnOrderDelete.value = "true";
+
+        els.btnOrderChange.innerText = "Изменить";
+        els.btnOrderChange.value = "true";
+        els.btnOrderChange.classList.remove("btn-outline-success");
+        els.btnOrderChange.classList.add("btn-outline-info");
+
+        els.orderInputNumber.style.display = "none";
+        els.orderInputCount.style.display = "none";
+        els.orderSelectCart.style.display = "none";
+
+        els.orderLabelNumber.style.display = "block";
+        els.orderLabelCount.style.display = "block";
+        els.orderLabelCart.style.display = "block";
+
+    }
+}
 
 

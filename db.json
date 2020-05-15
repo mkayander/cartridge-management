@@ -1,17 +1,17 @@
 {
     "Cartridge": [
         {
-            "count": 20,
+            "count": 23,
             "manufacturer": "HP",
             "name": "26X"
         },
         {
-            "count": 4,
+            "count": 17,
             "manufacturer": "HP",
             "name": "78A"
         },
         {
-            "count": 4,
+            "count": 23,
             "manufacturer": "HP",
             "name": "83X"
         },
@@ -27,14 +27,6 @@
         }
     ],
     "Supply": [
-        {
-            "cartridge_id": "26X",
-            "comment": "",
-            "count": 10,
-            "date": "2020-05-13T12:53:07.627Z",
-            "id": 1,
-            "out": true
-        },
         {
             "cartridge_id": "26X",
             "comment": "",
@@ -62,9 +54,57 @@
         {
             "cartridge_id": "78A",
             "comment": "",
-            "count": 5,
-            "date": "2020-05-13T12:53:37.127Z",
+            "count": 3,
+            "date": "2020-05-13T13:05:40.249Z",
             "id": 5,
+            "out": false
+        },
+        {
+            "cartridge_id": "83X",
+            "comment": "",
+            "count": 5,
+            "date": "2020-05-14T05:54:29.034Z",
+            "id": 7,
+            "out": false
+        },
+        {
+            "cartridge_id": "85A",
+            "comment": "",
+            "count": 2,
+            "date": "2020-05-14T06:52:33.079Z",
+            "id": 8,
+            "out": false
+        },
+        {
+            "cartridge_id": "83X",
+            "comment": "",
+            "count": 3,
+            "date": "2020-05-14T07:20:06.105Z",
+            "id": 9,
+            "out": false
+        },
+        {
+            "cartridge_id": "26X",
+            "comment": "",
+            "count": 8,
+            "date": "2020-05-14T07:37:31.117Z",
+            "id": 10,
+            "out": false
+        },
+        {
+            "cartridge_id": "83X",
+            "comment": "",
+            "count": 8,
+            "date": "2020-05-14T13:39:55.562Z",
+            "id": 17,
+            "out": true
+        },
+        {
+            "cartridge_id": "83X",
+            "comment": "\u0439\u0446\u0443\u0439\u0446",
+            "count": 15,
+            "date": "2020-05-14T13:38:19.962Z",
+            "id": 18,
             "out": false
         }
     ]
