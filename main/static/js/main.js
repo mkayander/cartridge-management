@@ -99,6 +99,7 @@ function btnSupplyDeleteOrCancel(id) {
         supplySelectCart.style.display = "none";
 
         btnSupplyDelete.innerText = "Удалить";
+        btnSupplyDelete.value = "true";
 
         supplyLabelCount.style.display = "block";
 
