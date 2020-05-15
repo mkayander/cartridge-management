@@ -2,7 +2,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 
-from main.models import Supply
+from main.models import Supply, Order
 
 
 class SupplyForm(forms.ModelForm):
@@ -18,4 +18,10 @@ class SupplyForm(forms.ModelForm):
 
     class Meta:
         model = Supply
+        fields = '__all__'
+
+
+class OrderForm(forms.ModelForm):
+    class Meta:
+        model = Order
         fields = '__all__'

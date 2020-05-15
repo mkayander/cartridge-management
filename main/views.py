@@ -1,23 +1,27 @@
 from django.http import Http404
 from django.shortcuts import render, redirect
 
-from main.forms import SupplyForm
+from main.forms import SupplyForm, OrderForm
 
-from main.models import Cartridge, Supply
+from main.models import Cartridge, Supply, Order
+
 
 def view(request):
     cartridges = Cartridge.objects.all()
     supply = Supply.objects.all().order_by("-date")
+    order = Order.objects.all().order_by("-date")
 
-    form = SupplyForm()
+    formSupply = SupplyForm()
+    formOrder = OrderForm()
 
     if request.method == "POST":
-        print("supply_view POST!" + '\n', request.POST)
-        form = SupplyForm(request.POST)
-        print(request.POST["count"***REMOVED***)
-        print(Cartridge.objects.get(pk=request.POST["cartridge"***REMOVED***).count)
-        if form.is_valid():
-            form.save()
+        formSupply = SupplyForm(request.POST)
+        formOrder = OrderForm(request.POST)
+        if formSupply.is_valid():
+            formSupply.save()
+            return redirect('index')
+        elif formOrder.is_valid():
+            formOrder.save()
             return redirect('index')
         else:
             raise Http404
@@ -25,5 +29,7 @@ def view(request):
     return render(request, "MainPage.html", {
         "cartridges": cartridges,
         "supply": supply,
-        "form": form
+        "formSupply": formSupply,
+        "order": order,
+        "formOrder": formOrder
     ***REMOVED***)
