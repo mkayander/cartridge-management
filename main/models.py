@@ -28,7 +28,7 @@ class Supply(models.Model):
 
     def update_cartridge_count(self, value):
         print(f"Updating cartridge count: {value} ; {self.out=}")
-        if value is not 0 and not None:
+        if value != 0 and None:
             if self.out:
                 self.cartridge.count -= value
             else:
@@ -37,7 +37,7 @@ class Supply(models.Model):
             self.cartridge.save()
 
     def save(self, *args, **kwargs):
-        if self.pk is None:
+        if self.pk is None or not Supply.objects.filter(pk=self.pk).exists():
             # If supply is new
             self.update_cartridge_count(self.count)
         else:
