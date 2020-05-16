@@ -2,6 +2,7 @@ import json
 
 from django.core.management.base import BaseCommand
 from django.core.serializers.json import DjangoJSONEncoder
+
 from main.models import Cartridge, Supply
 
 
@@ -12,11 +13,11 @@ class Command(BaseCommand):
         parser.add_argument('action', nargs='+', type=str)
 
     def handle(self, *args, **options):
-        print("called")
         if "all" in options["action"***REMOVED***:
             db = {
                 "Cartridge": list(Cartridge.objects.values()),
-                "Supply": list(Supply.objects.values())
+                "Supply": list(Supply.objects.values()),
+                "Order": list(Supply.objects.values())
             ***REMOVED***
 
             with open("db.json", 'w+') as outfile:
@@ -30,9 +31,46 @@ class Command(BaseCommand):
                     model = globals()[key***REMOVED***
                     for obj in values:
                         try:
-                            db_entry = model.objects.get(**obj)
+                            key = obj["id"***REMOVED*** if "id" in obj else obj["name"***REMOVED***
+                            print(f"{key=***REMOVED***")
+                            db_entry = model.objects.get(pk=key)
                         except model.DoesNotExist:
                             print(f'Restoring -- {obj***REMOVED***')
-                            model.objects.get_or_create(**obj)
+                            model.objects.create(**obj)
+                            print("done")
 
                 self.stdout.write(self.style.SUCCESS("Successfully restored database from db.json"))
+
+        elif "reload-all" in options["action"***REMOVED***:
+            with open("db.json", 'r') as file:
+                saved_data = json.load(file)
+                for key, values in saved_data.items():
+                    model = globals()[key***REMOVED***
+                    for obj in values:
+                        try:
+                            key = obj["id"***REMOVED*** if "id" in obj else obj["name"***REMOVED***
+                            print(f"{key=***REMOVED***")
+                            instance = model.objects.get(pk=key)
+
+                            for attr, value in obj.items():
+                                setattr(instance, attr, value)
+                            instance.save()
+                        except Cartridge.DoesNotExist:
+                            self.stdout.write(self.style.ERROR(f"Cartridge {obj.name***REMOVED*** does not exist!"))
+
+                self.stdout.write(self.style.SUCCESS("Reloaded from db.json"))
+
+        elif "reload-cartridges" in options["action"***REMOVED***:
+            with open("db.json", 'r') as file:
+                saved_data = json.load(file)
+                for obj in saved_data["Cartridge"***REMOVED***:
+                    try:
+                        cartridge = Cartridge.objects.get(pk=obj["name"***REMOVED***)
+                        print(obj.items())
+                        for attr, value in obj.items():
+                            setattr(cartridge, attr, value)
+                        cartridge.save()
+                    except Cartridge.DoesNotExist:
+                        self.stdout.write(self.style.ERROR(f"Cartridge {obj.name***REMOVED*** does not exist!"))
+
+                self.stdout.write(self.style.SUCCESS("Cartridges reloaded from db.json"))
