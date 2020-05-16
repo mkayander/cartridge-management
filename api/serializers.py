@@ -9,7 +9,7 @@ class CartridgeSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class SupplySerializer(serializers.ModelSerializer):
-    cartridge_str = serializers.StringRelatedField(source='cartridge')
+    cartridge_str = serializers.StringRelatedField(source='cartridge', read_only=True, required=False)
 
     class Meta:
         model = Supply

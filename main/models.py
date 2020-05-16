@@ -1,5 +1,7 @@
-from django.db import models
 from datetime import datetime
+
+from django.db import models
+
 from main import choices
 
 
@@ -19,7 +21,8 @@ class Supply(models.Model):
     out = models.BooleanField(choices=choices.SUPPLY_TYPE_BOOLEAN, default=True, verbose_name="Тип передвижения")
     cartridge = models.ForeignKey(Cartridge, related_name="supplies", on_delete=models.CASCADE,
                                   verbose_name="Тип картриджа")
-    date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now_add=True)
+    edited_at = models.DateTimeField(auto_now=True)
     count = models.PositiveIntegerField(verbose_name="Количество")
     comment = models.TextField(max_length=200, verbose_name="Комментарий", blank=True)
 
@@ -27,13 +30,14 @@ class Supply(models.Model):
         return str(self.date)
 
     def update_cartridge_count(self, value):
-        print(f"Updating cartridge count: {value} ; {self.out=}")
-        if value != 0 and None:
+        print(f"Updating cartridge count: {self.cartridge} {value=} ; {self.out=} ; {self.cartridge.count=}")
+        if value != 0 and value is not None:
             if self.out:
                 self.cartridge.count -= value
             else:
                 self.cartridge.count += value
 
+            print(f"{self.cartridge} new count is {self.cartridge.count}")
             self.cartridge.save()
 
     def save(self, *args, **kwargs):
@@ -42,9 +46,14 @@ class Supply(models.Model):
             self.update_cartridge_count(self.count)
         else:
             # If supply exists and got updated
-            prev_count = Supply.objects.get(pk=self.pk).count
-            difference = self.count - prev_count
-            self.update_cartridge_count(difference)
+            prev_supply = Supply.objects.get(pk=self.pk)
+
+            if prev_supply.out is not self.out:
+                # If direction is changed, compensate that
+                prev_supply.count -= prev_supply.count
+
+            count_difference = self.count - prev_supply.count
+            self.update_cartridge_count(count_difference)
         super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):
@@ -53,15 +62,18 @@ class Supply(models.Model):
 
 
 class Order(models.Model):
-    date = models.DateTimeField(auto_now=True)
-    date_finished = models.DateTimeField(blank=True, null=True)
-    number = models.PositiveIntegerField(blank=True, null=True)
-    finished = models.BooleanField(default=False)
-    cartridge = models.ForeignKey(Cartridge, related_name="orders", on_delete=models.CASCADE)
-    supply = models.ForeignKey(Supply, related_name="order", on_delete=models.CASCADE, blank=True, null=True)
-    count = models.PositiveIntegerField()
+    date = models.DateTimeField(auto_now=True, verbose_name="Дата создания")
+    date_finished = models.DateTimeField(blank=True, null=True, verbose_name="Дата выполнения")
+    number = models.PositiveIntegerField(blank=True, null=True, verbose_name="Номер заявки")
+    finished = models.BooleanField(default=False, verbose_name="Выполнен")
+    cartridge = models.ForeignKey(Cartridge, related_name="orders", on_delete=models.CASCADE, verbose_name="Картридж")
+    supply = models.ForeignKey(Supply, related_name="order", on_delete=models.CASCADE, blank=True, null=True,
+                               verbose_name="Перемещение")
+    count = models.PositiveIntegerField(verbose_name="Количество")
 
-    def save(self, *args, **kwargs):
-        if self.finished:
-            self.date_finished = datetime.now()
-        super().save(*args, **kwargs)
+    def finish(self):
+        self.finished = True
+        self.date_finished = datetime.now()
+
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
