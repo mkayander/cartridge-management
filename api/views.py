@@ -18,5 +18,5 @@ class SupplyViewSet(viewsets.ModelViewSet):
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
+    queryset = Order.objects.all().order_by("-date")
     serializer_class = OrderSerializer
