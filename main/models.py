@@ -62,7 +62,8 @@ class Supply(models.Model):
 
 
 class Order(models.Model):
-    date = models.DateTimeField(auto_now=True, verbose_name="Дата создания")
+    date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    edited_at = models.DateTimeField(auto_now=True, verbose_name="Дата редактирования")
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name="Дата выполнения")
     number = models.PositiveIntegerField(blank=True, null=True, verbose_name="Номер заявки")
     finished = models.BooleanField(default=False, verbose_name="Выполнен")

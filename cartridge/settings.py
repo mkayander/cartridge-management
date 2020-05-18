@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'crispy_forms',
     'corsheaders',
-    'webpack_loader',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
