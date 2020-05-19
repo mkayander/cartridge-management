@@ -1,6 +1,9 @@
+from rest_framework import viewsets
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
 from api.serializers import CartridgeSerializer, SupplySerializer, OrderSerializer
 from main.models import Cartridge, Supply, Order
-from rest_framework import viewsets
 
 
 class CartridgeViewSet(viewsets.ModelViewSet):
@@ -20,3 +23,12 @@ class SupplyViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all().order_by("-date")
     serializer_class = OrderSerializer
+
+
+@api_view(["GET"])
+def home_data_view(request):
+    return Response({
+        "cartridges": CartridgeSerializer(Cartridge.objects.all(), many=True, context={"request": request}).data,
+        "supplies": SupplySerializer(Supply.objects.all(), many=True, context={"request": request}).data,
+        "orders": OrderSerializer(Order.objects.all(), many=True, context={"request": request}).data
+    })
