@@ -1,4 +1,4 @@
-from api.views import CartridgeViewSet, SupplyViewSet, OrderViewSet
+from api.views import CartridgeViewSet, SupplyViewSet, OrderViewSet, home_data_view
 from django.urls import path, include
 from rest_framework import routers
 
@@ -9,5 +9,6 @@ router.register('orders', OrderViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('all', home_data_view, name="api_home_data"),
     path('auth/', include('rest_framework.urls'))
 ***REMOVED***
