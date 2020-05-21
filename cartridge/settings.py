@@ -97,6 +97,7 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'cartridge.wsgi.application'
 ASGI_APPLICATION = 'cartridge.routing.application'
 
