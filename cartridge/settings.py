@@ -40,6 +40,7 @@ STATICFILES_DIRS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'chat',
     'main',
     'api',
     'rest_framework',
@@ -97,6 +98,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'cartridge.wsgi.application'
+ASGI_APPLICATION = 'cartridge.routing.application'
+
+redis_host = os.environ.get('REDIS_HOST', '127.0.0.1')
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(redis_host, 6379)],
+        },
+
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
