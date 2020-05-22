@@ -2,8 +2,9 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from api.serializers import CartridgeSerializer, SupplySerializer, OrderSerializer
+from api.serializers import CartridgeSerializer, SupplySerializer, OrderSerializer, ChatMessageSerializer
 from main.models import Cartridge, Supply, Order
+from chat.models import ChatMessage
 
 
 class CartridgeViewSet(viewsets.ModelViewSet):
@@ -25,10 +26,16 @@ class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
 
 
+class ChatMessageViewSet(viewsets.ModelViewSet):
+    queryset = ChatMessage.objects.all().order_by("-date")
+    serializer_class = ChatMessageSerializer
+
+
 @api_view(["GET"])
 def home_data_view(request):
     return Response({
         "cartridges": CartridgeSerializer(Cartridge.objects.all(), many=True, context={"request": request}).data,
         "supplies": SupplySerializer(Supply.objects.all(), many=True, context={"request": request}).data,
-        "orders": OrderSerializer(Order.objects.all(), many=True, context={"request": request}).data
+        "orders": OrderSerializer(Order.objects.all(), many=True, context={"request": request}).data,
+        "chatMessage": ChatMessageSerializer(ChatMessage.objects.all(), many=True, context={"request": request}).data
     })
