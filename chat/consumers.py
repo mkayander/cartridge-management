@@ -1,6 +1,7 @@
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+from .models import ChatMessage
 
 
 class ChatConsumer(WebsocketConsumer):
@@ -30,6 +31,7 @@ class ChatConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message'***REMOVED***
         user = text_data_json['user'***REMOVED***
+        ChatMessage.objects.create(User=user, Message=message)
         print(f"{user***REMOVED*** message --- {message***REMOVED***")
 
         # Send message to room group

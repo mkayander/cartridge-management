@@ -1,4 +1,4 @@
-from api.views import CartridgeViewSet, SupplyViewSet, OrderViewSet, home_data_view
+from api.views import CartridgeViewSet, SupplyViewSet, OrderViewSet, ChatMessageViewSet, home_data_view
 from django.urls import path, include
 from rest_framework import routers
 
@@ -6,6 +6,7 @@ router = routers.DefaultRouter()
 router.register('cartridges', CartridgeViewSet)
 router.register('supplies', SupplyViewSet)
 router.register('orders', OrderViewSet)
+router.register('chatMessage', ChatMessageViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
