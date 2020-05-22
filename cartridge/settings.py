@@ -26,7 +26,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "ps-bykrc.dellin.local",
-    "it-vlshv.dellin.local"
+    "it-vlshv.dellin.local",
+    "10.36.240.51"
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
