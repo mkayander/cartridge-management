@@ -11,4 +11,3 @@ application = ProtocolTypeRouter({
     ),
 ***REMOVED***)
 
-print(application)
