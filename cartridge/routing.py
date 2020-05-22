@@ -10,3 +10,5 @@ application = ProtocolTypeRouter({
         )
     ),
 })
+
+print(application)
