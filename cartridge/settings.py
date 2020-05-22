@@ -41,6 +41,7 @@ STATICFILES_DIRS = [
 
 INSTALLED_APPS = [
     'chat',
+    'channels',
     'main',
     'api',
     'rest_framework',
