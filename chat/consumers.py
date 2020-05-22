@@ -31,7 +31,7 @@ class ChatConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         user = text_data_json['user']
-        ChatMessage.objects.create(User=user, Message=message)
+        ChatMessage.objects.create(user=user, message=message)
         print(f"{user} message --- {message}")
 
         # Send message to room group
