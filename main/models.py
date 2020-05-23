@@ -1,8 +1,20 @@
 from datetime import datetime
 
 from django.db import models
+from django.utils.dateformat import format
+from django.conf import settings
 
 from main import choices
+
+
+class BackupableModel(models.Model):
+    restoring = False
+
+    class Meta:
+        abstract = True
+
+
+# -------------------------------------------------------------------------------------------------------------------- #
 
 
 class Cartridge(models.Model):
@@ -16,8 +28,11 @@ class Cartridge(models.Model):
     def __str__(self):
         return f'{self.manufacturer***REMOVED*** {self.name***REMOVED***'
 
+    class Meta:
+        ordering = ['manufacturer', 'name'***REMOVED***
 
-class Supply(models.Model):
+
+class Supply(BackupableModel):
     out = models.BooleanField(choices=choices.SUPPLY_TYPE_BOOLEAN, default=True, verbose_name="Тип передвижения")
     cartridge = models.ForeignKey(Cartridge, related_name="supplies", on_delete=models.CASCADE,
                                   verbose_name="Тип картриджа")
@@ -27,7 +42,15 @@ class Supply(models.Model):
     comment = models.TextField(max_length=200, verbose_name="Комментарий", blank=True)
 
     def __str__(self):
-        return str(self.date)
+        return f"{format(self.date, settings.DATETIME_FORMAT)***REMOVED*** {self.get_out_display()***REMOVED*** {self.cartridge***REMOVED***"
+
+    def __init__(self, *args, **kwargs):
+        restoring = kwargs.pop('restoring', False)
+        self.restoring = restoring
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        ordering = ['-date'***REMOVED***
 
     def update_cartridge_count(self, value):
         print(f"Updating cartridge count: {self.cartridge***REMOVED*** {value=***REMOVED*** ; {self.out=***REMOVED*** ; {self.cartridge.count=***REMOVED***")
@@ -41,19 +64,21 @@ class Supply(models.Model):
             self.cartridge.save()
 
     def save(self, *args, **kwargs):
-        if self.pk is None or not Supply.objects.filter(pk=self.pk).exists():
-            # If supply is new
-            self.update_cartridge_count(self.count)
-        else:
-            # If supply exists and got updated
-            prev_supply = Supply.objects.get(pk=self.pk)
+        # If this is restoring from json, don't do any corrective actions, just save
+        if not self.restoring:
+            if self.pk is None or not Supply.objects.filter(pk=self.pk).exists():
+                # If supply is new
+                self.update_cartridge_count(self.count)
+            else:
+                # If supply exists and got updated
+                prev_supply = Supply.objects.get(pk=self.pk)
 
-            if prev_supply.out is not self.out:
-                # If direction is changed, compensate that
-                prev_supply.count -= prev_supply.count
+                if prev_supply.out is not self.out:
+                    # If direction is changed, compensate that
+                    prev_supply.count -= prev_supply.count
 
-            count_difference = self.count - prev_supply.count
-            self.update_cartridge_count(count_difference)
+                count_difference = self.count - prev_supply.count
+                self.update_cartridge_count(count_difference)
         super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):
@@ -75,6 +100,9 @@ class Order(models.Model):
     def finish(self):
         self.finished = True
         self.date_finished = datetime.now()
+
+    def __str__(self):
+        return f"{'finished' if self.finished else 'in work'***REMOVED*** {self.date.strftime('%d.%m.%Y %H:%M')***REMOVED*** {self.cartridge***REMOVED*** {self.count***REMOVED***"
 
     # def save(self, *args, **kwargs):
     #     super().save(*args, **kwargs)
