@@ -121,9 +121,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'django_db',
-        'USER': 'postgres',
-        'PASSWORD': 'b2x5z9',
-        'HOST': '127.0.0.1',
+        'USER': 'django',
+        'PASSWORD': 'D123456d',
+        # 'HOST': '127.0.0.1',
+        'HOST': 'centos7',
         'PORT': '5432',
     }
 }
@@ -151,7 +152,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ru-RU'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
+
+DATETIME_FORMAT = 'd E Y в H:m'
 
 USE_I18N = True
 

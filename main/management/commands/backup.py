@@ -3,7 +3,14 @@ import json
 from django.core.management.base import BaseCommand
 from django.core.serializers.json import DjangoJSONEncoder
 
-from main.models import Cartridge, Supply
+from django.db.models import Value, BooleanField
+from django.apps import apps
+
+from main.models import Cartridge, Supply, Order
+
+
+def get_item_key(obj):
+    return obj["id"] if "id" in obj else obj["name"]
 
 
 class Command(BaseCommand):
@@ -15,9 +22,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if "all" in options["action"]:
             db = {
-                "Cartridge": list(Cartridge.objects.values()),
-                "Supply": list(Supply.objects.values()),
-                "Order": list(Supply.objects.values())
+                "Cartridge": list(Cartridge.objects.annotate(restoring=Value(True, BooleanField())).values()),
+                "Supply": list(Supply.objects.annotate(restoring=Value(True, BooleanField())).values()),
+                "Order": list(Order.objects.annotate(restoring=Value(True, BooleanField())).values())
             }
 
             with open("db.json", 'w+') as outfile:
@@ -28,16 +35,14 @@ class Command(BaseCommand):
             with open("db.json", 'r') as file:
                 saved_data = json.load(file)
                 for key, values in saved_data.items():
-                    model = globals()[key]
+                    model = apps.get_model("main", key)
                     for obj in values:
                         try:
-                            key = obj["id"] if "id" in obj else obj["name"]
-                            print(f"{key=}")
-                            db_entry = model.objects.get(pk=key)
+                            model.objects.get(pk=get_item_key(obj))
                         except model.DoesNotExist:
                             print(f'Restoring -- {obj}')
                             model.objects.create(**obj)
-                            print("done")
+                            # print("done")
 
                 self.stdout.write(self.style.SUCCESS("Successfully restored database from db.json"))
 
@@ -45,12 +50,10 @@ class Command(BaseCommand):
             with open("db.json", 'r') as file:
                 saved_data = json.load(file)
                 for key, values in saved_data.items():
-                    model = globals()[key]
+                    model = apps.get_model("main", key)
                     for obj in values:
                         try:
-                            key = obj["id"] if "id" in obj else obj["name"]
-                            print(f"{key=}")
-                            instance = model.objects.get(pk=key)
+                            instance = model.objects.get(pk=get_item_key(obj))
 
                             for attr, value in obj.items():
                                 setattr(instance, attr, value)
