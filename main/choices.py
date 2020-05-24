@@ -4,6 +4,12 @@ MANUFACTURER_CHOICES = (
     ("Samsung", "Samsung")
 )
 
+ORDER_STATUS = (
+    ("pending", "Обработка заявки"),
+    ("work", "В работе"),
+    ("finished", "Завершён")
+)
+
 SUPPLY_TYPE_BOOLEAN = (
     (True, "Выдача"),
     (False, "Поступление")

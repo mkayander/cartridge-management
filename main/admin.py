@@ -15,7 +15,7 @@ class SupplyAdmin(admin.ModelAdmin):
 
 class OrderAdmin(admin.ModelAdmin):
     # fields = '__all__'
-    list_display = ["date", "date_finished", "finished", "number", "cartridge", "count"]
+    list_display = ["date", "status", "date_finished", "finished", "number", "cartridge", "count"]
 
 
 admin.site.register(Cartridge, CartridgeAdmin)
