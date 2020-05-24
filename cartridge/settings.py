@@ -11,8 +11,14 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+REACT_APP_DIR = os.path.join(BASE_DIR, 'frontend', 'react-cartridge-management')
+STATICFILES_DIRS = [
+    os.path.join(REACT_APP_DIR, 'build', 'static'),
+]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -25,18 +31,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
-    "ps-bykrc.dellin.local",
+    "localhost",
+    # "ps-bykrc.dellin.local",
     "it-vlshv.dellin.local",
-    "10.36.240.51"
+    # "10.36.240.51"
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
-
-REACT_APP_DIR = os.path.join(BASE_DIR, 'frontend')
-
-STATICFILES_DIRS = [
-    os.path.join(REACT_APP_DIR, 'build', 'static'),
-]
 
 # Application definition
 
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'crispy_forms',
     'corsheaders',
+    'debug_toolbar',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -74,6 +76,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -99,11 +102,11 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = 'cartridge.wsgi.application'
 ASGI_APPLICATION = 'cartridge.routing.application'
 
 redis_host = os.environ.get('REDIS_HOST', '127.0.0.1')
+print(redis_host)
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
