@@ -1,8 +1,8 @@
 from datetime import datetime
 
+from django.conf import settings
 from django.db import models
 from django.utils.dateformat import format
-from django.conf import settings
 
 from main import choices
 
@@ -87,6 +87,7 @@ class Supply(BackupableModel):
 
 
 class Order(models.Model):
+    status = models.CharField(max_length=10, choices=choices.ORDER_STATUS, default="work", verbose_name="Статус")
     date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     edited_at = models.DateTimeField(auto_now=True, verbose_name="Дата редактирования")
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name="Дата выполнения")
@@ -99,10 +100,11 @@ class Order(models.Model):
 
     def finish(self):
         self.finished = True
+        self.status = "finished"
         self.date_finished = datetime.now()
 
     def __str__(self):
-        return f"{'finished' if self.finished else 'in work'***REMOVED*** {self.date.strftime('%d.%m.%Y %H:%M')***REMOVED*** {self.cartridge***REMOVED*** {self.count***REMOVED***"
+        return f"{self.date.strftime('%d.%m.%Y %H:%M')***REMOVED*** {self.get_status_display()***REMOVED*** {self.cartridge***REMOVED*** {self.count***REMOVED***"
 
     # def save(self, *args, **kwargs):
     #     super().save(*args, **kwargs)
