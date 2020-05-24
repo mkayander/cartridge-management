@@ -37,6 +37,10 @@ ALLOWED_HOSTS = [
     # "10.36.240.51"
 ]
 
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
@@ -106,7 +110,6 @@ WSGI_APPLICATION = 'cartridge.wsgi.application'
 ASGI_APPLICATION = 'cartridge.routing.application'
 
 redis_host = os.environ.get('REDIS_HOST', '127.0.0.1')
-print(redis_host)
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
@@ -169,3 +172,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+DEBUG_TOOLBAR_CONFIG = {
+    # Toolbar options
+    # 'RESULTS_CACHE_SIZE': 3,
+    'SHOW_COLLAPSED': True,
+    # Panel options
+    'SQL_WARNING_THRESHOLD': 100,   # milliseconds
+}

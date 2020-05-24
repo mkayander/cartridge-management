@@ -3,8 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from api.serializers import CartridgeSerializer, SupplySerializer, OrderSerializer, ChatMessageSerializer
-from main.models import Cartridge, Supply, Order
 from chat.models import ChatMessage
+from main.models import Cartridge, Supply, Order
 
 
 class CartridgeViewSet(viewsets.ModelViewSet):
@@ -13,7 +13,7 @@ class CartridgeViewSet(viewsets.ModelViewSet):
 
 
 class SupplyViewSet(viewsets.ModelViewSet):
-    queryset = Supply.objects.all().order_by("-date")
+    queryset = Supply.objects.select_related('cartridge')
     serializer_class = SupplySerializer
 
     def initialize_request(self, request, *args, **kwargs):
@@ -22,12 +22,12 @@ class SupplyViewSet(viewsets.ModelViewSet):
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all().order_by("-date")
+    queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
 
 class ChatMessageViewSet(viewsets.ModelViewSet):
-    queryset = ChatMessage.objects.all().order_by("-date")
+    queryset = ChatMessage.objects.all()
     serializer_class = ChatMessageSerializer
 
 
@@ -35,7 +35,8 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
 def home_data_view(request):
     return Response({
         "cartridges": CartridgeSerializer(Cartridge.objects.all(), many=True, context={"request": request}).data,
-        "supplies": SupplySerializer(Supply.objects.all(), many=True, context={"request": request}).data,
+        "supplies": SupplySerializer(Supply.objects.select_related('cartridge'), many=True,
+                                     context={"request": request}).data,
         "orders": OrderSerializer(Order.objects.all(), many=True, context={"request": request}).data,
         "chatMessage": ChatMessageSerializer(ChatMessage.objects.all(), many=True, context={"request": request}).data
     })

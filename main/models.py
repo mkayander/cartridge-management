@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from django.utils.dateformat import format
 
 from main import choices
@@ -30,13 +31,14 @@ class Cartridge(models.Model):
 
     class Meta:
         ordering = ['manufacturer', 'name']
+        # ordering = ['name']
 
 
 class Supply(BackupableModel):
     out = models.BooleanField(choices=choices.SUPPLY_TYPE_BOOLEAN, default=True, verbose_name="Тип передвижения")
     cartridge = models.ForeignKey(Cartridge, related_name="supplies", on_delete=models.CASCADE,
                                   verbose_name="Тип картриджа")
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(default=timezone.now, blank=True)
     edited_at = models.DateTimeField(auto_now=True)
     count = models.PositiveIntegerField(verbose_name="Количество")
     comment = models.TextField(max_length=200, verbose_name="Комментарий", blank=True)
@@ -104,7 +106,7 @@ class Order(models.Model):
         self.date_finished = datetime.now()
 
     def __str__(self):
-        return f"{self.date.strftime('%d.%m.%Y %H:%M')} {self.get_status_display()} {self.cartridge} {self.count}"
+        return f"{format(self.date, settings.DATETIME_FORMAT)} {self.get_status_display()} {self.cartridge} {self.count}"
 
     # def save(self, *args, **kwargs):
     #     super().save(*args, **kwargs)
