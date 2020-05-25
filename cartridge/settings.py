@@ -129,7 +129,7 @@ DATABASES = {
         'NAME': 'django_db',
         'USER': 'postgres',
         'PASSWORD': 'v2x5z9',
-        'HOST': '127.0.0.1',
+        'HOST': 'it-vlshv.dellin.local',
         # 'HOST': 'centos7',
         'PORT': '5432',
     }
