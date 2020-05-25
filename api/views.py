@@ -38,5 +38,5 @@ def home_data_view(request):
         "supplies": SupplySerializer(Supply.objects.select_related('cartridge'), many=True,
                                      context={"request": request}).data,
         "orders": OrderSerializer(Order.objects.all(), many=True, context={"request": request}).data,
-        "chatMessage": ChatMessageSerializer(ChatMessage.objects.all(), many=True, context={"request": request}).data
+        "chatMessage": ChatMessageSerializer(ChatMessage.objects.all()[:5], many=True, context={"request": request}).data
     })
