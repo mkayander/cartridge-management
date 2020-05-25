@@ -127,8 +127,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'django_db',
-        'USER': 'postgres',
-        'PASSWORD': 'v2x5z9',
+        'USER': 'django',
+        'PASSWORD': 'D123456d',
         'HOST': 'it-vlshv.dellin.local',
         # 'HOST': 'centos7',
         'PORT': '5432',
