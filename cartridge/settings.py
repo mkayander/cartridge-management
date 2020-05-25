@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
     # "ps-bykrc.dellin.local",
     "it-vlshv.dellin.local",
     # "10.36.240.51"
+    "vlshv-127.dellin.local"
 ]
 
 INTERNAL_IPS = [
