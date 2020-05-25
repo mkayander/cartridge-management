@@ -39,17 +39,17 @@ def view(request):
     supply = Supply.objects.all().order_by("-date")
     order = Order.objects.all().order_by("-date")
 
-    formSupply = SupplyForm()
-    formOrder = OrderForm()
+    form_supply = SupplyForm()
+    form_order = OrderForm()
 
     if request.method == "POST":
-        formSupply = SupplyForm(request.POST)
-        formOrder = OrderForm(request.POST)
-        if formSupply.is_valid():
-            formSupply.save()
+        form_supply = SupplyForm(request.POST)
+        form_order = OrderForm(request.POST)
+        if form_supply.is_valid():
+            form_supply.save()
             return redirect('index')
-        elif formOrder.is_valid():
-            formOrder.save()
+        elif form_order.is_valid():
+            form_order.save()
             return redirect('index')
         else:
             raise Http404
@@ -57,7 +57,7 @@ def view(request):
     return render(request, "MainPage.html", {
         "cartridges": cartridges,
         "supply": supply,
-        "formSupply": formSupply,
+        "formSupply": form_supply,
         "order": order,
-        "formOrder": formOrder
+        "formOrder": form_order
     ***REMOVED***)
