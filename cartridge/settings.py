@@ -35,7 +35,8 @@ ALLOWED_HOSTS = [
     # "ps-bykrc.dellin.local",
     "it-vlshv.dellin.local",
     # "10.36.240.51"
-    "vlshv-127.dellin.local"
+    "vlshv-127.dellin.local",
+    "10.36.241.83"
 ]
 
 INTERNAL_IPS = [
@@ -124,6 +125,10 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': 'mydatabase',
+    # }
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'django_db',
@@ -173,11 +178,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-
 DEBUG_TOOLBAR_CONFIG = {
     # Toolbar options
     # 'RESULTS_CACHE_SIZE': 3,
     'SHOW_COLLAPSED': True,
     # Panel options
-    'SQL_WARNING_THRESHOLD': 100,   # milliseconds
+    'SQL_WARNING_THRESHOLD': 100,  # milliseconds
 }
