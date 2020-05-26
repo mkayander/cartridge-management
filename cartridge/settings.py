@@ -32,6 +32,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
+    "10.36.240.155",
     # "ps-bykrc.dellin.local",
     "it-vlshv.dellin.local",
     # "10.36.240.51"
