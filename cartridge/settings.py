@@ -134,7 +134,8 @@ DATABASES = {
         'NAME': 'django_db',
         'USER': 'django',
         'PASSWORD': 'D123456d',
-        'HOST': 'it-vlshv.dellin.local',
+        # 'HOST': 'it-vlshv.dellin.local',
+        'HOST': '127.0.0.1',
         # 'HOST': 'centos7',
         'PORT': '5432',
     }
