@@ -98,7 +98,7 @@ class Order(models.Model):
     date = models.DateTimeField(default=timezone.now, blank=True, verbose_name="Дата создания")
     edited_at = models.DateTimeField(auto_now=True, verbose_name="Дата редактирования")
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name="Дата выполнения")
-    number = models.PositiveIntegerField(blank=True, null=True, verbose_name="Номер заявки")
+    number = models.PositiveIntegerField(default=0, blank=True, verbose_name="Номер заявки")
     finished = models.BooleanField(default=False, verbose_name="Выполнен")
     cartridge = models.ForeignKey(Cartridge, related_name="orders", on_delete=models.CASCADE, verbose_name="Картридж")
     supply = models.ForeignKey(Supply, related_name="order", on_delete=models.CASCADE, blank=True, null=True,
