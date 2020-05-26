@@ -34,6 +34,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "10.36.240.155",
     # "ps-bykrc.dellin.local",
+    "10.36.240.51",
     "it-vlshv.dellin.local",
     # "10.36.240.51"
     "vlshv-127.dellin.local",
