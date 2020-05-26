@@ -110,6 +110,7 @@ class Order(models.Model):
         self.restoring = restoring
         super().__init__(*args, **kwargs)
 
+
     def finish(self):
         self.finished = True
         self.status = "finished"
