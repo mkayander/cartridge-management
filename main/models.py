@@ -26,6 +26,11 @@ class Cartridge(models.Model):
                             db_column="cartridge_name")
     count = models.PositiveIntegerField(verbose_name="Количество")
 
+    def __init__(self, *args, **kwargs):
+        restoring = kwargs.pop('restoring', False)
+        self.restoring = restoring
+        super().__init__(*args, **kwargs)
+
     def __str__(self):
         return f'{self.manufacturer***REMOVED*** {self.name***REMOVED***'
 
@@ -90,15 +95,20 @@ class Supply(BackupableModel):
 
 class Order(models.Model):
     status = models.CharField(max_length=10, choices=choices.ORDER_STATUS, default="work", verbose_name="Статус")
-    date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    date = models.DateTimeField(default=timezone.now, blank=True, verbose_name="Дата создания")
     edited_at = models.DateTimeField(auto_now=True, verbose_name="Дата редактирования")
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name="Дата выполнения")
-    number = models.PositiveIntegerField(blank=True, null=True, verbose_name="Номер заявки")
+    number = models.PositiveIntegerField(default=0, blank=True, verbose_name="Номер заявки")
     finished = models.BooleanField(default=False, verbose_name="Выполнен")
     cartridge = models.ForeignKey(Cartridge, related_name="orders", on_delete=models.CASCADE, verbose_name="Картридж")
     supply = models.ForeignKey(Supply, related_name="order", on_delete=models.CASCADE, blank=True, null=True,
                                verbose_name="Перемещение")
     count = models.PositiveIntegerField(verbose_name="Количество")
+
+    def __init__(self, *args, **kwargs):
+        restoring = kwargs.pop('restoring', False)
+        self.restoring = restoring
+        super().__init__(*args, **kwargs)
 
     def finish(self):
         self.finished = True
