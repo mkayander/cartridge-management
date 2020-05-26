@@ -33,6 +33,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     "10.36.240.155",
+    "10.36.240.51",
     # "ps-bykrc.dellin.local",
     "it-vlshv.dellin.local",
     # "10.36.240.51"
@@ -78,6 +79,12 @@ REST_FRAMEWORK = {
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'inqer.net@gmail.com'
+EMAIL_HOST_PASSWORD = 'Hw&YQ2DxmjC#$uZdp%^K'
+EMAIL_PORT = 587
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
