@@ -76,7 +76,7 @@
             "edited_at": "2020-05-25T13:51:02.245Z",
             "finished": false,
             "id": 1,
-            "number": null,
+            "number": 0,
             "restoring": true,
             "status": "work",
             "supply_id": null
@@ -89,7 +89,7 @@
             "edited_at": "2020-05-25T13:51:02.264Z",
             "finished": false,
             "id": 2,
-            "number": null,
+            "number": 0,
             "restoring": true,
             "status": "work",
             "supply_id": null
