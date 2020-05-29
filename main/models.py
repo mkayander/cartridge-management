@@ -1,9 +1,12 @@
 from datetime import datetime
 
 from django.conf import settings
+from django.core import mail
 from django.db import models
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.dateformat import format
+from django.utils.html import strip_tags
 
 from main import choices
 
@@ -119,6 +122,14 @@ class Order(models.Model):
                 'Системный администратор\n'
                 'Каяндер Максим Эдуардович\n'
                 '89854199347')
+
+    def send(self):
+        html_message = render_to_string('OrderMessage.html', {'order': self})
+        print(html_message)
+        plain_message = strip_tags(html_message)
+        mail.send_mail(
+            "Предоставление картриджей "
+        )
 
     def finish(self):
         self.finished = True
