@@ -1,9 +1,12 @@
 from datetime import datetime
 
 from django.conf import settings
+from django.core import mail
 from django.db import models
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.dateformat import format
+from django.utils.html import strip_tags
 
 from main import choices
 
@@ -96,6 +99,7 @@ class Supply(BackupableModel):
 class Order(models.Model):
     status = models.CharField(max_length=10, choices=choices.ORDER_STATUS, default="work", verbose_name="Статус")
     date = models.DateTimeField(default=timezone.now, blank=True, verbose_name="Дата создания")
+    destination = models.CharField(max_length=100, blank=True, default="2 подъезд от КПП (АБЧ 2), Этаж 2, кабинет 14")
     edited_at = models.DateTimeField(auto_now=True, verbose_name="Дата редактирования")
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name="Дата выполнения")
     number = models.PositiveIntegerField(default=0, blank=True, verbose_name="Номер заявки")
@@ -110,6 +114,22 @@ class Order(models.Model):
         self.restoring = restoring
         super().__init__(*args, **kwargs)
 
+    def make_message(self):
+        return ('ООО «Деловые Линии»\n'
+                'PNK Парк Валищево +7 (916) 5654206 142143, Московская обл, Подольск г, Валищево д, промышленного парка Валищево тер, дом № 2, стр 1\n'
+                f'Прошу предоставить картриджи {self.cartridge} в количестве {self.count} штук\n'
+                f'{self.destination}\n'
+                'Системный администратор\n'
+                'Каяндер Максим Эдуардович\n'
+                '89854199347')
+
+    def send(self):
+        html_message = render_to_string('OrderMessage.html', {'order': self})
+        print(html_message)
+        plain_message = strip_tags(html_message)
+        mail.send_mail(
+            "Предоставление картриджей "
+        )
 
     def finish(self):
         self.finished = True
