@@ -81,11 +81,18 @@ REST_FRAMEWORK = {
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
+EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'inqer.net@gmail.com'
-EMAIL_HOST_PASSWORD = 'Hw&YQ2DxmjC#$uZdp%^K'
-EMAIL_PORT = 587
+# EMAIL_USE_SSL = True
+EMAIL_HOST = 'mail.dellin.ru'
+EMAIL_PORT = 443
+DEFAULT_FROM_EMAIL = "Maksim.Kayander@dellin.ru"
+EMAIL_HOST_USER = "dellin\mkayander"
+EMAIL_HOST_PASSWORD = "Xp513012021998"
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST_USER = 'inqer.net@gmail.com'
+# EMAIL_HOST_PASSWORD = 'Hw&YQ2DxmjC#$uZdp%^K'
+# EMAIL_PORT = 587
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

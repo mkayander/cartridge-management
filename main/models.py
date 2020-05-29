@@ -125,13 +125,13 @@ class Order(models.Model):
 
     def send(self):
         html_message = render_to_string('OrderMessage.html', {'order': self})
-        print(html_message)
+        # print(html_message)
         plain_message = strip_tags(html_message)
         mail.send_mail(
             "Предоставление картриджей ",
             plain_message,
-            from_email="inqer.net@gmail.com",
-            recipient_list=["maxim.kayander1@gmail.com"],
+            from_email="Maksim.Kayander@dellin.ru",
+            recipient_list=["Maksim.Kayander@dellin.ru"],
             html_message=html_message
         )
 
