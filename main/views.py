@@ -1,15 +1,13 @@
-from django.http import Http404
-from django.shortcuts import render, redirect
-
-from main.forms import SupplyForm, OrderForm
-
-from main.models import Cartridge, Supply, Order
-
 ***REMOVED***
 
-from django.views.generic import View
-from django.http import HttpResponse
 from django.conf import settings
+from django.http import Http404
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.views.generic import View
+
+from main.forms import SupplyForm, OrderForm
+from main.models import Cartridge, Supply, Order
 
 
 class FrontendAppView(View):
@@ -61,3 +59,9 @@ def view(request):
         "order": order,
         "formOrder": form_order
     ***REMOVED***)
+
+
+def order_mail_test(request):
+    order = Order.objects.first()
+
+    return render(request, 'OrderMessage.html', {order: order***REMOVED***)
