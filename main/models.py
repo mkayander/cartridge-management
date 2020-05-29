@@ -128,7 +128,11 @@ class Order(models.Model):
         print(html_message)
         plain_message = strip_tags(html_message)
         mail.send_mail(
-            "Предоставление картриджей "
+            "Предоставление картриджей ",
+            plain_message,
+            from_email="inqer.net@gmail.com",
+            recipient_list=["maxim.kayander1@gmail.com"],
+            html_message=html_message
         )
 
     def finish(self):
