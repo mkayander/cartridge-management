@@ -76,7 +76,7 @@
             "edited_at": "2020-05-25T13:51:02.245Z",
             "finished": false,
             "id": 1,
-            "number": null,
+            "number": 0,
             "restoring": true,
             "status": "work",
             "supply_id": null
@@ -89,14 +89,12 @@
             "edited_at": "2020-05-25T13:51:02.264Z",
             "finished": false,
             "id": 2,
-            "number": null,
+            "number": 0,
             "restoring": true,
             "status": "work",
             "supply_id": null
         ***REMOVED***
     ***REMOVED***,
-<<<<<<< HEAD
-=======
     "Supply": [
     ***REMOVED***
             "cartridge_id": "26X",
@@ -109,5 +107,4 @@
             "restoring": true
         ***REMOVED***
     ***REMOVED***
->>>>>>> 4eaff6bfd2459762bb7707fa7a4630848f1096ab
 ***REMOVED***
