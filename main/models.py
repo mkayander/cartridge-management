@@ -133,7 +133,7 @@ class Order(BackupableModel):
         self.status = "finished"
         self.date_finished = datetime.now()
         self.supply = Supply.objects.create(out=False, cartridge=self.cartridge, count=self.count,
-                                            comment=f"По заказу {self.pk***REMOVED*** от {format(self.date, 'd E Y')***REMOVED***")
+                                            comment=f"По заказу №{self.pk***REMOVED*** от {format(self.date, 'd E Y')***REMOVED***")
         # self.save()
 
     def roll_back(self):
