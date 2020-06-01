@@ -121,11 +121,14 @@ class Order(BackupableModel):
         # print(html_message)
         plain_message = strip_tags(html_message)
         mail.send_mail(
-            "Предоставление картриджей ",
+            "Предоставление картриджей2",
             plain_message,
             from_email="Maksim.Kayander@dellin.ru",
-            recipient_list=["Maksim.Kayander@dellin.ru"***REMOVED***,
-            html_message=html_message
+            # from_email="printer@dellin.ru",
+            # recipient_list=["Maksim.Kayander@dellin.ru"***REMOVED***,
+            recipient_list=["maxim.kayander1@gmail.com"***REMOVED***,
+            html_message=html_message,
+            fail_silently=False
         )
 
     def finish(self):
