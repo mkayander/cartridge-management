@@ -81,10 +81,16 @@ REST_FRAMEWORK = {
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'inqer.net@gmail.com'
-EMAIL_HOST_PASSWORD = 'Hw&YQ2DxmjC#$uZdp%^K'
+#EMAIL_USE_TLS = True
+#EMAIL_HOST = 'smtp.gmail.com'
+#EMAIL_HOST_USER = 'inqer.net@gmail.com'
+#EMAIL_HOST_PASSWORD = 'Hw&YQ2DxmjC#$uZdp%^K'
+#EMAIL_PORT = 587
+
+EMAIL_USE_STARTTLS = True
+EMAIL_HOST = '10.20.80.110'
+EMAIL_HOST_USER = 'dellin\mbx-printer'
+EMAIL_HOST_PASSWORD = 'D5zDWaIdKPH7'
 EMAIL_PORT = 587
 
 MIDDLEWARE = [
