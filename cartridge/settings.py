@@ -82,7 +82,7 @@ REST_FRAMEWORK = {
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # ----- EMAIL Settings -----
-EMAIL_HOST = '10.20.80.110'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
@@ -136,18 +136,12 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': 'mydatabase',
-    # }
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'django_db',
         'USER': 'django',
         'PASSWORD': 'D123456d',
-        # 'HOST': 'it-vlshv.dellin.local',
         'HOST': '127.0.0.1',
-        # 'HOST': 'centos7',
         'PORT': '5432',
     }
 }
