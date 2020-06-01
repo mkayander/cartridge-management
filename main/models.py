@@ -14,6 +14,11 @@ from main import choices
 class BackupableModel(models.Model):
     restoring = False
 
+    def __init__(self, *args, **kwargs):
+        restoring = kwargs.pop('restoring', False)
+        self.restoring = restoring
+        super().__init__(*args, **kwargs)
+
     class Meta:
         abstract = True
 
@@ -21,18 +26,13 @@ class BackupableModel(models.Model):
 # -------------------------------------------------------------------------------------------------------------------- #
 
 
-class Cartridge(models.Model):
+class Cartridge(BackupableModel):
     manufacturer = models.CharField(max_length=30, choices=choices.MANUFACTURER_CHOICES, default="HP",
                                     verbose_name="Производитель")
     name = models.CharField(max_length=30, unique=True, primary_key=True, verbose_name="Название картриджа",
                             help_text="Наименование картриджа должно быть уникальным",
                             db_column="cartridge_name")
     count = models.PositiveIntegerField(verbose_name="Количество")
-
-    def __init__(self, *args, **kwargs):
-        restoring = kwargs.pop('restoring', False)
-        self.restoring = restoring
-        super().__init__(*args, **kwargs)
 
     def __str__(self):
         return f'{self.manufacturer} {self.name}'
@@ -53,11 +53,6 @@ class Supply(BackupableModel):
 
     def __str__(self):
         return f"{format(self.date, settings.DATETIME_FORMAT)} {self.get_out_display()} {self.cartridge}"
-
-    def __init__(self, *args, **kwargs):
-        restoring = kwargs.pop('restoring', False)
-        self.restoring = restoring
-        super().__init__(*args, **kwargs)
 
     class Meta:
         ordering = ['-date']
@@ -96,7 +91,7 @@ class Supply(BackupableModel):
         return super().delete(using, keep_parents)
 
 
-class Order(models.Model):
+class Order(BackupableModel):
     status = models.CharField(max_length=10, choices=choices.ORDER_STATUS, default="work", verbose_name="Статус")
     date = models.DateTimeField(default=timezone.now, blank=True, verbose_name="Дата создания")
     destination = models.CharField(max_length=100, blank=True, default="2 подъезд от КПП (АБЧ 2), Этаж 2, кабинет 14")
@@ -105,14 +100,12 @@ class Order(models.Model):
     number = models.PositiveIntegerField(default=0, blank=True, verbose_name="Номер заявки")
     finished = models.BooleanField(default=False, verbose_name="Выполнен")
     cartridge = models.ForeignKey(Cartridge, related_name="orders", on_delete=models.CASCADE, verbose_name="Картридж")
-    supply = models.ForeignKey(Supply, related_name="order", on_delete=models.CASCADE, blank=True, null=True,
-                               verbose_name="Перемещение")
+    supply = models.OneToOneField(Supply, related_name="order", on_delete=models.CASCADE, blank=True, null=True,
+                                  verbose_name="Перемещение")
     count = models.PositiveIntegerField(verbose_name="Количество")
 
-    def __init__(self, *args, **kwargs):
-        restoring = kwargs.pop('restoring', False)
-        self.restoring = restoring
-        super().__init__(*args, **kwargs)
+    class Meta:
+        ordering = ['-date']
 
     def make_message(self):
         return ('ООО «Деловые Линии»\n'
@@ -125,19 +118,44 @@ class Order(models.Model):
 
     def send(self):
         html_message = render_to_string('OrderMessage.html', {'order': self})
-        print(html_message)
+        # print(html_message)
         plain_message = strip_tags(html_message)
         mail.send_mail(
-            "Предоставление картриджей "
+            "Предоставление картриджей ",
+            plain_message,
+            from_email="Maksim.Kayander@dellin.ru",
+            recipient_list=["Maksim.Kayander@dellin.ru"],
+            html_message=html_message
         )
 
     def finish(self):
         self.finished = True
         self.status = "finished"
         self.date_finished = datetime.now()
+        self.supply = Supply.objects.create(out=False, cartridge=self.cartridge, count=self.count,
+                                            comment=f"По заказу №{self.pk} от {format(self.date, 'd E Y')}")
+        # self.save()
+
+    def roll_back(self):
+        self.finished = False
+        self.status = "work"
+        self.date_finished = None
+        self.supply.delete()
+        self.supply = None
 
     def __str__(self):
         return f"{format(self.date, settings.DATETIME_FORMAT)} {self.get_status_display()} {self.cartridge} {self.count}"
 
-    # def save(self, *args, **kwargs):
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        if self.pk and not self.restoring:
+            prev_values = Order.objects.get(pk=self.pk)
+            if self.finished and not prev_values.finished:
+                self.finish()
+            elif prev_values.finished and not self.finished:
+                self.roll_back()
+
+        super().save(*args, **kwargs)
+
+    def delete(self, using=None, keep_parents=False):
+        self.roll_back()
+        return super().delete(using, keep_parents)
