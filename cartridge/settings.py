@@ -82,26 +82,32 @@ REST_FRAMEWORK = {
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-#EMAIL_USE_TLS = True
-#EMAIL_HOST = 'smtp.gmail.com'
-#EMAIL_HOST_USER = 'inqer.net@gmail.com'
-#EMAIL_HOST_PASSWORD = 'Hw&YQ2DxmjC#$uZdp%^K'
-#EMAIL_PORT = 587
+# ----- EMAIL Settings -----
 
-#EMAIL_USE_STARTTLS = True
-#EMAIL_HOST = '10.20.80.110'
-#EMAIL_HOST_USER = 'dellin\mbx-printer'
-#EMAIL_HOST_PASSWORD = 'D5zDWaIdKPH7'
-#EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST_USER = 'inqer.net@gmail.com'
+# EMAIL_HOST_PASSWORD = 'Hw&YQ2DxmjC#$uZdp%^K'
+# EMAIL_PORT = 587
+
+# EMAIL_USE_STARTTLS = True
+# EMAIL_HOST = '10.20.80.110'
+
+EMAIL_HOST = 'mail.dellin.ru'
+EMAIL_HOST_USER = r"dellin\mbx-printer"
+EMAIL_HOST_PASSWORD = 'D5zDWaIdKPH7'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = "printer@dellin.ru"
 
 # EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
-#EMAIL_USE_TLS = True
+# EMAIL_USE_TLS = True
 # EMAIL_USE_SSL = True
-EMAIL_HOST = 'mail.dellin.ru'
-EMAIL_PORT = 443
-DEFAULT_FROM_EMAIL = "Maksim.Kayander@dellin.ru"
-EMAIL_HOST_USER = "dellin\mkayander"
-EMAIL_HOST_PASSWORD = ""
+# EMAIL_HOST = 'mail.dellin.ru'
+# EMAIL_PORT = 443
+# DEFAULT_FROM_EMAIL = "Maksim.Kayander@dellin.ru"
+# EMAIL_HOST_USER = "dellin\mkayander"
+# EMAIL_HOST_PASSWORD = ""
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_HOST_USER = 'inqer.net@gmail.com'
 # EMAIL_HOST_PASSWORD = 'Hw&YQ2DxmjC#$uZdp%^K'
