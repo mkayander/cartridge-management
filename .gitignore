@@ -10,6 +10,8 @@ db.sqlite3
 db.sqlite3-journal
 media
 
+mailbox_attachments/
+
 **/migrations/*
 
 ### Django.Python Stack ###
@@ -41,4 +43,3 @@ media
 .idea/**/gradle.xml
 .idea/**/libraries
 
-#.idea
