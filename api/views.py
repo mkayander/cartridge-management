@@ -17,7 +17,7 @@ class SupplyViewSet(viewsets.ModelViewSet):
     serializer_class = SupplySerializer
 
     def initialize_request(self, request, *args, **kwargs):
-        print(request, '\n', request.headers, request.body)
+        # print(request, '\n', request.headers, request.body)
         return super().initialize_request(request, *args, **kwargs)
 
 
@@ -26,7 +26,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
 
     def initialize_request(self, request, *args, **kwargs):
-        print(request, '\n', request.headers, request.body)
+        # print(request, '\n', request.headers, request.body)
         return super().initialize_request(request, *args, **kwargs)
 
     # def update(self, request, *args, **kwargs):
