@@ -1,8 +1,9 @@
 from datetime import datetime
+from email.utils import make_msgid
 
 from django.conf import settings
 from django.core import mail
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -119,28 +120,29 @@ class Order(BackupableModel):
     #             '89854199347')
 
     def send(self):
-        html_message = render_to_string('OrderMessage.html', {'order': self})
-        # print(html_message)
-        # plain_message = strip_tags(html_message)
-        email = EmailMessage(
+        html_message = render_to_string('OutlookOrder.html', {'order': self})
+        plain_message = strip_tags(html_message)
+        email = EmailMultiAlternatives(
             f"Прошу предоставить картриджи {self.cartridge}",
-            html_message,
+            plain_message,
             settings.DEFAULT_FROM_EMAIL,
             ["maxim.kayander1@gmail.com"],
+            # headers={
+            #     "charset": "UTF-8"
+            # }
+            # headers={
+            #     'Message-ID': make_msgid()
+            # }
         )
+        email.attach_alternative(html_message, "text/html")
+        email.encoding = "UTF-8"
+        email.extra_headers['Message-ID'] = make_msgid()
+        print(email.message())
         email.send()
 
         mailbox = Mailbox.objects.get(name="oks-dellin")
         mailbox.record_outgoing_message(email.message())
-
-        # mail.send_mail(
-        #     "Предоставление картриджей2",
-        #     plain_message,
-        #     from_email=settings.DEFAULT_FROM_EMAIL,
-        #     recipient_list=["maxim.kayander1@gmail.com"],
-        #     html_message=html_message,
-        #     fail_silently=False
-        # )
+        print(email.message())
 
     def finish(self):
         self.finished = True

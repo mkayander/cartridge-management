@@ -64,4 +64,4 @@ def view(request):
 def order_mail_test(request):
     order = Order.objects.first()
 
-    return render(request, 'OrderMessage.html', {order: order})
+    return render(request, 'OutlookOrder.html', {'order': order})
