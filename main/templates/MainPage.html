@@ -1,16 +1,16 @@
-{% extends "Base.html" %***REMOVED***
+{% extends "Base.html" %}
 
-{% load crispy_forms_filters %***REMOVED***
+{% load crispy_forms_filters %}
 
-{% block title %***REMOVED***
+{% block title %}
     My title
-{% endblock %***REMOVED***
+{% endblock %}
 
-{% block header %***REMOVED***
+{% block header %}
     My header
-{% endblock %***REMOVED***
+{% endblock %}
 
-{% block content %***REMOVED***
+{% block content %}
     <body>
     <div class="row">
         <div class="col">
@@ -18,28 +18,28 @@
             <table class="table table-striped mx-3">
                 <thead class="thead-dark">
                 <tr>
-                ***REMOVED***#            <th scope="col">#</th>#***REMOVED***
+                    {#            <th scope="col">#</th>#}
                     <th scope="col">Производитель</th>
                     <th scope="col">Наименование</th>
                     <th scope="col">Количество</th>
                 </tr>
                 </thead>
                 <tbody>
-            ***REMOVED***% for cartridge in cartridges %***REMOVED***
+                {% for cartridge in cartridges %}
                     <tr>
-                    ***REMOVED***#                <th scope="row">{{ cartridge.id ***REMOVED******REMOVED***</th>#***REMOVED***
-                        <td><label id="{{ cartridge.manufacturer ***REMOVED******REMOVED***">{{ cartridge.manufacturer ***REMOVED******REMOVED***</label></td>
-                        <td><label id="{{ cartridge.name ***REMOVED******REMOVED***">{{ cartridge.name ***REMOVED******REMOVED***</label></td>
-                        <td><label id="{{ cartridge.name ***REMOVED******REMOVED***{{ cartridge.count ***REMOVED******REMOVED***">{{ cartridge.count ***REMOVED******REMOVED***</label></td>
+                        {#                <th scope="row">{{ cartridge.id }}</th>#}
+                        <td><label id="{{ cartridge.manufacturer }}">{{ cartridge.manufacturer }}</label></td>
+                        <td><label id="{{ cartridge.name }}">{{ cartridge.name }}</label></td>
+                        <td><label id="{{ cartridge.name }}{{ cartridge.count }}">{{ cartridge.count }}</label></td>
                     </tr>
-            ***REMOVED***% endfor %***REMOVED***
+                {% endfor %}
                 </tbody>
             </table>
             <h1 class="pl-5">Заявки</h1>
             <table class="table mx-3 pt-5">
                 <thead class="thead-dark">
                 <tr>
-                ***REMOVED***#            <th scope="col">#</th>#***REMOVED***
+                    {#            <th scope="col">#</th>#}
                     <th scope="col">Создана</th>
                     <th scope="col">Завершена</th>
                     <th scope="col">Номер</th>
@@ -52,43 +52,43 @@
                 </tr>
                 </thead>
                 <tbody class="table-info">
-            ***REMOVED***% for ord in order %***REMOVED***
-                ***REMOVED***% if ord.finished %***REMOVED***
+                {% for ord in order %}
+                    {% if ord.finished %}
                         <tr class="table-success">
-                ***REMOVED***% endif %***REMOVED***
+                    {% endif %}
                 <td>
-                    <label id="orderLabelDate{{ ord.id ***REMOVED******REMOVED***">{{ ord.date ***REMOVED******REMOVED***</label>
+                    <label id="orderLabelDate{{ ord.id }}">{{ ord.date }}</label>
                 </td>
-                <td><label id="{{ ord.date_finished ***REMOVED******REMOVED***">{{ ord.date_finished ***REMOVED******REMOVED***</label></td>
+                <td><label id="{{ ord.date_finished }}">{{ ord.date_finished }}</label></td>
                 <td>
-                    <label id="orderLabelNumber{{ ord.id ***REMOVED******REMOVED***">{{ ord.number ***REMOVED******REMOVED***</label>
-                    <input type="text" class="input-group-text" value="{{ ord.number ***REMOVED******REMOVED***"
-                           style="display: none; width: 3rem" id="orderInputNumber{{ ord.id ***REMOVED******REMOVED***">
+                    <label id="orderLabelNumber{{ ord.id }}">{{ ord.number }}</label>
+                    <input type="text" class="input-group-text" value="{{ ord.number }}"
+                           style="display: none; width: 3rem" id="orderInputNumber{{ ord.id }}">
                 </td>
                 <td>
-                    <label id="orderLabelCart{{ ord.id ***REMOVED******REMOVED***">{{ ord.cartridge ***REMOVED******REMOVED***</label>
-                    <select class="form-control" id="orderSelectCart{{ ord.id ***REMOVED******REMOVED***"
+                    <label id="orderLabelCart{{ ord.id }}">{{ ord.cartridge }}</label>
+                    <select class="form-control" id="orderSelectCart{{ ord.id }}"
                             style="display: none;"></select>
                 </td>
                 <td>
-                    <label id="orderLabelCount{{ ord.id ***REMOVED******REMOVED***">{{ ord.count ***REMOVED******REMOVED***</label>
-                    <input type="text" class="input-group-text" value="{{ ord.count ***REMOVED******REMOVED***"
-                           style="display: none; width: 3rem" id="orderInputCount{{ ord.id ***REMOVED******REMOVED***">
+                    <label id="orderLabelCount{{ ord.id }}">{{ ord.count }}</label>
+                    <input type="text" class="input-group-text" value="{{ ord.count }}"
+                           style="display: none; width: 3rem" id="orderInputCount{{ ord.id }}">
                 </td>
                 <td>
                     <div class="btn-group-vertical" role="group">
-                        <button id="btnOrderChange{{ ord.id ***REMOVED******REMOVED***" style="width: 8rem" type="button"
+                        <button id="btnOrderChange{{ ord.id }}" style="width: 8rem" type="button"
                                 class="btn btn-sm btn-outline-info" value="true"
-                                onclick="btnOrderChangeOrSubmit('{{ ord.id ***REMOVED******REMOVED***')">Изменить
+                                onclick="btnOrderChangeOrSubmit('{{ ord.id }}')">Изменить
                         </button>
-                        <button id="btnOrderDelete{{ ord.id ***REMOVED******REMOVED***" style="width: 8rem" type="button"
+                        <button id="btnOrderDelete{{ ord.id }}" style="width: 8rem" type="button"
                                 class="btn btn-sm btn-outline-danger" value="true"
-                                onclick="btnOrderDeleteOrCancel('{{ ord.id ***REMOVED******REMOVED***')">Удалить
+                                onclick="btnOrderDeleteOrCancel('{{ ord.id }}')">Удалить
                         </button>
                     </div>
                 </td>
                 </tr>
-            ***REMOVED***% endfor %***REMOVED***
+                {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -108,60 +108,60 @@
                 </tr>
                 </thead>
                 <tbody>
-            ***REMOVED***% for suppl in supply %***REMOVED***
-                ***REMOVED***% if suppl.out %***REMOVED***
+                {% for suppl in supply %}
+                    {% if suppl.out %}
                         <tr class="table-danger">
-                        ***REMOVED***% else %***REMOVED***
+                            {% else %}
                         <tr class="table-success">
-                ***REMOVED***% endif %***REMOVED***
+                    {% endif %}
 
-                <td><label id="{{ suppl.date ***REMOVED******REMOVED***">{{ suppl.date ***REMOVED******REMOVED***</label></td>
+                <td><label id="{{ suppl.date }}">{{ suppl.date }}</label></td>
                 <td>
                     <div class="input-group">
                         <label class="col-12"
-                               id="supplyLabelCart{{ suppl.id ***REMOVED******REMOVED***">{{ suppl.cartridge ***REMOVED******REMOVED***</label>
-                        <select class="form-control" id="supplySelectCart{{ suppl.id ***REMOVED******REMOVED***"
+                               id="supplyLabelCart{{ suppl.id }}">{{ suppl.cartridge }}</label>
+                        <select class="form-control" id="supplySelectCart{{ suppl.id }}"
                                 style="display: none;"></select>
-                    ***REMOVED***#                    <input type="text" class="input-group-text col-5" placeholder="{{ suppl.cartridge ***REMOVED******REMOVED***"#***REMOVED***
-                    ***REMOVED***#                           style="display: none;" id="supplyInputCart{{ suppl.id ***REMOVED******REMOVED***">#***REMOVED***
+                        {#                    <input type="text" class="input-group-text col-5" placeholder="{{ suppl.cartridge }}"#}
+                        {#                           style="display: none;" id="supplyInputCart{{ suppl.id }}">#}
                     </div>
                 </td>
                 <td>
                     <div class="input-group">
                         <label class=""
-                               id="supplyLabelCount{{ suppl.id ***REMOVED******REMOVED***">{{ suppl.count ***REMOVED******REMOVED***</label>
-                        <input type="text" class="input-group-text" value="{{ suppl.count ***REMOVED******REMOVED***"
-                               style="display: none; width: 3rem" id="supplyInputCount{{ suppl.id ***REMOVED******REMOVED***">
+                               id="supplyLabelCount{{ suppl.id }}">{{ suppl.count }}</label>
+                        <input type="text" class="input-group-text" value="{{ suppl.count }}"
+                               style="display: none; width: 3rem" id="supplyInputCount{{ suppl.id }}">
                     </div>
                 </td>
-                <td><label id="{{ suppl.comment ***REMOVED******REMOVED***">{{ suppl.comment ***REMOVED******REMOVED***</label></td>
+                <td><label id="{{ suppl.comment }}">{{ suppl.comment }}</label></td>
                 <td>
                     <div class="btn-group-vertical" role="group">
-                        <button id="btnSupplyChange{{ suppl.id ***REMOVED******REMOVED***" style="width: 8rem" type="button"
+                        <button id="btnSupplyChange{{ suppl.id }}" style="width: 8rem" type="button"
                                 class="btn btn-sm btn-outline-info" value="true"
-                                onclick="btnSupplyChangeOrSubmit('{{ suppl.id ***REMOVED******REMOVED***')">Изменить
+                                onclick="btnSupplyChangeOrSubmit('{{ suppl.id }}')">Изменить
                         </button>
-                        <button id="btnSupplyDelete{{ suppl.id ***REMOVED******REMOVED***" style="width: 8rem" type="button"
+                        <button id="btnSupplyDelete{{ suppl.id }}" style="width: 8rem" type="button"
                                 class="btn btn-sm btn-outline-danger" value="true"
-                                onclick="btnSupplyDeleteOrCancel('{{ suppl.id ***REMOVED******REMOVED***')">Удалить
+                                onclick="btnSupplyDeleteOrCancel('{{ suppl.id }}')">Удалить
                         </button>
                     </div>
                 </td>
                 </tr>
-            ***REMOVED***% endfor %***REMOVED***
+                {% endfor %}
                 </tbody>
             </table>
         </div>
 
     </div>
-***REMOVED***#          popup on Supply        #***REMOVED***
+    {#          popup on Supply        #}
     <div class="modal fade" id="modalPopup" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content p-5">
                 <form method="post">
-                ***REMOVED***% csrf_token %***REMOVED***
-                ***REMOVED***{ formSupply | crispy ***REMOVED******REMOVED***
-                ***REMOVED***#    ***REMOVED***% crispy form form.helper %***REMOVED***#***REMOVED***
+                    {% csrf_token %}
+                    {{ formSupply | crispy }}
+                    {#        {% crispy form form.helper %}#}
                     <button class="btn btn-outline-primary" type="submit">
                         <span>Отправить</span>
                     </button>
@@ -173,14 +173,14 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-***REMOVED***#          popup on Order       #***REMOVED***
+    {#          popup on Order       #}
     <div class="modal fade" id="modalOrder" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content p-5">
                 <form method="post">
-                ***REMOVED***% csrf_token %***REMOVED***
-                ***REMOVED***{ formOrder | crispy ***REMOVED******REMOVED***
-                ***REMOVED***#    ***REMOVED***% crispy form form.helper %***REMOVED***#***REMOVED***
+                    {% csrf_token %}
+                    {{ formOrder | crispy }}
+                    {#        {% crispy form form.helper %}#}
                     <button class="btn btn-outline-primary" type="submit">
                         <span>Отправить</span>
                     </button>
@@ -192,7 +192,7 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
-***REMOVED***#          popup on Delete        #***REMOVED***
+    {#          popup on Delete        #}
     <div class="modal fade" id="modalOnDelete" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content p-5 btn-toolbar">
@@ -215,4 +215,4 @@
 
     </body>
 
-{% endblock %***REMOVED***
+{% endblock %}

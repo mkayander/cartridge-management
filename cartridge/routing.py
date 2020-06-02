@@ -9,5 +9,5 @@ application = ProtocolTypeRouter({
             chat.routing.websocket_urlpatterns
         )
     ),
-***REMOVED***)
+})
 

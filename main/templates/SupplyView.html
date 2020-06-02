@@ -1,23 +1,23 @@
-{% extends "Base.html" %***REMOVED***
+{% extends "Base.html" %}
 
-{% load crispy_forms_filters %***REMOVED***
-{#{% load crispy_forms_tags %***REMOVED***#***REMOVED***
+{% load crispy_forms_filters %}
+{#{% load crispy_forms_tags %}#}
 
-{% block title %***REMOVED***
+{% block title %}
     Перемещение картриджей
-{% endblock %***REMOVED***
+{% endblock %}
 
-{% block header %***REMOVED***
+{% block header %}
     Перемещение картриджей
-{% endblock %***REMOVED***
+{% endblock %}
 
-{% block content %***REMOVED***
+{% block content %}
     <form method="post">
-    ***REMOVED***% csrf_token %***REMOVED***
-            ***REMOVED***{ form|crispy ***REMOVED******REMOVED***
-{#    ***REMOVED***% crispy form form.helper %***REMOVED***#***REMOVED***
+        {% csrf_token %}
+                {{ form|crispy }}
+{#        {% crispy form form.helper %}#}
     <button class="btn btn-outline-primary" type="submit">
         <span>Отправить</span>
     </button>
     </form>
-{% endblock %***REMOVED***
+{% endblock %}

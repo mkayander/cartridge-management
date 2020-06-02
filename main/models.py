@@ -1,8 +1,9 @@
 from datetime import datetime
+from email.utils import make_msgid
 
 from django.conf import settings
 from django.core import mail
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -37,11 +38,11 @@ class Cartridge(BackupableModel):
     count = models.PositiveIntegerField(verbose_name="Количество")
 
     def __str__(self):
-        return f'{self.manufacturer***REMOVED*** {self.name***REMOVED***'
+        return f'{self.manufacturer} {self.name}'
 
     class Meta:
-        ordering = ['manufacturer', 'name'***REMOVED***
-        # ordering = ['name'***REMOVED***
+        ordering = ['manufacturer', 'name']
+        # ordering = ['name']
 
 
 class Supply(BackupableModel):
@@ -54,20 +55,20 @@ class Supply(BackupableModel):
     comment = models.TextField(max_length=200, verbose_name="Комментарий", blank=True)
 
     def __str__(self):
-        return f"{format(self.date, settings.DATETIME_FORMAT)***REMOVED*** {self.get_out_display()***REMOVED*** {self.cartridge***REMOVED***"
+        return f"{format(self.date, settings.DATETIME_FORMAT)} {self.get_out_display()} {self.cartridge}"
 
     class Meta:
-        ordering = ['-date'***REMOVED***
+        ordering = ['-date']
 
     def update_cartridge_count(self, value):
-        print(f"Updating cartridge count: {self.cartridge***REMOVED*** {value=***REMOVED*** ; {self.out=***REMOVED*** ; {self.cartridge.count=***REMOVED***")
+        print(f"Updating cartridge count: {self.cartridge} {value=} ; {self.out=} ; {self.cartridge.count=}")
         if value != 0 and value is not None:
             if self.out:
                 self.cartridge.count -= value
             else:
                 self.cartridge.count += value
 
-            print(f"{self.cartridge***REMOVED*** new count is {self.cartridge.count***REMOVED***")
+            print(f"{self.cartridge} new count is {self.cartridge.count}")
             self.cartridge.save()
 
     def save(self, *args, **kwargs):
@@ -107,47 +108,48 @@ class Order(BackupableModel):
     count = models.PositiveIntegerField(verbose_name="Количество")
 
     class Meta:
-        ordering = ['-date'***REMOVED***
+        ordering = ['-date']
 
     # def make_message(self):
     #     return ('ООО «Деловые Линии»\n'
     #             'PNK Парк Валищево +7 (916) 5654206 142143, Московская обл, Подольск г, Валищево д, промышленного парка Валищево тер, дом № 2, стр 1\n'
-    #             f'Прошу предоставить картриджи {self.cartridge***REMOVED*** в количестве {self.count***REMOVED*** штук\n'
-    #             f'{self.destination***REMOVED***\n'
+    #             f'Прошу предоставить картриджи {self.cartridge} в количестве {self.count} штук\n'
+    #             f'{self.destination}\n'
     #             'Системный администратор\n'
     #             'Каяндер Максим Эдуардович\n'
     #             '89854199347')
 
     def send(self):
-        html_message = render_to_string('OrderMessage.html', {'order': self***REMOVED***)
-        # print(html_message)
-        # plain_message = strip_tags(html_message)
-        email = EmailMessage(
-            f"Прошу предоставить картриджи {self.cartridge***REMOVED***",
-            html_message,
+        html_message = render_to_string('OutlookOrder.html', {'order': self})
+        plain_message = strip_tags(html_message)
+        email = EmailMultiAlternatives(
+            f"Прошу предоставить картриджи {self.cartridge}",
+            plain_message,
             settings.DEFAULT_FROM_EMAIL,
-            ["maxim.kayander1@gmail.com"***REMOVED***,
+            ["maxim.kayander1@gmail.com"],
+            # headers={
+            #     "charset": "UTF-8"
+            # }
+            # headers={
+            #     'Message-ID': make_msgid()
+            # }
         )
+        email.attach_alternative(html_message, "text/html")
+        email.encoding = "UTF-8"
+        email.extra_headers['Message-ID'] = make_msgid()
+        print(email.message())
         email.send()
 
         mailbox = Mailbox.objects.get(name="oks-dellin")
         mailbox.record_outgoing_message(email.message())
-
-        # mail.send_mail(
-        #     "Предоставление картриджей2",
-        #     plain_message,
-        #     from_email=settings.DEFAULT_FROM_EMAIL,
-        #     recipient_list=["maxim.kayander1@gmail.com"***REMOVED***,
-        #     html_message=html_message,
-        #     fail_silently=False
-        # )
+        print(email.message())
 
     def finish(self):
         self.finished = True
         self.status = "finished"
         self.date_finished = datetime.now()
         self.supply = Supply.objects.create(out=False, cartridge=self.cartridge, count=self.count,
-                                            comment=f"По заказу №{self.pk***REMOVED*** от {format(self.date, 'd E Y')***REMOVED***")
+                                            comment=f"По заказу №{self.pk} от {format(self.date, 'd E Y')}")
         # self.save()
 
     def roll_back(self):
@@ -158,7 +160,7 @@ class Order(BackupableModel):
         self.supply = None
 
     def __str__(self):
-        return f"{format(self.date, settings.DATETIME_FORMAT)***REMOVED*** {self.get_status_display()***REMOVED*** {self.cartridge***REMOVED*** {self.count***REMOVED***"
+        return f"{format(self.date, settings.DATETIME_FORMAT)} {self.get_status_display()} {self.cartridge} {self.count}"
 
     def save(self, *args, **kwargs):
         if self.pk and not self.restoring:

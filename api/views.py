@@ -42,12 +42,12 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
     serializer_class = ChatMessageSerializer
 
 
-@api_view(["GET"***REMOVED***)
+@api_view(["GET"])
 def home_data_view(request):
     return Response({
-        "cartridges": CartridgeSerializer(Cartridge.objects.all(), many=True, context={"request": request***REMOVED***).data,
+        "cartridges": CartridgeSerializer(Cartridge.objects.all(), many=True, context={"request": request}).data,
         "supplies": SupplySerializer(Supply.objects.select_related('cartridge'), many=True,
-                                     context={"request": request***REMOVED***).data,
-        "orders": OrderSerializer(Order.objects.all(), many=True, context={"request": request***REMOVED***).data,
-        "chatMessage": ChatMessageSerializer(ChatMessage.objects.all()[:50***REMOVED***, many=True, context={"request": request***REMOVED***).data
-    ***REMOVED***)
+                                     context={"request": request}).data,
+        "orders": OrderSerializer(Order.objects.all(), many=True, context={"request": request}).data,
+        "chatMessage": ChatMessageSerializer(ChatMessage.objects.all()[:50], many=True, context={"request": request}).data
+    })

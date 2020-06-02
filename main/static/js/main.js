@@ -3,16 +3,16 @@
 //         let options = {
 //             "backdrop": "static",
 //             "show": true
-//         ***REMOVED***;
+//         };
 //         $("#popup").on("click", function () {
 //             $('#modalPopup').modal(options);
-//         ***REMOVED***);
+//         });
 //         $("#btnAddOrder").on("click", function () {
 //             $('#modalOrder').modal(options);
-//         ***REMOVED***);
-//     ***REMOVED***);
+//         });
+//     });
 //
-// ***REMOVED***;
+// };
 //
 // function btnSupplySubmit(id, value) {
 //     const input = parseInt(document.getElementById("supplyInputCount" + id).value);
@@ -20,17 +20,17 @@
 //     $.ajax({
 //         type: 'PATCH',
 //         url: 'http://ps-bykrc.dellin.local/api/supplies/' + id + "/",
-//         data: {"count": input, "cartridge": value***REMOVED***,
+//         data: {"count": input, "cartridge": value},
 //         success: location.reload()
-//     ***REMOVED***);
-// ***REMOVED***
+//     });
+// }
 //
 // function confirmDelete(modal, url, id) {
-//     const {btnConfirmDelete***REMOVED*** = getDomElements(id);
+//     const {btnConfirmDelete} = getDomElements(id);
 //     let options = {
 //         "backdrop": "static",
 //         "show": true
-//     ***REMOVED***;
+//     };
 //     modal.modal(options);
 //     btnConfirmDelete.onclick = () => {
 //         console.log("btnConfirmDelete clicked");
@@ -38,21 +38,21 @@
 //             type: 'Delete',
 //             url: url + id + "/",
 //             success: location.reload()
-//         ***REMOVED***);
-//     ***REMOVED***;
-// ***REMOVED***
+//         });
+//     };
+// }
 //
 // function getCartridgeName(select) {
 //     $.get('http://ps-bykrc.dellin.local/api/cartridges/', function (data) {
 //                     for (let dat in data) {
 //                         let opt = document.createElement('option');
-//                         opt.innerText = data[dat***REMOVED***.name;
-//                         opt.value = data[dat***REMOVED***.name;
+//                         opt.innerText = data[dat].name;
+//                         opt.value = data[dat].name;
 //                         select.append(opt);
-//                     ***REMOVED***
-//                 ***REMOVED***
+//                     }
+//                 }
 //             );
-// ***REMOVED***
+// }
 //
 // function getDomElements(id) {
 //     return {
@@ -71,14 +71,14 @@
 //         orderLabelCount: document.getElementById("orderLabelCount" + id),
 //         orderSelectCart: document.getElementById("orderSelectCart" + id),
 //         orderLabelCart: document.getElementById("orderLabelCart" + id),
-//     ***REMOVED***
-// ***REMOVED***
+//     }
+// }
 //
 //
 // function btnSupplyChangeOrSubmit(id) {
 //     // const els = getDomElements();
 //     // console.log(els.btnSupplyChange);
-//     const {btnSupplyChange, btnSupplyDelete, supplyLabelCount, supplyInputCount, supplyLabelCart, supplySelectCart***REMOVED*** = getDomElements(id);
+//     const {btnSupplyChange, btnSupplyDelete, supplyLabelCount, supplyInputCount, supplyLabelCart, supplySelectCart} = getDomElements(id);
 //
 //     if (btnSupplyChange.value === 'true') {
 //         supplySelectCart.style.display = "block";
@@ -99,10 +99,10 @@
 //
 //         if (supplySelectCart.childElementCount === 0) {
 //             getCartridgeName(supplySelectCart);
-//         ***REMOVED***
+//         }
 //
 //
-//     ***REMOVED*** else {
+//     } else {
 //         btnSupplySubmit(id, supplySelectCart.value);
 //         console.log(supplySelectCart.value);
 //         btnSupplyChange.innerText = "Изменить";
@@ -114,15 +114,15 @@
 //         supplyInputCount.style.display = "none";
 //
 //         supplyLabelCart.style.display = "block";
-//     ***REMOVED***
-// ***REMOVED***
+//     }
+// }
 //
 // function btnSupplyDeleteOrCancel(id) {
-//     const {btnSupplyChange, btnSupplyDelete, supplyLabelCount, supplyInputCount, supplyLabelCart, supplySelectCart***REMOVED*** = getDomElements(id);
+//     const {btnSupplyChange, btnSupplyDelete, supplyLabelCount, supplyInputCount, supplyLabelCart, supplySelectCart} = getDomElements(id);
 //
 //     if (btnSupplyDelete.value === 'true') {
 //         confirmDelete($("#modalOnDelete"), 'http://ps-bykrc.dellin.local/api/supplies/', id);
-//     ***REMOVED*** else {
+//     } else {
 //         supplySelectCart.style.display = "none";
 //
 //         btnSupplyDelete.innerText = "Удалить";
@@ -138,8 +138,8 @@
 //         btnSupplyChange.classList.add("btn-outline-info");
 //
 //         supplyLabelCart.style.display = "block";
-//     ***REMOVED***
-// ***REMOVED***
+//     }
+// }
 //
 // function btnOrderChangeOrSubmit(id) {
 //     const els = getDomElements(id);
@@ -162,20 +162,20 @@
 //
 //         if (els.orderSelectCart.childElementCount === 0) {
 //             getCartridgeName(els.orderSelectCart);
-//         ***REMOVED***
-//     ***REMOVED*** else {
+//         }
+//     } else {
 //         els.btnOrderChange.innerText = "Изменить";
 //         els.btnOrderChange.classList.remove("btn-outline-success");
 //         els.btnOrderChange.classList.add("btn-outline-info");
-//     ***REMOVED***
-// ***REMOVED***
+//     }
+// }
 //
 // function btnOrderDeleteOrCancel(id) {
 //     const els = getDomElements(id);
 //
 //     if (els.btnOrderDelete.value === 'true') {
 //         confirmDelete($("#modalOnDelete"), 'http://ps-bykrc.dellin.local/api/orders/', id);
-//     ***REMOVED*** else {
+//     } else {
 //         els.btnOrderDelete.innerText = "Удалить";
 //         els.btnOrderDelete.value = "true";
 //
@@ -192,7 +192,7 @@
 //         els.orderLabelCount.style.display = "block";
 //         els.orderLabelCart.style.display = "block";
 //
-//     ***REMOVED***
-// ***REMOVED***
+//     }
+// }
 //
 //

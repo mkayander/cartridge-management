@@ -4,4 +4,4 @@ from . import consumers
 
 websocket_urlpatterns = [
     path('chat', consumers.ChatConsumer),
-***REMOVED***
+]

@@ -6,7 +6,7 @@ from rest_framework import serializers
 class CartridgeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Cartridge
-        fields = ["url", "name", "manufacturer", "count"***REMOVED***
+        fields = ["url", "name", "manufacturer", "count"]
 
 
 class SupplySerializer(serializers.ModelSerializer):

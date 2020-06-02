@@ -17,7 +17,7 @@ mailbox_attachments/
 
 ### Django.Python Stack ###
 # Byte-compiled / optimized / DLL files
-*.py[cod***REMOVED***
+*.py[cod]
 *$py.class
 
 # User-specific stuff

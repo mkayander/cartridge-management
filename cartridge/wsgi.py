@@ -1,13 +1,13 @@
-***REMOVED***
+"""
 WSGI config for cartridge project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
-***REMOVED***
+For more information on this file, see
 https://docs.djangoproject.com/en/3.0/howto/deployment/wsgi/
-***REMOVED***
+"""
 
-***REMOVED***
+import os
 
 from django.core.wsgi import get_wsgi_application
 

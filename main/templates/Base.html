@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
 
-***REMOVED***% load static %***REMOVED***
-    <link rel="stylesheet" href="{% static "css/bootstrap.css" %***REMOVED***">
-{#    <script src={% static "js/main.js" %***REMOVED***></script>#***REMOVED***
-***REMOVED***#    <script type="application/javascript" src={% static "js/JQuery.js" %***REMOVED***></script>#***REMOVED***
-***REMOVED***#    <script type="application/javascript" src={% static "js/JQuery.js" %***REMOVED***></script>#***REMOVED***
-{#    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>#***REMOVED***
-{#    <script src="{% static "js/bootstrap.js" %***REMOVED***"></script>#***REMOVED***
+    {% load static %}
+    <link rel="stylesheet" href="{% static "css/bootstrap.css" %}">
+{#    <script src={% static "js/main.js" %}></script>#}
+    {#    <script type="application/javascript" src={% static "js/JQuery.js" %}></script>#}
+    {#    <script type="application/javascript" src={% static "js/JQuery.js" %}></script>#}
+{#    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>#}
+{#    <script src="{% static "js/bootstrap.js" %}"></script>#}
 
     <title>
-    ***REMOVED***% block title %***REMOVED***
-    ***REMOVED***% endblock %***REMOVED***
+        {% block title %}
+        {% endblock %}
     </title>
 
 </head>
@@ -21,8 +21,8 @@
 <header>
     <nav class="navbar navbar-dark bg-primary">
         <span class="navbar-brand mb-0 h1">
-        ***REMOVED***% block header %***REMOVED***
-        ***REMOVED***% endblock %***REMOVED***
+            {% block header %}
+            {% endblock %}
         </span>
         <div class="btn-group">
             <a href="/api/" class="btn btn-info my-2 my-sm-0" type="button">Rest</a>
@@ -33,8 +33,8 @@
 
 <body>
 <div class="container-fluid pr-5 pt-5">
-***REMOVED***% block content %***REMOVED***
-***REMOVED***% endblock %***REMOVED***
+    {% block content %}
+    {% endblock %}
 </div>
 </body>
 </html>

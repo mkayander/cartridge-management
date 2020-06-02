@@ -12,4 +12,4 @@ urlpatterns = [
     path('', include(router.urls)),
     path('all', home_data_view, name="api_home_data"),
     path('auth/', include('rest_framework.urls'))
-***REMOVED***
+]

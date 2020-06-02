@@ -1,4 +1,4 @@
-***REMOVED***
+import os
 
 from django.conf import settings
 from django.http import Http404
@@ -11,10 +11,10 @@ from main.models import Cartridge, Supply, Order
 
 
 class FrontendAppView(View):
-    ***REMOVED***
+    """
     Serves the compiled frontend entry point (only works if you have run `yarn
     run build`).
-    ***REMOVED***
+    """
 
     def get(self, request):
         try:
@@ -23,11 +23,11 @@ class FrontendAppView(View):
         except FileNotFoundError:
             # logging.exception('Production build of app not found')
             return HttpResponse(
-                ***REMOVED***
+                """
                 This URL is only used when you have built the production
                 version of the app. Visit http://localhost:3000/ instead, or
                 run yarn run build to test the production version.
-                ***REMOVED***,
+                """,
                 status=501,
             )
 
@@ -58,10 +58,10 @@ def view(request):
         "formSupply": form_supply,
         "order": order,
         "formOrder": form_order
-    ***REMOVED***)
+    })
 
 
 def order_mail_test(request):
     order = Order.objects.first()
 
-    return render(request, 'OrderMessage.html', {order: order***REMOVED***)
+    return render(request, 'OutlookOrder.html', {'order': order})

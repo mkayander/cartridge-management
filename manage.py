@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-***REMOVED***Django's command-line utility for administrative tasks.***REMOVED***
-***REMOVED***
+"""Django's command-line utility for administrative tasks."""
+import os
 import sys
 
 

@@ -5,17 +5,17 @@ from main.models import Cartridge, Supply, Order
 
 class CartridgeAdmin(admin.ModelAdmin):
     # fields = '__all__'
-    list_display = ["name", "manufacturer", "count"***REMOVED***
+    list_display = ["name", "manufacturer", "count"]
 
 
 class SupplyAdmin(admin.ModelAdmin):
     # fields = '__all__'
-    list_display = ["date", "out", "cartridge", "count", "comment"***REMOVED***
+    list_display = ["date", "out", "cartridge", "count", "comment"]
 
 
 class OrderAdmin(admin.ModelAdmin):
     # fields = '__all__'
-    list_display = ["date", "status", "date_finished", "finished", "number", "cartridge", "count"***REMOVED***
+    list_display = ["date", "status", "date_finished", "finished", "number", "cartridge", "count"]
 
 
 admin.site.register(Cartridge, CartridgeAdmin)
