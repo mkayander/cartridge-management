@@ -27,6 +27,7 @@ mailbox_attachments/
 .idea/**/dictionaries
 .idea/**/shelf
 .idea/misc.xml
+.idea/cartridge.iml
 
 # Generated files
 .idea/**/contentModel.xml
