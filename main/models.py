@@ -2,11 +2,13 @@ from datetime import datetime
 
 from django.conf import settings
 from django.core import mail
+from django.core.mail import EmailMessage
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.dateformat import format
 from django.utils.html import strip_tags
+from django_mailbox.models import Mailbox
 
 from main import choices
 
@@ -107,27 +109,38 @@ class Order(BackupableModel):
     class Meta:
         ordering = ['-date']
 
-    def make_message(self):
-        return ('ООО «Деловые Линии»\n'
-                'PNK Парк Валищево +7 (916) 5654206 142143, Московская обл, Подольск г, Валищево д, промышленного парка Валищево тер, дом № 2, стр 1\n'
-                f'Прошу предоставить картриджи {self.cartridge} в количестве {self.count} штук\n'
-                f'{self.destination}\n'
-                'Системный администратор\n'
-                'Каяндер Максим Эдуардович\n'
-                '89854199347')
+    # def make_message(self):
+    #     return ('ООО «Деловые Линии»\n'
+    #             'PNK Парк Валищево +7 (916) 5654206 142143, Московская обл, Подольск г, Валищево д, промышленного парка Валищево тер, дом № 2, стр 1\n'
+    #             f'Прошу предоставить картриджи {self.cartridge} в количестве {self.count} штук\n'
+    #             f'{self.destination}\n'
+    #             'Системный администратор\n'
+    #             'Каяндер Максим Эдуардович\n'
+    #             '89854199347')
 
     def send(self):
         html_message = render_to_string('OrderMessage.html', {'order': self})
         # print(html_message)
-        plain_message = strip_tags(html_message)
-        mail.send_mail(
-            "Предоставление картриджей2",
-            plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=["maxim.kayander1@gmail.com"],
-            html_message=html_message,
-            fail_silently=False
+        # plain_message = strip_tags(html_message)
+        email = EmailMessage(
+            f"Прошу предоставить картриджи {self.cartridge}",
+            html_message,
+            settings.DEFAULT_FROM_EMAIL,
+            ["maxim.kayander1@gmail.com"],
         )
+        email.send()
+
+        mailbox = Mailbox.objects.get(name="oks-dellin")
+        mailbox.record_outgoing_message(email.message())
+
+        # mail.send_mail(
+        #     "Предоставление картриджей2",
+        #     plain_message,
+        #     from_email=settings.DEFAULT_FROM_EMAIL,
+        #     recipient_list=["maxim.kayander1@gmail.com"],
+        #     html_message=html_message,
+        #     fail_silently=False
+        # )
 
     def finish(self):
         self.finished = True
