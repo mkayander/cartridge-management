@@ -2,14 +2,14 @@ from datetime import datetime
 from email.utils import make_msgid
 
 from django.conf import settings
-from django.core import mail
-from django.core.mail import EmailMessage, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.dateformat import format
 from django.utils.html import strip_tags
 from django_mailbox.models import Mailbox
+from django_mailbox.models import Message
 
 from main import choices
 
@@ -106,18 +106,10 @@ class Order(BackupableModel):
     supply = models.OneToOneField(Supply, related_name="order", on_delete=models.CASCADE, blank=True, null=True,
                                   verbose_name="Перемещение")
     count = models.PositiveIntegerField(verbose_name="Количество")
+    email = models.OneToOneField(Message, on_delete=models.SET_NULL, related_name="order", null=True, blank=True)
 
     class Meta:
         ordering = ['-date']
-
-    # def make_message(self):
-    #     return ('ООО «Деловые Линии»\n'
-    #             'PNK Парк Валищево +7 (916) 5654206 142143, Московская обл, Подольск г, Валищево д, промышленного парка Валищево тер, дом № 2, стр 1\n'
-    #             f'Прошу предоставить картриджи {self.cartridge} в количестве {self.count} штук\n'
-    #             f'{self.destination}\n'
-    #             'Системный администратор\n'
-    #             'Каяндер Максим Эдуардович\n'
-    #             '89854199347')
 
     def send(self):
         html_message = render_to_string('OutlookOrder.html', {'order': self})
@@ -127,22 +119,15 @@ class Order(BackupableModel):
             plain_message,
             settings.DEFAULT_FROM_EMAIL,
             ["maxim.kayander1@gmail.com"],
-            # headers={
-            #     "charset": "UTF-8"
-            # }
-            # headers={
-            #     'Message-ID': make_msgid()
-            # }
         )
         email.attach_alternative(html_message, "text/html")
         email.encoding = "UTF-8"
         email.extra_headers['Message-ID'] = make_msgid()
-        print(email.message())
         email.send()
 
-        mailbox = Mailbox.objects.get(name="oks-dellin")
-        mailbox.record_outgoing_message(email.message())
-        print(email.message())
+        mailbox = Mailbox.objects.get(name="oks-gmail")
+        self.email = mailbox.record_outgoing_message(email.message())
+        self.save()
 
     def finish(self):
         self.finished = True
@@ -150,7 +135,6 @@ class Order(BackupableModel):
         self.date_finished = datetime.now()
         self.supply = Supply.objects.create(out=False, cartridge=self.cartridge, count=self.count,
                                             comment=f"По заказу №{self.pk} от {format(self.date, 'd E Y')}")
-        # self.save()
 
     def roll_back(self):
         self.finished = False
@@ -165,11 +149,11 @@ class Order(BackupableModel):
     def save(self, *args, **kwargs):
         if self.pk and not self.restoring:
             prev_values = Order.objects.get(pk=self.pk)
-            if self.finished and not prev_values.finished:
-                self.finish()
-            elif prev_values.finished and not self.finished:
-                self.roll_back()
-
+            if self.finished is not prev_values.finished:
+                if self.finished and not prev_values.finished:
+                    self.finish()
+                elif prev_values.finished and not self.finished:
+                    self.roll_back()
         super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):
