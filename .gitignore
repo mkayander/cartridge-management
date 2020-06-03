@@ -26,8 +26,8 @@ mailbox_attachments/
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
-.idea/misc.xml
-.idea/cartridge.iml
+#.idea/misc.xml
+#.idea/cartridge.iml
 
 # Generated files
 .idea/**/contentModel.xml
