@@ -11,11 +11,6 @@ from main.models import Cartridge, Supply, Order
 
 
 class FrontendAppView(View):
-    """
-    Serves the compiled frontend entry point (only works if you have run `yarn
-    run build`).
-    """
-
     def get(self, request):
         try:
             with open(os.path.join(settings.REACT_APP_DIR, 'build', 'index.html')) as f:
