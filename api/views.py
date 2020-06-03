@@ -1,5 +1,5 @@
-from rest_framework import viewsets
-from rest_framework.decorators import api_view
+from rest_framework import viewsets, permissions
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -52,6 +52,7 @@ class ChatMessageViewSet(viewsets.ModelViewSet):
 
 
 @api_view(["GET"])
+# @permission_classes([permissions.AllowAny])
 def home_data_view(request):
     return Response({
         "cartridges": CartridgeSerializer(Cartridge.objects.all(), many=True, context={"request": request}).data,
@@ -64,7 +65,12 @@ def home_data_view(request):
 
 
 class SendOrderView(APIView):
+    # queryset = Order.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request, id):
-        print(f"{request=} \n {id=}")
-        return Response({"result": "ok"})
+    def get(self, request, order_pk):
+        try:
+            order = Order.objects.get(pk=order_pk)
+            return Response({"result": "ok"})
+        except Order.DoesNotExist:
+            return Response({"result": f"Order with pk = {order_pk} does not exist."}, status=400)
