@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'debug_toolbar',
     'django_mailbox',
+    'constance',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -78,6 +79,19 @@ REST_FRAMEWORK = {
         # 'rest_framework.permissions.DjangoModelPermissions',
         'rest_framework.permissions.AllowAny',
     ],
+}
+
+CONSTANCE_BACKEND = 'constance.backends.redisd.RedisBackend'
+CONSTANCE_REDIS_CONNECTION = {
+    'host': 'localhost',
+    'port': 6379,
+    'db': 0,
+}
+CONSTANCE_CONFIG = {
+    'PRINTER_SUPPORT_MAIL': ("support@masservice.ru", "")
+}
+CONSTANCE_FIELDSETS = {
+    'Email Options': ('PRINTER_SUPPORT_MAIL',)
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

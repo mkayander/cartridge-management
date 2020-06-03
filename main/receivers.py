@@ -7,11 +7,11 @@ from django_mailbox.signals import message_received
 from main.models import Supply, Order
 
 
-@receiver(post_save, sender=Supply)
-def backup_db_to_json(sender, instance, created, **kwargs):
-    # call_command("backup", "all")
-    print("backup_db_to_json called")
-    pprint(instance.__dict__, indent=2)
+# @receiver(post_save, sender=Supply)
+# def backup_db_to_json(sender, instance, created, **kwargs):
+#     # call_command("backup", "all")
+#     print("backup_db_to_json called")
+#     pprint(instance.__dict__, indent=2)
 
 
 @receiver(message_received)

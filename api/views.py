@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from api.serializers import CartridgeSerializer, SupplySerializer, OrderSerializer, ChatMessageSerializer
 from chat.models import ChatMessage
@@ -29,6 +30,14 @@ class OrderViewSet(viewsets.ModelViewSet):
         # print(request, '\n', request.headers, request.body)
         return super().initialize_request(request, *args, **kwargs)
 
+    def get_object(self):
+        print("get_object")
+        return super().get_object()
+
+    def retrieve(self, request, *args, **kwargs):
+        print("retrieve")
+        return super().retrieve(request, *args, **kwargs)
+
     # def update(self, request, *args, **kwargs):
     #     partial = kwargs.pop('partial', False)
     #     instance = self.get_object()
@@ -49,5 +58,13 @@ def home_data_view(request):
         "supplies": SupplySerializer(Supply.objects.select_related('cartridge'), many=True,
                                      context={"request": request}).data,
         "orders": OrderSerializer(Order.objects.all(), many=True, context={"request": request}).data,
-        "chatMessage": ChatMessageSerializer(ChatMessage.objects.all()[:50], many=True, context={"request": request}).data
+        "chatMessage": ChatMessageSerializer(ChatMessage.objects.all()[:50], many=True,
+                                             context={"request": request}).data
     })
+
+
+class SendOrderView(APIView):
+
+    def get(self, request, id):
+        print(f"{request=} \n {id=}")
+        return Response({"result": "ok"})

@@ -1,6 +1,7 @@
 from datetime import datetime
 from email.utils import make_msgid
 
+from constance import config
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.db import models
@@ -115,10 +116,10 @@ class Order(BackupableModel):
         html_message = render_to_string('OutlookOrder.html', {'order': self})
         plain_message = strip_tags(html_message)
         email = EmailMultiAlternatives(
-            f"Прошу предоставить картриджи {self.cartridge}",
+            f'Картриджи {self.cartridge}, ООО "Деловые Линии"',
             plain_message,
             settings.DEFAULT_FROM_EMAIL,
-            ["maxim.kayander1@gmail.com"],
+            [config.PRINTER_SUPPORT_MAIL],
         )
         email.attach_alternative(html_message, "text/html")
         email.encoding = "UTF-8"
