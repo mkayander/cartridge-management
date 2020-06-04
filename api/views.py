@@ -67,7 +67,6 @@ def home_data_view(request):
 
 
 class SendOrderView(APIView):
-    # queryset = Order.objects.all()
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, order_pk):
