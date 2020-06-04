@@ -88,13 +88,18 @@ CONSTANCE_REDIS_CONNECTION = {
     'db': 0,
 }
 CONSTANCE_CONFIG = {
-    'PRINTER_SUPPORT_MAIL': ("support@masservice.ru", "")
+    # 'PRINTER_SUPPORT_MAIL': (
+    # "support@masservice.ru", "Почтовый адрес менеджера принт-сервиса, куда будут отправлятся письма."),
+    'EMAIL_MANAGER_ADDRESS': (
+        "maxim.kayander1@gmail.com", "Почтовый адрес менеджера принт-сервиса, куда будут отправлятся письма."),
+    'EMAIL_ALLOW_RESEND': (False, "Разрешить повторную отправку писем по заказу?")
 }
 CONSTANCE_FIELDSETS = {
-    'Email Options': ('PRINTER_SUPPORT_MAIL',)
+    'Email Options': ('EMAIL_MANAGER_ADDRESS', 'EMAIL_ALLOW_RESEND')
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
 # ----- EMAIL Settings -----
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587

@@ -1,3 +1,4 @@
+from constance import config
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -9,6 +10,7 @@ from main.models import Cartridge, Supply, Order
 
 
 class CartridgeViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Cartridge.objects.all()
     serializer_class = CartridgeSerializer
 
@@ -71,6 +73,9 @@ class SendOrderView(APIView):
     def get(self, request, order_pk):
         try:
             order = Order.objects.get(pk=order_pk)
-            return Response({"result": "ok"})
+            if not order.email or config.EMAIL_ALLOW_RESEND:
+                order.send_to([config.EMAIL_MANAGER_ADDRESS])
+                return Response({"result": "sent"})
+            return Response({"result": "Email already sent"}, status=400)
         except Order.DoesNotExist:
             return Response({"result": f"Order with pk = {order_pk} does not exist."}, status=400)

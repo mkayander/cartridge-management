@@ -62,6 +62,11 @@ class Supply(BackupableModel):
         ordering = ['-date']
 
     def update_cartridge_count(self, value):
+        """
+        Makes necessary changes to the count of cartridges.
+        :param value: Difference on count in supply compared to previous count.
+        :type value: int
+        """
         print(f"Updating cartridge count: {self.cartridge} {value=} ; {self.out=} ; {self.cartridge.count=}")
         if value != 0 and value is not None:
             if self.out:
@@ -112,25 +117,37 @@ class Order(BackupableModel):
     class Meta:
         ordering = ['-date']
 
-    def send(self):
+    def __str__(self):
+        return (
+            f"{format(self.date, settings.DATETIME_FORMAT)} {self.get_status_display()} {self.cartridge} {self.count}"
+        )
+
+    def send_to(self, address_list):
+        """
+        Makes the email message from html template, sends it to specified addresses, records the message to
+        django-mailbox.
+        :param address_list: list of email addresses as strings.
+        :type address_list: list
+        """
         html_message = render_to_string('OutlookOrder.html', {'order': self})
         plain_message = strip_tags(html_message)
         email = EmailMultiAlternatives(
             f'Картриджи {self.cartridge}, ООО "Деловые Линии"',
             plain_message,
             settings.DEFAULT_FROM_EMAIL,
-            [config.PRINTER_SUPPORT_MAIL],
+            address_list,
         )
         email.attach_alternative(html_message, "text/html")
         email.encoding = "UTF-8"
         email.extra_headers['Message-ID'] = make_msgid()
         email.send()
 
-        mailbox = Mailbox.objects.get(name="oks-gmail")
+        mailbox = Mailbox.objects.get(name="oks-dellin")
         self.email = mailbox.record_outgoing_message(email.message())
         self.save()
 
     def finish(self):
+        """Processes order to finished state."""
         self.finished = True
         self.status = "finished"
         self.date_finished = datetime.now()
@@ -138,14 +155,12 @@ class Order(BackupableModel):
                                             comment=f"По заказу №{self.pk} от {format(self.date, 'd E Y')}")
 
     def roll_back(self):
+        """Processes order from finished state to work state."""
         self.finished = False
         self.status = "work"
         self.date_finished = None
         self.supply.delete()
         self.supply = None
-
-    def __str__(self):
-        return f"{format(self.date, settings.DATETIME_FORMAT)} {self.get_status_display()} {self.cartridge} {self.count}"
 
     def save(self, *args, **kwargs):
         if self.pk and not self.restoring:
