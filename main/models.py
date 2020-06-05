@@ -1,15 +1,16 @@
 from datetime import datetime
 from email.utils import make_msgid
 
+from constance import config
 from django.conf import settings
-from django.core import mail
-from django.core.mail import EmailMessage, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.dateformat import format
 from django.utils.html import strip_tags
 from django_mailbox.models import Mailbox
+from django_mailbox.models import Message
 
 from main import choices
 
@@ -61,6 +62,11 @@ class Supply(BackupableModel):
         ordering = ['-date']
 
     def update_cartridge_count(self, value):
+        """
+        Makes necessary changes to the count of cartridges.
+        :param value: Difference on count in supply compared to previous count.
+        :type value: int
+        """
         print(f"Updating cartridge count: {self.cartridge} {value=} ; {self.out=} ; {self.cartridge.count=}")
         if value != 0 and value is not None:
             if self.out:
@@ -106,70 +112,64 @@ class Order(BackupableModel):
     supply = models.OneToOneField(Supply, related_name="order", on_delete=models.CASCADE, blank=True, null=True,
                                   verbose_name="Перемещение")
     count = models.PositiveIntegerField(verbose_name="Количество")
+    email = models.OneToOneField(Message, on_delete=models.SET_NULL, related_name="order", null=True, blank=True)
 
     class Meta:
         ordering = ['-date']
 
-    # def make_message(self):
-    #     return ('ООО «Деловые Линии»\n'
-    #             'PNK Парк Валищево +7 (916) 5654206 142143, Московская обл, Подольск г, Валищево д, промышленного парка Валищево тер, дом № 2, стр 1\n'
-    #             f'Прошу предоставить картриджи {self.cartridge} в количестве {self.count} штук\n'
-    #             f'{self.destination}\n'
-    #             'Системный администратор\n'
-    #             'Каяндер Максим Эдуардович\n'
-    #             '89854199347')
+    def __str__(self):
+        return (
+            f"{format(self.date, settings.DATETIME_FORMAT)} {self.get_status_display()} {self.cartridge} {self.count}"
+        )
 
-    def send(self):
+    def send_to(self, address_list):
+        """
+        Makes the email message from html template, sends it to specified addresses, records the message to
+        django-mailbox.
+        :param address_list: list of email addresses as strings.
+        :type address_list: list
+        """
         html_message = render_to_string('OutlookOrder.html', {'order': self})
         plain_message = strip_tags(html_message)
         email = EmailMultiAlternatives(
-            f"Прошу предоставить картриджи {self.cartridge}",
+            f'Картриджи {self.cartridge}, ООО "Деловые Линии"',
             plain_message,
             settings.DEFAULT_FROM_EMAIL,
-            ["maxim.kayander1@gmail.com"],
-            # headers={
-            #     "charset": "UTF-8"
-            # }
-            # headers={
-            #     'Message-ID': make_msgid()
-            # }
+            address_list,
         )
         email.attach_alternative(html_message, "text/html")
         email.encoding = "UTF-8"
         email.extra_headers['Message-ID'] = make_msgid()
-        print(email.message())
         email.send()
 
         mailbox = Mailbox.objects.get(name="oks-dellin")
-        mailbox.record_outgoing_message(email.message())
-        print(email.message())
+        self.email = mailbox.record_outgoing_message(email.message())
+        self.save()
 
     def finish(self):
+        """Processes order to finished state."""
         self.finished = True
         self.status = "finished"
         self.date_finished = datetime.now()
         self.supply = Supply.objects.create(out=False, cartridge=self.cartridge, count=self.count,
                                             comment=f"По заказу №{self.pk} от {format(self.date, 'd E Y')}")
-        # self.save()
 
     def roll_back(self):
+        """Processes order from finished state to work state."""
         self.finished = False
         self.status = "work"
         self.date_finished = None
         self.supply.delete()
         self.supply = None
 
-    def __str__(self):
-        return f"{format(self.date, settings.DATETIME_FORMAT)} {self.get_status_display()} {self.cartridge} {self.count}"
-
     def save(self, *args, **kwargs):
         if self.pk and not self.restoring:
             prev_values = Order.objects.get(pk=self.pk)
-            if self.finished and not prev_values.finished:
-                self.finish()
-            elif prev_values.finished and not self.finished:
-                self.roll_back()
-
+            if self.finished is not prev_values.finished:
+                if self.finished and not prev_values.finished:
+                    self.finish()
+                elif prev_values.finished and not self.finished:
+                    self.roll_back()
         super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):

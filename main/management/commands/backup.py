@@ -1,10 +1,9 @@
 import json
 
+from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.core.serializers.json import DjangoJSONEncoder
-
 from django.db.models import Value, BooleanField
-from django.apps import apps
 
 from main.models import Cartridge, Supply, Order
 
@@ -77,3 +76,6 @@ class Command(BaseCommand):
                         self.stdout.write(self.style.ERROR(f"Cartridge {obj.name} does not exist!"))
 
                 self.stdout.write(self.style.SUCCESS("Cartridges reloaded from db.json"))
+
+        else:
+            self.stdout.write(self.style.ERROR(f"Action {options['action']} not recognized!"))
