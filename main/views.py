@@ -1,4 +1,5 @@
 import os
+import json
 
 from django.conf import settings
 from django.http import Http404
@@ -54,6 +55,13 @@ def view(request):
         "order": order,
         "formOrder": form_order
     })
+
+
+def react_home_view(request):
+    context = {
+        'permissions': json.dumps(list(request.user.get_all_permissions()))
+    }
+    return render(request, 'react_index.html', context)
 
 
 def order_mail_test(request):

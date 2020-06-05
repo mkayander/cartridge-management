@@ -34,10 +34,8 @@ ALLOWED_HOSTS = [
     "localhost",
     "10.36.240.155",
     "10.36.240.51",
-    # "ps-bykrc.dellin.local",
     "10.36.240.51",
     "it-vlshv.dellin.local",
-    # "10.36.240.51"
     "vlshv-127.dellin.local",
     "10.36.241.83"
 ]
@@ -77,7 +75,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly'
+        'rest_framework.permissions.AllowAny',
+        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 }
 
