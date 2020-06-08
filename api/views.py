@@ -1,4 +1,7 @@
+# from mailbox import Message
+
 from constance import config
+from django_mailbox.models import Message
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -28,17 +31,17 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-    def initialize_request(self, request, *args, **kwargs):
-        # print(request, '\n', request.headers, request.body)
-        return super().initialize_request(request, *args, **kwargs)
-
-    def get_object(self):
-        print("get_object")
-        return super().get_object()
-
-    def retrieve(self, request, *args, **kwargs):
-        print("retrieve")
-        return super().retrieve(request, *args, **kwargs)
+    # def initialize_request(self, request, *args, **kwargs):
+    #     # print(request, '\n', request.headers, request.body)
+    #     return super().initialize_request(request, *args, **kwargs)
+    #
+    # def get_object(self):
+    #     print("get_object")
+    #     return super().get_object()
+    #
+    # def retrieve(self, request, *args, **kwargs):
+    #     print("retrieve")
+    #     return super().retrieve(request, *args, **kwargs)
 
     # def update(self, request, *args, **kwargs):
     #     partial = kwargs.pop('partial', False)
@@ -46,6 +49,11 @@ class OrderViewSet(viewsets.ModelViewSet):
     #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
     #     serializer.is_valid(raise_exception=True)
     #     self.perform_update(serializer)
+
+
+class MailViewSet(viewsets.ModelViewSet):
+    queryset = Message.objects.all()
+    serializer_class = OrderSerializer
 
 
 class ChatMessageViewSet(viewsets.ModelViewSet):
