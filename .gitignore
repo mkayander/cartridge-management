@@ -10,12 +10,17 @@ db.sqlite3
 db.sqlite3-journal
 media
 
+mailbox_attachments/
+
 **/migrations/*
+**/migrations/0001_initial.py
 
 ### Django.Python Stack ###
 # Byte-compiled / optimized / DLL files
 *.py[cod]
 *$py.class
+
+.idea
 
 # User-specific stuff
 .idea/**/workspace.xml
@@ -23,7 +28,8 @@ media
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
-.idea/misc.xml
+#.idea/misc.xml
+#.idea/cartridge.iml
 
 # Generated files
 .idea/**/contentModel.xml
@@ -41,4 +47,3 @@ media
 .idea/**/gradle.xml
 .idea/**/libraries
 
-#.idea

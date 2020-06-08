@@ -34,10 +34,8 @@ ALLOWED_HOSTS = [
     "localhost",
     "10.36.240.155",
     "10.36.240.51",
-    # "ps-bykrc.dellin.local",
     "10.36.240.51",
     "it-vlshv.dellin.local",
-    # "10.36.240.51"
     "vlshv-127.dellin.local",
     "10.36.241.83"
 ]
@@ -59,6 +57,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'corsheaders',
     'debug_toolbar',
+    'django_mailbox',
+    'constance',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -69,24 +69,43 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication'
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication'
     ],
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        # 'rest_framework.permissions.DjangoModelPermissions',
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
         'rest_framework.permissions.AllowAny',
+        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
+}
+
+CONSTANCE_BACKEND = 'constance.backends.redisd.RedisBackend'
+CONSTANCE_REDIS_CONNECTION = {
+    'host': 'localhost',
+    'port': 6379,
+    'db': 0,
+}
+CONSTANCE_CONFIG = {
+    # 'PRINTER_SUPPORT_MAIL': (
+    # "support@masservice.ru", "Почтовый адрес менеджера принт-сервиса, куда будут отправлятся письма."),
+    'EMAIL_MANAGER_ADDRESS': (
+        "maxim.kayander1@gmail.com", "Почтовый адрес менеджера принт-сервиса, куда будут отправлятся письма."),
+    'EMAIL_ALLOW_RESEND': (False, "Разрешить повторную отправку писем по заказу?")
+}
+CONSTANCE_FIELDSETS = {
+    'Email Options': ('EMAIL_MANAGER_ADDRESS', 'EMAIL_ALLOW_RESEND')
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
-EMAIL_HOST = 'mail.dellin.local'
-EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'dellin\\ntirskih'
-EMAIL_HOST_PASSWORD = 'Warman4403972'
-EMAIL_PORT = 443
+# ----- EMAIL Settings -----
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -140,9 +159,7 @@ DATABASES = {
         'NAME': 'django_db',
         'USER': 'django',
         'PASSWORD': 'D123456d',
-        # 'HOST': 'it-vlshv.dellin.local',
         'HOST': '127.0.0.1',
-        # 'HOST': 'centos7',
         'PORT': '5432',
     }
 }

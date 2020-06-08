@@ -1,23 +1,17 @@
+import os
+import json
+
+from django.conf import settings
 from django.http import Http404
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.views.generic import View
 
 from main.forms import SupplyForm, OrderForm
-
 from main.models import Cartridge, Supply, Order
-
-import os
-
-from django.views.generic import View
-from django.http import HttpResponse
-from django.conf import settings
 
 
 class FrontendAppView(View):
-    """
-    Serves the compiled frontend entry point (only works if you have run `yarn
-    run build`).
-    """
-
     def get(self, request):
         try:
             with open(os.path.join(settings.REACT_APP_DIR, 'build', 'index.html')) as f:
@@ -61,3 +55,16 @@ def view(request):
         "order": order,
         "formOrder": form_order
     })
+
+
+def react_home_view(request):
+    context = {
+        'permissions': json.dumps(list(request.user.get_all_permissions()))
+    }
+    return render(request, 'react_index.html', context)
+
+
+def order_mail_test(request):
+    order = Order.objects.first()
+
+    return render(request, 'OutlookOrder.html', {'order': order})

@@ -1,10 +1,9 @@
 import json
 
+from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.core.serializers.json import DjangoJSONEncoder
-
 from django.db.models import Value, BooleanField
-from django.apps import apps
 
 from main.models import Cartridge, Supply, Order
 
@@ -38,6 +37,7 @@ class Command(BaseCommand):
                     model = apps.get_model("main", key)
                     for obj in values:
                         try:
+                            print(get_item_key(obj))
                             model.objects.get(pk=get_item_key(obj))
                         except model.DoesNotExist:
                             print(f'Restoring -- {obj}')
@@ -58,8 +58,8 @@ class Command(BaseCommand):
                             for attr, value in obj.items():
                                 setattr(instance, attr, value)
                             instance.save()
-                        except Cartridge.DoesNotExist:
-                            self.stdout.write(self.style.ERROR(f"Cartridge {obj.name} does not exist!"))
+                        except model.DoesNotExist:
+                            self.stdout.write(self.style.ERROR(f"Object {obj} does not exist!"))
 
                 self.stdout.write(self.style.SUCCESS("Reloaded from db.json"))
 
@@ -77,3 +77,6 @@ class Command(BaseCommand):
                         self.stdout.write(self.style.ERROR(f"Cartridge {obj.name} does not exist!"))
 
                 self.stdout.write(self.style.SUCCESS("Cartridges reloaded from db.json"))
+
+        else:
+            self.stdout.write(self.style.ERROR(f"Action {options['action']} not recognized!"))
