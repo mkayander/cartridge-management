@@ -7,7 +7,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.serializers import CartridgeSerializer, SupplySerializer, OrderSerializer, ChatMessageSerializer
+from api.serializers import CartridgeSerializer, SupplySerializer, OrderSerializer, ChatMessageSerializer, \
+    MailSerializer
 from chat.models import ChatMessage
 from main.models import Cartridge, Supply, Order
 
@@ -53,7 +54,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 class MailViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
-    serializer_class = OrderSerializer
+    serializer_class = MailSerializer
 
 
 class ChatMessageViewSet(viewsets.ModelViewSet):
@@ -74,15 +75,14 @@ def home_data_view(request):
     })
 
 
-class SendOrderView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request, order_pk):
-        try:
-            order = Order.objects.get(pk=order_pk)
-            if not order.email or config.EMAIL_ALLOW_RESEND:
-                order.send_to([config.EMAIL_MANAGER_ADDRESS])
-                return Response({"result": "sent"})
-            return Response({"result": "Email already sent"}, status=400)
-        except Order.DoesNotExist:
-            return Response({"result": f"Order with pk = {order_pk} does not exist."}, status=400)
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def send_order_view(request, order_pk):
+    try:
+        order = Order.objects.get(pk=order_pk)
+        if not order.email or config.EMAIL_ALLOW_RESEND:
+            order.send_to_manager([config.EMAIL_MANAGER_ADDRESS])
+            return Response({"result": "sent"})
+        return Response({"result": "Email already sent"}, status=400)
+    except Order.DoesNotExist:
+        return Response({"result": f"Order with pk = {order_pk} does not exist."}, status=400)

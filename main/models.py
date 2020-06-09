@@ -1,7 +1,6 @@
 from datetime import datetime
 from email.utils import make_msgid
 
-from constance import config
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.db import models
@@ -101,7 +100,7 @@ class Supply(BackupableModel):
 
 
 class Order(BackupableModel):
-    status = models.CharField(max_length=10, choices=choices.ORDER_STATUS, default="work", verbose_name="Статус")
+    status = models.CharField(max_length=10, choices=choices.ORDER_STATUS, default="creating", verbose_name="Статус")
     date = models.DateTimeField(default=timezone.now, blank=True, verbose_name="Дата создания")
     destination = models.CharField(max_length=100, blank=True, default="2 подъезд от КПП (АБЧ 2), Этаж 2, кабинет 14")
     edited_at = models.DateTimeField(auto_now=True, verbose_name="Дата редактирования")
@@ -122,7 +121,7 @@ class Order(BackupableModel):
             f"{format(self.date, settings.DATETIME_FORMAT)} {self.get_status_display()} {self.cartridge} {self.count}"
         )
 
-    def send_to(self, address_list):
+    def send_to_manager(self, address_list):
         """
         Makes the email message from html template, sends it to specified addresses, records the message to
         django-mailbox.
@@ -141,6 +140,8 @@ class Order(BackupableModel):
         email.encoding = "UTF-8"
         email.extra_headers['Message-ID'] = make_msgid()
         email.send()
+        if self.status == "creating":
+            self.status = "pending"
 
         mailbox = Mailbox.objects.get(name="oks-dellin")
         self.email = mailbox.record_outgoing_message(email.message())

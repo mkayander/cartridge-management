@@ -144,7 +144,8 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('it-vlshv.dellin.local', 6379)],
+            # "hosts": [('it-vlshv.dellin.local', 6379)],
+            "hosts": [('localhost', 6379)],
         },
 
     },
