@@ -113,6 +113,10 @@ class Order(BackupableModel):
     count = models.PositiveIntegerField(verbose_name="Количество")
     email = models.OneToOneField(Message, on_delete=models.SET_NULL, related_name="order", null=True, blank=True)
 
+    @property
+    def html_message(self):
+        return render_to_string('OutlookOrder.html', {'order': self})
+
     class Meta:
         ordering = ['-date']
 
@@ -121,6 +125,9 @@ class Order(BackupableModel):
             f"{format(self.date, settings.DATETIME_FORMAT)} {self.get_status_display()} {self.cartridge} {self.count}"
         )
 
+    def get_html_message(self):
+        return render_to_string('OutlookOrder.html', {'order': self})
+
     def send_to_manager(self, address_list):
         """
         Makes the email message from html template, sends it to specified addresses, records the message to
@@ -128,7 +135,7 @@ class Order(BackupableModel):
         :param address_list: list of email addresses as strings.
         :type address_list: list
         """
-        html_message = render_to_string('OutlookOrder.html', {'order': self})
+        html_message = self.html_message
         plain_message = strip_tags(html_message)
         email = EmailMultiAlternatives(
             f'Картриджи {self.cartridge}, ООО "Деловые Линии"',
@@ -160,10 +167,12 @@ class Order(BackupableModel):
         self.finished = False
         self.status = "work"
         self.date_finished = None
-        self.supply.delete()
-        self.supply = None
+        if self.supply:
+            self.supply.delete()
+            self.supply = None
 
     def save(self, *args, **kwargs):
+        # Make corrections only if it's not the initial save and object is not being restored
         if self.pk and not self.restoring:
             prev_values = Order.objects.get(pk=self.pk)
             if self.finished is not prev_values.finished:

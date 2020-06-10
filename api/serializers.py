@@ -20,9 +20,19 @@ class SupplySerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    # html_message = serializers.SerializerMethodField()
+    email_is_sent = serializers.SerializerMethodField()
+
+    # def get_html_message(self):
+    #     return self.html_message()
+
+    def get_email_is_sent(self, obj):
+        return obj.email is not None
+
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = ["id", "status", "date", "destination", "edited_at", "date_finished", "number", "finished", "count",
+                  "cartridge", "supply", "email", "email_is_sent", "html_message"]
 
 
 class MailSerializer(serializers.ModelSerializer):
