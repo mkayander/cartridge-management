@@ -76,7 +76,7 @@ def home_data_view(request):
 
 
 @api_view(["POST"])
-@permission_classes([permissions.IsAuthenticated])
+# @permission_classes([permissions.IsAuthenticated])
 def send_order_view(request, order_pk):
     try:
         order = Order.objects.get(pk=order_pk)
