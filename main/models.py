@@ -154,6 +154,18 @@ class Order(BackupableModel):
         self.email = mailbox.record_outgoing_message(email.message())
         self.save()
 
+    def to_work(self, request_num: int):
+        """
+        If current status is "pending", sets order's status to "work", sets external request number.
+        Usually called upon manager's answer about order acceptation.
+        :type request_num: int
+        :param request_num: external request id from manager's database.
+        """
+        if self.status == "pending":
+            self.status = "work"
+            self.number = request_num
+            self.save()
+
     def finish(self):
         """Processes order to finished state."""
         self.finished = True
