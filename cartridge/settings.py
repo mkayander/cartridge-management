@@ -210,3 +210,6 @@ DEBUG_TOOLBAR_CONFIG = {
     # Panel options
     'SQL_WARNING_THRESHOLD': 100,  # milliseconds
 }
+
+# --- CELERY ---
+CELERY_BROKER_URL = 'redis://localhost:6379/1'

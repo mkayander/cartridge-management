@@ -165,6 +165,7 @@ class Order(BackupableModel):
             self.status = "work"
             self.number = request_num
             self.save()
+            print(f"Successfully moved order {self} to work.")
 
     def finish(self):
         """Processes order to finished state."""
