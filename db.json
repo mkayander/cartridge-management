@@ -1,7 +1,7 @@
 {
     "Cartridge": [
         {
-            "count": 3,
+            "count": 6,
             "manufacturer": "HP",
             "name": "26X",
             "restoring": true
@@ -19,7 +19,7 @@
             "restoring": true
         },
         {
-            "count": 2,
+            "count": 6,
             "manufacturer": "HP",
             "name": "78A",
             "restoring": true
@@ -69,6 +69,36 @@
     ],
     "Order": [
         {
+            "cartridge_id": "78A",
+            "count": 6,
+            "date": "2020-06-15T06:48:58.734Z",
+            "date_finished": "2020-06-17T12:12:44.240Z",
+            "destination": "2 \u043f\u043e\u0434\u044a\u0435\u0437\u0434 \u043e\u0442 \u041a\u041f\u041f (\u0410\u0411\u0427 2), \u042d\u0442\u0430\u0436 2, \u043a\u0430\u0431\u0438\u043d\u0435\u0442 14",
+            "edited_at": "2020-06-17T12:12:44.475Z",
+            "email_id": null,
+            "finished": true,
+            "id": 5,
+            "number": 0,
+            "restoring": true,
+            "status": "finished",
+            "supply_id": 16
+        },
+        {
+            "cartridge_id": "26X",
+            "count": 6,
+            "date": "2020-06-15T06:48:46.566Z",
+            "date_finished": "2020-06-17T12:12:40.843Z",
+            "destination": "2 \u043f\u043e\u0434\u044a\u0435\u0437\u0434 \u043e\u0442 \u041a\u041f\u041f (\u0410\u0411\u0427 2), \u042d\u0442\u0430\u0436 2, \u043a\u0430\u0431\u0438\u043d\u0435\u0442 14",
+            "edited_at": "2020-06-17T12:12:40.891Z",
+            "email_id": null,
+            "finished": true,
+            "id": 4,
+            "number": 0,
+            "restoring": true,
+            "status": "finished",
+            "supply_id": 15
+        },
+        {
             "cartridge_id": "30A",
             "count": 8,
             "date": "2020-06-01T10:40:59.556Z",
@@ -116,11 +146,61 @@
     ],
     "Supply": [
         {
+            "cartridge_id": "78A",
+            "comment": "\u041f\u043e \u0437\u0430\u043a\u0430\u0437\u0443 \u21165 \u043e\u0442 15 \u0438\u044e\u043d\u044f 2020",
+            "count": 6,
+            "date": "2020-06-17T12:12:44.241Z",
+            "edited_at": "2020-06-17T12:12:44.360Z",
+            "id": 16,
+            "out": false,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "26X",
+            "comment": "\u041f\u043e \u0437\u0430\u043a\u0430\u0437\u0443 \u21164 \u043e\u0442 15 \u0438\u044e\u043d\u044f 2020",
+            "count": 6,
+            "date": "2020-06-17T12:12:40.844Z",
+            "edited_at": "2020-06-17T12:12:40.881Z",
+            "id": 15,
+            "out": false,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "26X",
+            "comment": "\u0421\u043a\u043b\u0430\u0434",
+            "count": 1,
+            "date": "2020-06-15T06:45:24.367Z",
+            "edited_at": "2020-06-15T06:45:24.796Z",
+            "id": 14,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "78A",
+            "comment": "10 \u043a\u0430\u0431\u0438\u043d\u0435\u0442",
+            "count": 2,
+            "date": "2020-06-09T06:23:19.842Z",
+            "edited_at": "2020-06-09T06:23:19.893Z",
+            "id": 13,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "26X",
+            "comment": "\u0412\u044b\u0434\u0430\u043b \u041d\u0438\u043a\u0438\u0442\u0430",
+            "count": 2,
+            "date": "2020-06-08T09:49:20.160Z",
+            "edited_at": "2020-06-08T09:49:20.224Z",
+            "id": 12,
+            "out": true,
+            "restoring": true
+        },
+        {
             "cartridge_id": "26X",
             "comment": "\u042d\u0440\u043a\u0438\u043d",
             "count": 1,
             "date": "2020-06-05T05:47:56.956Z",
-            "edited_at": "2020-06-08T06:03:39.581Z",
+            "edited_at": "2020-06-08T07:12:20.905Z",
             "id": 10,
             "out": true,
             "restoring": true
