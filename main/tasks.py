@@ -1,3 +1,4 @@
+from django.core.management import call_command
 from django_mailbox.models import Mailbox
 
 from cartridge.celery import app
@@ -16,4 +17,15 @@ def hello_world():
 
 @app.task
 def refresh_oks_email():
-    Mailbox.objects.get(name="oks-dellin").get_new_mail()
+    for message in Mailbox.objects.get(name="oks-dellin").get_new_mail():
+        print(message)
+
+
+@app.task
+def run_mailbox_getmail():
+    call_command("getmail")
+
+
+@app.task
+def backup_db_to_json():
+    call_command("backup", "all")

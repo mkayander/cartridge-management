@@ -60,8 +60,6 @@ def view(request):
 
 
 def react_home_view(request):
-    hello_world.delay()
-    debug_task.delay()
     context = {
         'permissions': json.dumps(list(request.user.get_all_permissions()))
     }

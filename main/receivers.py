@@ -23,7 +23,9 @@ def mail_received(sender, message, **kwargs):
         # Trying to get the order
         try:
             order = Order.objects.get(email__pk=message.in_reply_to_id)
-            if "заявка принята" in message.text:
+            answer_str = message.text[0: message.text.find(message.mailbox.from_email)]  # Strip the quote part
+
+            if "заявка принята" in answer_str.lower():
                 subject_id = text_id = None
                 # Try to get request id from email subject:
                 subject_id_string = message.subject.split()[-1]
@@ -31,12 +33,23 @@ def mail_received(sender, message, **kwargs):
                     subject_id = int(subject_id_string)
 
                 # Try to get request id from email text:
-                num_index = message.text.find('№')
+                num_index = answer_str.find('№')
                 if num_index != -1:
-                    id_string = message.text[num_index + 1: num_index + 5]
+                    if answer_str[num_index+1].isspace():
+                        answer_str = answer_str[:num_index+1] + answer_str[num_index+2:]
+                    id_string = answer_str[num_index + 1: num_index + 5]
                     if request_id_is_valid(id_string):
                         text_id = int(id_string)
-                # print(f'{is_accepted=}\n{request_id=}\n{id_string=}\n{num_index=}\n{sub=}')
+                else:
+                    try:
+                        text_arr = answer_str.split()
+                        index = text_arr.index("заявки")
+                        id_string = text_arr[index + 1].strip().strip('.')
+                        if request_id_is_valid(id_string):
+                            text_id = int(id_string)
+                        # TODO: Try to make this pattern repeat less
+                    except ValueError as e:
+                        print(e)
 
                 request_id = text_id or subject_id
                 if request_id:
