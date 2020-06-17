@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'django_mailbox',
     'constance',
+    'django_celery_beat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -213,3 +214,4 @@ DEBUG_TOOLBAR_CONFIG = {
 
 # --- CELERY ---
 CELERY_BROKER_URL = 'redis://localhost:6379/1'
+CELERY_CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"

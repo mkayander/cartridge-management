@@ -7,8 +7,10 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.generic import View
 
+from cartridge.celery import debug_task
 from main.forms import SupplyForm, OrderForm
 from main.models import Cartridge, Supply, Order
+from main.tasks import hello_world
 
 
 class FrontendAppView(View):
@@ -58,6 +60,8 @@ def view(request):
 
 
 def react_home_view(request):
+    hello_world.delay()
+    debug_task.delay()
     context = {
         'permissions': json.dumps(list(request.user.get_all_permissions()))
     }
