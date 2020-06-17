@@ -37,6 +37,8 @@ celerybeat-schedule.dat
 celerybeat-schedule.dir
 celerybeat.pid
 
+db.json
+
 # Generated files
 .idea/**/contentModel.xml
 
