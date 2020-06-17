@@ -32,7 +32,9 @@ mailbox_attachments/
 #.idea/cartridge.iml
 
 # Celery & Celery Beat
-celerybeat-schedule
+celerybeat-schedule.bak
+celerybeat-schedule.dat
+celerybeat-schedule.dir
 celerybeat.pid
 
 # Generated files
