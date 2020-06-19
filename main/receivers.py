@@ -1,7 +1,9 @@
+from constance import config
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django_mailbox.signals import message_received
 
-from main.models import Order
+from main.models import Order, Cartridge
 
 
 # @receiver(post_save, sender=Supply)
@@ -13,6 +15,14 @@ from main.models import Order
 
 def request_id_is_valid(id_string: str):
     return len(id_string) == 4 and id_string.isnumeric()
+
+
+@receiver(post_save, sender=Cartridge)
+def check_cartridge_count(sender, instance, created, **kwargs):
+    if instance.count < config.CARTRIDGE_MIN_COUNT:
+        if not Order.objects.filter(cartridge=instance).exclude(status="finished").exists():
+            print(f"Amount of {instance} is less then required and no active order is found, creating new.")
+            Order.objects.create(cartridge=instance, count=config.CARTRIDGE_DEF_AMOUNT)
 
 
 @receiver(message_received)
@@ -35,8 +45,8 @@ def mail_received(sender, message, **kwargs):
                 # Try to get request id from email text:
                 num_index = answer_str.find('№')
                 if num_index != -1:
-                    if answer_str[num_index+1].isspace():
-                        answer_str = answer_str[:num_index+1] + answer_str[num_index+2:]
+                    if answer_str[num_index + 1].isspace():  # if there's a space after '№' remove it
+                        answer_str = answer_str[:num_index + 1] + answer_str[num_index + 2:]
                     id_string = answer_str[num_index + 1: num_index + 5]
                     if request_id_is_valid(id_string):
                         text_id = int(id_string)

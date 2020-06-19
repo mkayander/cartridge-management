@@ -92,10 +92,14 @@ CONSTANCE_CONFIG = {
     # "support@masservice.ru", "Почтовый адрес менеджера принт-сервиса, куда будут отправлятся письма."),
     'EMAIL_MANAGER_ADDRESS': (
         "maxim.kayander1@gmail.com", "Почтовый адрес менеджера принт-сервиса, куда будут отправлятся письма."),
-    'EMAIL_ALLOW_RESEND': (False, "Разрешить повторную отправку писем по заказу?")
+    'EMAIL_ALLOW_RESEND': (False, "Разрешить повторную отправку писем по заказу?"),
+    'CARTRIDGE_MIN_COUNT': (
+        3, "Минимально допустимое кол-во картриджей одного типа. Заказ будет создан если кол-во ниже данного значения."),
+    'CARTRIDGE_DEF_AMOUNT': (6, "Кол-во картриджей для нового заказа по умолчанию.")
 }
-CONSTANCE_FIELDSETS = {
-    'Email Options': ('EMAIL_MANAGER_ADDRESS', 'EMAIL_ALLOW_RESEND')
+CONSTANCE_CONFIG_FIELDSETS = {
+    'Email Options': ('EMAIL_MANAGER_ADDRESS', 'EMAIL_ALLOW_RESEND'),
+    'Cartridge Options': ('CARTRIDGE_MIN_COUNT', 'CARTRIDGE_DEF_AMOUNT')
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
