@@ -15,6 +15,9 @@ from main import choices
 
 
 class BackupableModel(models.Model):
+    """
+    Introduces 'restoring' boolean object-only field that is needed to skip various actions on model's 'save()' method.
+    """
     restoring = False
 
     def __init__(self, *args, **kwargs):
@@ -30,6 +33,9 @@ class BackupableModel(models.Model):
 
 
 class Cartridge(BackupableModel):
+    """
+    Cartridge (toner) for the printers.
+    """
     manufacturer = models.CharField(max_length=30, choices=choices.MANUFACTURER_CHOICES, default="HP",
                                     verbose_name="Производитель")
     name = models.CharField(max_length=30, unique=True, primary_key=True, verbose_name="Название картриджа",
@@ -46,6 +52,14 @@ class Cartridge(BackupableModel):
 
 
 class Supply(BackupableModel):
+    """
+    Cartridge transfer, either outgoing (to customer), or incoming (to stock from order), specified by the 'out' boolean
+    field. \n
+    Automatically corrects the 'count' field of Cartridge based on transfer direction, count and previous values if it
+    was updated. \n
+    If cartridge count would end up negative during the save procedure, an exception would be raised and instance would
+    not be saved.
+    """
     out = models.BooleanField(choices=choices.SUPPLY_TYPE_BOOLEAN, default=True, verbose_name="Тип передвижения")
     cartridge = models.ForeignKey(Cartridge, related_name="supplies", on_delete=models.CASCADE,
                                   verbose_name="Тип картриджа")
@@ -100,6 +114,11 @@ class Supply(BackupableModel):
 
 
 class Order(BackupableModel):
+    """
+    Order to cartridges provider, used to fulfill the cartridges stock when needed. \n
+    Instance is tied with it's outgoing email message to manager, has 'html_message' property field with email body
+    and 'send_to_manager' method that would send the email.
+    """
     status = models.CharField(max_length=10, choices=choices.ORDER_STATUS, default="creating", verbose_name="Статус")
     date = models.DateTimeField(default=timezone.now, blank=True, verbose_name="Дата создания")
     destination = models.CharField(max_length=100, blank=True, default="2 подъезд от КПП (АБЧ 2), Этаж 2, кабинет 14")
@@ -124,9 +143,6 @@ class Order(BackupableModel):
         return (
             f"{format(self.date, settings.DATETIME_FORMAT)} {self.get_status_display()} {self.cartridge} {self.count}"
         )
-
-    def get_html_message(self):
-        return render_to_string('OutlookOrder.html', {'order': self})
 
     def send_to_manager(self, address_list):
         """

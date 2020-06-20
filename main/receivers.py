@@ -7,19 +7,20 @@ from django_mailbox.signals import message_received
 from main.models import Order, Cartridge
 
 
-# @receiver(post_save, sender=Supply)
-# def backup_db_to_json(sender, instance, created, **kwargs):
-#     # call_command("backup", "all")
-#     print("backup_db_to_json called")
-#     pprint(instance.__dict__, indent=2)
-
-
 def request_id_is_valid(id_string: str):
+    """
+    Does specific checks for the id string and returns True if it complies.
+    :rtype: bool
+    :param id_string: string that is a numeric id
+    """
     return len(id_string) == 4 and id_string.isnumeric()
 
 
 @receiver(post_save, sender=Cartridge)
-def check_cartridge_count(sender, instance, created, **kwargs):
+def check_cartridge_count(instance, **kwargs):
+    """
+    Creates a new Order if cartridge amount is less than required.
+    """
     if instance.count < config.CARTRIDGE_MIN_COUNT:
         if not Order.objects.filter(cartridge=instance).exclude(status="finished").exists():
             print(f"Amount of {instance} is less then required and no active order is found, creating new.")
@@ -27,7 +28,10 @@ def check_cartridge_count(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=Order)
-def check_if_waiting_email(instance, **kwargs):
+def check_if_waiting_email(**kwargs):
+    """
+    Makes the email refresh task run more often if there's at least one order that is waiting for the answer.
+    """
     try:
         refresh_task = PeriodicTask.objects.get(name=config.EMAIL_REFRESH_TASK_NAME)
         old_interval = refresh_task.interval
@@ -36,7 +40,7 @@ def check_if_waiting_email(instance, **kwargs):
         else:
             refresh_task.interval = IntervalSchedule.objects.get_or_create(every=1, period="days")[0]
 
-        if refresh_task.interval != old_interval:
+        if refresh_task.interval != old_interval:  # Don't run useless sql query
             refresh_task.save()
 
     except PeriodicTask.DoesNotExist as e:
@@ -45,7 +49,11 @@ def check_if_waiting_email(instance, **kwargs):
 
 
 @receiver(message_received)
-def mail_received(sender, message, **kwargs):
+def mail_received(message, **kwargs):
+    """
+    Main incoming email callback. Checks if message is the answer to any local Order, tries to get the external id from
+    the message and set's it to the order if found, with Order status also changed to "work".
+    """
     print(f"I just received a message titled {message.subject} from a mailbox named {message.mailbox.name}")
 
     if message.in_reply_to_id:
@@ -92,9 +100,3 @@ def mail_received(sender, message, **kwargs):
         except Order.DoesNotExist as exception:
             print(f'There is no order with email pk being set to {message.in_reply_to_id}',
                   exception, sep='\n')
-
-        # -- OR --
-        # target_msg = Message.objects.get(pk=message.in_reply_to_id)
-        # if target_msg.order:
-        #     order = target_msg.order
-        #     pprint(order.__dict__)
