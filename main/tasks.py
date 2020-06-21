@@ -1,8 +1,11 @@
 from django.core.management import call_command
 from django_mailbox.models import Mailbox
+from main.models import Order
 
 from cartridge.celery import app
 
+# import main.receivers
+# import main.models
 
 # @shared_task
 # def sleepy(duration):
@@ -19,6 +22,11 @@ def hello_world():
 def refresh_oks_email():
     for message in Mailbox.objects.get(name="oks-dellin").get_new_mail():
         print(message)
+
+
+@app.task
+def save_test():
+    Order.objects.first().save()
 
 
 @app.task

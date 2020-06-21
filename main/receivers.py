@@ -32,13 +32,16 @@ def check_if_waiting_email(**kwargs):
     """
     Makes the email refresh task run more often if there's at least one order that is waiting for the answer.
     """
+    print("Checking if orders waiting for email...")
     try:
         refresh_task = PeriodicTask.objects.get(name=config.EMAIL_REFRESH_TASK_NAME)
         old_interval = refresh_task.interval
         if Order.objects.filter(status="pending").exists():
+            print("Order with pending status detected!")
             refresh_task.interval = IntervalSchedule.objects.get_or_create(every=5, period="minutes")[0]
         else:
             refresh_task.interval = IntervalSchedule.objects.get_or_create(every=1, period="days")[0]
+            print("No pending orders, settings long delay.")
 
         if refresh_task.interval != old_interval:  # Don't run useless sql query
             refresh_task.save()
