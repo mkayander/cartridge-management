@@ -48,7 +48,7 @@ def check_if_waiting_email(**kwargs):
 
     except PeriodicTask.DoesNotExist as e:
         print(f"Periodic Task with name {config.EMAIL_REFRESH_TASK_NAME} not found,\n" +
-              "check if it exists or correct the name value in constance config!\n"+e)
+              "check if it exists or correct the name value in constance config!\n"+str(e))
 
 
 @receiver(message_received)

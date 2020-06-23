@@ -127,6 +127,7 @@ class Order(BackupableModel):
     number = models.PositiveIntegerField(default=0, blank=True, verbose_name="Номер заявки")
     finished = models.BooleanField(default=False, verbose_name="Выполнен")
     cartridge = models.ForeignKey(Cartridge, related_name="orders", on_delete=models.CASCADE, verbose_name="Картридж")
+    take_old_away = models.BooleanField(default=False, verbose_name="Забрать израсходованные картриджи")
     supply = models.OneToOneField(Supply, related_name="order", on_delete=models.CASCADE, blank=True, null=True,
                                   verbose_name="Перемещение")
     count = models.PositiveIntegerField(verbose_name="Количество")

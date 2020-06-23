@@ -81,6 +81,10 @@ def send_order_view(request, order_pk):
     try:
         order = Order.objects.get(pk=order_pk)
         if not order.email or config.EMAIL_ALLOW_RESEND:
+            print(dict(request.POST))
+            if request.POST["take_old_away"] is True and not order.take_old_away:
+                order.take_old_away = True
+
             order.send_to_manager([config.EMAIL_MANAGER_ADDRESS])
             return Response({"result": "sent"})
         return Response({"result": "Email already sent"}, status=400)
