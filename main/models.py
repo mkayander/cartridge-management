@@ -175,7 +175,6 @@ class Order(BackupableModel):
         """
         If current status is "pending", sets order's status to "work", sets external request number.
         Usually called upon manager's answer about order acceptation.
-        :type request_num: int
         :param request_num: external request id from manager's database.
         """
         if self.status == "pending":
