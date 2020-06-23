@@ -32,7 +32,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ["id", "status", "date", "destination", "edited_at", "date_finished", "number", "finished", "count",
-                  "cartridge", "supply", "email", "email_is_sent", "html_message"]
+                  "cartridge", "take_old_away", "supply", "email", "email_is_sent", "html_message"]
 
 
 class MailSerializer(serializers.ModelSerializer):

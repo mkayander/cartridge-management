@@ -1,11 +1,11 @@
 # from mailbox import Message
+import json
 
 from constance import config
 from django_mailbox.models import Message
 from rest_framework import viewsets, permissions
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from api.serializers import CartridgeSerializer, SupplySerializer, OrderSerializer, ChatMessageSerializer, \
     MailSerializer
@@ -78,11 +78,12 @@ def home_data_view(request):
 @api_view(["POST"])
 # @permission_classes([permissions.IsAuthenticated])
 def send_order_view(request, order_pk):
+    # if request.is_ajax():
     try:
         order = Order.objects.get(pk=order_pk)
         if not order.email or config.EMAIL_ALLOW_RESEND:
-            print(dict(request.POST))
-            if request.POST["take_old_away"] is True and not order.take_old_away:
+            data = json.loads(request.body.decode('utf-8'))
+            if "take_old_away" in data and data["take_old_away"] is True and not order.take_old_away:
                 order.take_old_away = True
 
             order.send_to_manager([config.EMAIL_MANAGER_ADDRESS])
