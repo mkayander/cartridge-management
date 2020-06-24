@@ -2,6 +2,7 @@ from django.core.mail import mail_admins
 from django.core.management import call_command
 from django.template.loader import render_to_string
 from django_mailbox.models import Mailbox, Message
+from django.conf import settings
 
 from cartridge.celery import app
 from main.models import Order
@@ -43,9 +44,9 @@ def backup_db_to_json():
 
 
 @app.task
-def notify_admins(subject: str, text: str, message_sub: str = None, message_body: str = None, answer_str: str = None):
+def notify_admins(subject: str, text: str, *args):
 	body = text + "\n"
-	body += message_sub + "\n"
-	body += message_body
+	for line in args:
+		body += str(line) + "\n"
 	mail_admins(subject, body, html_message=render_to_string('AdminNotifyMsg.html',
-                                                             {text: body, answer_str: answer_str}))
+                                                             {'text_arr': [text, "------------------------------------------", *args]}))

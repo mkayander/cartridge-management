@@ -117,6 +117,7 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 ADMINS = [('Каяндер Максим', 'Maksim.Kayander@dellin.ru'), ('Тирских Никита', 'Nikita.Tirskih@dellin.ru')]
+# ADMINS = [('Каяндер Максим', 'maxim.kayander1@gmail.com')]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
