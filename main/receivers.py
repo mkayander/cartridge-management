@@ -3,8 +3,10 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from django_mailbox.signals import message_received
+from django_mailbox.models import Message
 
 from main.models import Order, Cartridge
+from main.tasks import notify_admins
 
 
 def request_id_is_valid(id_string: str):
@@ -25,6 +27,12 @@ def check_cartridge_count(instance, **kwargs):
         if not Order.objects.filter(cartridge=instance).exclude(status="finished").exists():
             print(f"Amount of {instance} is less then required and no active order is found, creating new.")
             Order.objects.create(cartridge=instance, count=config.CARTRIDGE_DEF_AMOUNT)
+            notify_admins(f"Подтвердите заказ на картриджи {instance}",
+                          f"""
+                          Количество картриджей {instance} стало меньше минимума ({config.CARTRIDGE_MIN_COUNT})
+                          Был создан новый заказ на {config.CARTRIDGE_DEF_AMOUNT} штук.
+                          Требуется подтвердить отправку письма менеджеру - http://it-vlshv.dellin.local/
+                          """).delay()
 
 
 @receiver(post_save, sender=Order)
@@ -48,7 +56,7 @@ def check_if_waiting_email(**kwargs):
 
     except PeriodicTask.DoesNotExist as e:
         print(f"Periodic Task with name {config.EMAIL_REFRESH_TASK_NAME} not found,\n" +
-              "check if it exists or correct the name value in constance config!\n"+str(e))
+              "check if it exists or correct the name value in constance config!\n" + str(e))
 
 
 @receiver(message_received)
@@ -94,12 +102,34 @@ def mail_received(message, **kwargs):
                 request_id = text_id or subject_id
                 if request_id:
                     order.to_work(request_id)
+                    notify_admins(f"Получен ответ на заказ {order}",
+                                  f"""Заказ на {order.count} картриджей {order.cartridge} принят в работу,
+                                  присвоен номер {order.number}
+                                  -----------------------------
+                                  {message.text}""")
                 else:
+                    notify_admins("Ошибка обработки входящего письма",
+                                  f"""
+                                  Был получен ответ на письмо от заказа {order}, но не удалось извлеч номер заказа
+                                  Информация:
+                                  {message.subject=}
+                                  {message.text=}
+                                  {answer_str=}
+                                  """)
                     print("Failed to retrieve external request id from email subject and text")
 
             else:
+                notify_admins("Ошибка обработки входящего письма",
+                              f"Получен ответ на заказ {order}, но отсутствует ключевое слово.\n {message.text=}")
                 print("Keyword not found in email text")
 
         except Order.DoesNotExist as exception:
             print(f'There is no order with email pk being set to {message.in_reply_to_id}',
                   exception, sep='\n')
+            notify_admins("Ошибка обработки входящего письма",
+                          f"""
+                          Входящее письмо было ответом на {Message.objects.get(id=message.in_reply_to_id)}
+                          К этому письму не привязан ни один заказ.
+                          {message.subject=}
+                          {message.text=}
+                          """)

@@ -1,3 +1,4 @@
+from django.core.mail import mail_admins
 from django.core.management import call_command
 from django_mailbox.models import Mailbox
 from main.models import Order
@@ -37,3 +38,8 @@ def run_mailbox_getmail():
 @app.task
 def backup_db_to_json():
     call_command("backup", "all")
+
+
+@app.task
+def notify_admins(subject, message):
+    mail_admins(subject, message)
