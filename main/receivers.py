@@ -106,7 +106,7 @@ def mail_received(message, **kwargs):
                                   f"""Заказ на {order.count} картриджей {order.cartridge} принят в работу,
                                   присвоен номер {order.number}
                                   -----------------------------
-                                  {message.text}""")
+                                  {message.text}""").delay()
                 else:
                     notify_admins("Ошибка обработки входящего письма",
                                   f"""
@@ -115,12 +115,13 @@ def mail_received(message, **kwargs):
                                   {message.subject=}
                                   {message.text=}
                                   {answer_str=}
-                                  """)
+                                  """).delay()
                     print("Failed to retrieve external request id from email subject and text")
 
             else:
                 notify_admins("Ошибка обработки входящего письма",
-                              f"Получен ответ на заказ {order}, но отсутствует ключевое слово.\n {message.text=}")
+                              f"Получен ответ на заказ {order}, но отсутствует ключевое слово.\n {message.text=}"
+                              ).delay()
                 print("Keyword not found in email text")
 
         except Order.DoesNotExist as exception:
@@ -132,4 +133,4 @@ def mail_received(message, **kwargs):
                           К этому письму не привязан ни один заказ.
                           {message.subject=}
                           {message.text=}
-                          """)
+                          """).delay()
