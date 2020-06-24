@@ -43,6 +43,9 @@ def backup_db_to_json():
 
 
 @app.task
-def notify_admins(subject: str, text: str, message: Message = None, answer_str: str = None):
-    mail_admins(subject, text, html_message=render_to_string('AdminNotifyMsg.html',
-                                                             {text: text, message: message, answer_str: answer_str}))
+def notify_admins(subject: str, text: str, message_sub: str = None, message_body: str = None, answer_str: str = None):
+	body = text + "\n"
+	body += message_sub + "\n"
+	body += message_body
+	mail_admins(subject, body, html_message=render_to_string('AdminNotifyMsg.html',
+                                                             {text: body, answer_str: answer_str}))
