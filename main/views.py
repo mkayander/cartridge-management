@@ -69,7 +69,6 @@ def react_home_view(request):
 
 def order_mail_test(request):
 	order = Order.objects.first()
-	#msg = Message.objects.last()
-	#notify_admins("Сабжект", "Текст письма 123123")
-	return render(request, 'OutlookOrder.html', {'order': order})
-	#return render(request, 'AdminNotifyMsg.html', {'text': "AAAAAAAAAAAAASDAS РУсский"})
+	# msg = Message.objects.last()
+	# return render(request, 'OutlookOrder.html', {'order': order})
+	return render(request, 'AdminNotifyMsg.html', {'text': str(settings.ADMINS)})
