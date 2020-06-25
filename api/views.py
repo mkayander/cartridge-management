@@ -14,7 +14,6 @@ from main.models import Cartridge, Supply, Order
 
 
 class CartridgeViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
     queryset = Cartridge.objects.all()
     serializer_class = CartridgeSerializer
 
