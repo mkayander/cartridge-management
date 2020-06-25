@@ -114,7 +114,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
+EMAIL_SUBJECT_PREFIX = os.environ.get("EMAIL_SUBJECT_PREFIX")
 
 if os.environ.get("EMAIL_USE_ADMIN_NOTIF") == "yes":
     ADMINS = [('Каяндер Максим', 'Maksim.Kayander@dellin.ru'), ('Тирских Никита', 'Nikita.Tirskih@dellin.ru')]
