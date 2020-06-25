@@ -27,10 +27,11 @@ def check_cartridge_count(instance, **kwargs):
         if not Order.objects.filter(cartridge=instance).exclude(status="finished").exists():
             print(f"Amount of {instance} is less then required and no active order is found, creating new.")
             Order.objects.create(cartridge=instance, count=config.CARTRIDGE_DEF_AMOUNT)
-            notify_admins(f"Подтвердите заказ на картриджи {instance}",
-                          f"""Количество картриджей {instance} стало меньше минимума ({config.CARTRIDGE_MIN_COUNT}) - 
+            notify_admins \
+                .delay(f"Подтвердите заказ на картриджи {instance}",
+                       f"""Количество картриджей {instance} стало меньше минимума ({config.CARTRIDGE_MIN_COUNT}) - 
                           их {instance.count} шт. Был создан новый заказ на {config.CARTRIDGE_DEF_AMOUNT} шт.""",
-                          "Требуется подтвердить отправку письма менеджеру - http://it-vlshv.dellin.local/").delay()
+                       "Требуется подтвердить отправку письма менеджеру - http://it-vlshv.dellin.local/")
 
 
 @receiver(post_save, sender=Order)
@@ -100,29 +101,30 @@ def mail_received(message, **kwargs):
                 request_id = text_id or subject_id
                 if request_id:
                     order.to_work(request_id)
-                    notify_admins(f"Получен ответ на заказ {order}",
-                                  f"Заказ на {order.count} картриджей {order.cartridge} принят в работу",
-                                  f"присвоен номер {order.number}",
-                                  message.text).delay()
+                    notify_admins.delay(f"Получен ответ на заказ {order}",
+                                        f"Заказ на {order.count} картриджей {order.cartridge} принят в работу",
+                                        f"присвоен номер {order.number}",
+                                        message.text)
                 else:
-                    notify_admins("Ошибка обработки входящего письма",
-                                  f"Был получен ответ на письмо от заказа {order}, но не удалось извлеч номер заказа",
-                                  message.subject,
-                                  message.text,
-                                  answer_str).delay()
+                    notify_admins \
+                        .delay("Ошибка обработки входящего письма",
+                               f"Был получен ответ на письмо от заказа {order}, но не удалось извлеч номер заказа",
+                               message.subject,
+                               message.text,
+                               answer_str)
                     print("Failed to retrieve external request id from email subject and text")
 
             else:
-                notify_admins("Ошибка обработки входящего письма",
-                              f"Получен ответ на заказ {order}, но отсутствует ключевое слово.",
-                              message.text).delay()
+                notify_admins.delay("Ошибка обработки входящего письма",
+                                    f"Получен ответ на заказ {order}, но отсутствует ключевое слово.",
+                                    message.text)
                 print("Keyword not found in email text")
 
         except Order.DoesNotExist as exception:
             print(f'There is no order with email pk being set to {message.in_reply_to_id}',
                   exception, sep='\n')
-            notify_admins("Ошибка обработки входящего письма",
-                          f"""Входящее письмо было ответом на {Message.objects.get(id=message.in_reply_to_id)} 
-                          К этому письму не привязан ни один заказ.""",
-                          message.subject,
-                          message.text).delay()
+            notify_admins.delay("Ошибка обработки входящего письма",
+                                f"""Входящее письмо было ответом на {Message.objects.get(id=message.in_reply_to_id)} 
+                                К этому письму не привязан ни один заказ.""",
+                                message.subject,
+                                message.text)
