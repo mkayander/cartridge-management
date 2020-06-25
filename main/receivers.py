@@ -26,12 +26,12 @@ def check_cartridge_count(instance, **kwargs):
     if instance.count < config.CARTRIDGE_MIN_COUNT:
         if not Order.objects.filter(cartridge=instance).exclude(status="finished").exists():
             print(f"Amount of {instance} is less then required and no active order is found, creating new.")
-            Order.objects.create(cartridge=instance, count=config.CARTRIDGE_DEF_AMOUNT)
+            order = Order.objects.create(cartridge=instance, count=config.CARTRIDGE_DEF_AMOUNT)
             notify_admins \
                 .delay(f"Подтвердите заказ на картриджи {instance}",
                        f"""Количество картриджей {instance} стало меньше минимума ({config.CARTRIDGE_MIN_COUNT}) - 
                           их {instance.count} шт. Был создан новый заказ на {config.CARTRIDGE_DEF_AMOUNT} шт.""",
-                       "Требуется подтвердить отправку письма менеджеру - http://it-vlshv.dellin.local/")
+                       f"Требуется подтвердить отправку письма менеджеру - http://it-vlshv.dellin.local/?orderId={order.id}")
 
 
 @receiver(post_save, sender=Order)
