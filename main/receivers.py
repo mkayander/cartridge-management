@@ -104,7 +104,7 @@ def mail_received(message, **kwargs):
                     notify_admins.delay(f"Получен ответ на заказ {order}",
                                         f"Заказ на {order.count} картриджей {order.cartridge} принят в работу",
                                         f"присвоен номер {order.number}",
-                                        message.text)
+                                        answer_str)
                 else:
                     notify_admins \
                         .delay("Ошибка обработки входящего письма",
