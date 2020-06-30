@@ -214,3 +214,15 @@ class Order(BackupableModel):
     def delete(self, using=None, keep_parents=False):
         self.roll_back()
         return super().delete(using, keep_parents)
+
+
+class Service(BackupableModel):
+    status = models.CharField(max_length=10, choices=choices.ORDER_STATUS, default="creating", verbose_name="Статус")
+    date = models.DateTimeField(default=timezone.now, blank=True, verbose_name="Дата создания")
+    destination = models.CharField(max_length=100, blank=True, default="2 подъезд от КПП (АБЧ 2), Этаж 2, кабинет 14")
+    edited_at = models.DateTimeField(auto_now=True, verbose_name="Дата редактирования")
+    date_finished = models.DateTimeField(blank=True, null=True, verbose_name="Дата выполнения")
+    finished = models.BooleanField(default=False, verbose_name="Выполнен")
+    printer = models.CharField(max_length=100, blank=True, verbose_name="Принтер")
+    inv_number = models.CharField(max_length=100, verbose_name="Инвентарный номер")
+    email = models.OneToOneField(Message, on_delete=models.SET_NULL, related_name="order", null=True, blank=True)
