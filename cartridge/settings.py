@@ -81,12 +81,13 @@ REST_FRAMEWORK = {
     ],
 }
 
-CONSTANCE_BACKEND = 'constance.backends.redisd.RedisBackend'
+CONSTANCE_BACKEND = 'constance.backends.redis.RedisBackend'
 CONSTANCE_REDIS_CONNECTION = {
     'host': 'localhost',
     'port': 6379,
     'db': 0,
 }
+
 CONSTANCE_CONFIG = {
     # 'PRINTER_SUPPORT_MAIL': (
     # "support@masservice.ru", "Почтовый адрес менеджера принт-сервиса, куда будут отправлятся письма."),
