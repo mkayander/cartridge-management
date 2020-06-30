@@ -1,5 +1,5 @@
-import os
 import json
+import os
 
 from django.conf import settings
 from django.http import Http404
@@ -66,5 +66,6 @@ def react_home_view(request):
 
 def order_mail_test(request):
     order = Order.objects.first()
-
-    return render(request, 'OutlookOrder.html', {'order': order})
+    # msg = Message.objects.last()
+    # return render(request, 'OutlookOrder.html', {'order': order})
+    return render(request, 'AdminNotifyMsg.html', {'text': str(settings.ADMINS)})

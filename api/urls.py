@@ -6,11 +6,12 @@ router = routers.DefaultRouter()
 router.register('cartridges', views.CartridgeViewSet)
 router.register('supplies', views.SupplyViewSet)
 router.register('orders', views.OrderViewSet)
+router.register('emails', views.MailViewSet)
 router.register('chatMessage', views.ChatMessageViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
     path('all', views.home_data_view, name="api_home_data"),
     path('auth/', include('rest_framework.urls')),
-    path('action/send-order/<int:order_pk>', views.SendOrderView.as_view())
+    path('action/send-order/<int:order_pk>', views.send_order_view)
 ]

@@ -5,7 +5,8 @@ MANUFACTURER_CHOICES = (
 )
 
 ORDER_STATUS = (
-    ("pending", "Обработка заявки"),
+    ("creating", "Ожидает Отправки"),
+    ("pending", "Обработка менеджером"),
     ("work", "В работе"),
     ("finished", "Завершён")
 )

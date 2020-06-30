@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'django_mailbox',
     'constance',
+    'django_celery_beat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -69,12 +70,12 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication'
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
         'rest_framework.permissions.AllowAny',
         # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
@@ -91,10 +92,17 @@ CONSTANCE_CONFIG = {
     # "support@masservice.ru", "Почтовый адрес менеджера принт-сервиса, куда будут отправлятся письма."),
     'EMAIL_MANAGER_ADDRESS': (
         "maxim.kayander1@gmail.com", "Почтовый адрес менеджера принт-сервиса, куда будут отправлятся письма."),
-    'EMAIL_ALLOW_RESEND': (False, "Разрешить повторную отправку писем по заказу?")
+    'EMAIL_ALLOW_RESEND': (False, "Разрешить повторную отправку писем по заказу?"),
+    'EMAIL_REFRESH_TASK_NAME': (
+        "Refresh Email Mailbox", "Наименование Periodic Task'а в Celery Beat для обновления почтовых ящиков"),
+    'CARTRIDGE_MIN_COUNT': (
+        3,
+        "Минимально допустимое кол-во картриджей одного типа. Заказ будет создан если кол-во ниже данного значения."),
+    'CARTRIDGE_DEF_AMOUNT': (6, "Кол-во картриджей для нового заказа по умолчанию.")
 }
-CONSTANCE_FIELDSETS = {
-    'Email Options': ('EMAIL_MANAGER_ADDRESS', 'EMAIL_ALLOW_RESEND')
+CONSTANCE_CONFIG_FIELDSETS = {
+    'Email Options': ('EMAIL_MANAGER_ADDRESS', 'EMAIL_ALLOW_RESEND', 'EMAIL_REFRESH_TASK_NAME'),
+    'Cartridge Options': ('CARTRIDGE_MIN_COUNT', 'CARTRIDGE_DEF_AMOUNT')
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -106,6 +114,13 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+EMAIL_SUBJECT_PREFIX = os.environ.get("EMAIL_SUBJECT_PREFIX")
+
+if os.environ.get("EMAIL_USE_ADMIN_NOTIF") == "yes":
+    ADMINS = [('Каяндер Максим', 'Maksim.Kayander@dellin.ru'), ('Тирских Никита', 'Nikita.Tirskih@dellin.ru')]
+# ADMINS = [('Каяндер Максим', 'maxim.kayander1@gmail.com')]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -144,7 +159,8 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('it-vlshv.dellin.local', 6379)],
+            # "hosts": [('it-vlshv.dellin.local', 6379)],
+            "hosts": [('localhost', 6379)],
         },
 
     },
@@ -209,3 +225,9 @@ DEBUG_TOOLBAR_CONFIG = {
     # Panel options
     'SQL_WARNING_THRESHOLD': 100,  # milliseconds
 }
+
+# --- CELERY ---
+CELERY_BROKER_URL = 'redis://localhost:6379/1'
+CELERY_CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+# CELERY_TASK_ALWAYS_EAGER = True
+# CELERY_IMPORTS = ("main.receivers","main.models")
