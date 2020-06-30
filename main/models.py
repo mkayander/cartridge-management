@@ -1,6 +1,4 @@
 from datetime import datetime
-from email.utils import make_msgid
-
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.db import models
@@ -10,7 +8,7 @@ from django.utils.dateformat import format
 from django.utils.html import strip_tags
 from django_mailbox.models import Mailbox
 from django_mailbox.models import Message
-
+from email.utils import make_msgid
 from main import choices
 
 
@@ -27,6 +25,94 @@ class BackupableModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class EmailRequestModel(BackupableModel):
+    status = models.CharField(max_length=10, choices=choices.ORDER_STATUS, default="creating",
+                              verbose_name="Статус")
+    date = models.DateTimeField(default=timezone.now, blank=True, verbose_name="Дата создания")
+    destination = models.CharField(max_length=100, blank=True,
+                                   default="2 подъезд от КПП (АБЧ 2), Этаж 2, кабинет 14")
+    edited_at = models.DateTimeField(auto_now=True, verbose_name="Дата редактирования")
+    date_finished = models.DateTimeField(blank=True, null=True, verbose_name="Дата выполнения")
+    number = models.PositiveIntegerField(default=0, blank=True, verbose_name="Номер заявки")
+    finished = models.BooleanField(default=False, verbose_name="Выполнен")
+    email = models.OneToOneField(Message, on_delete=models.SET_NULL, related_name="order", null=True, blank=True)
+
+    @property
+    def html_message(self):
+        return render_to_string('OutlookOrder.html', {'order': self})
+
+    def get_email_subject(self):
+        return None
+
+    class Meta:
+        ordering = ['-date']
+
+    def send_to_manager(self, address_list):
+        """
+        Makes the email message from html template, sends it to specified addresses, records the message to
+        django-mailbox.
+        :param address_list: list of email addresses as strings.
+        :type address_list: list
+        """
+        html_message = self.html_message
+        plain_message = strip_tags(html_message)
+        email = EmailMultiAlternatives(
+            self.get_email_subject(),
+            plain_message,
+            settings.DEFAULT_FROM_EMAIL,
+            address_list,
+        )
+        email.attach_alternative(html_message, "text/html")
+        email.encoding = "UTF-8"
+        email.extra_headers['Message-ID'] = make_msgid()
+        email.send()
+        if self.status == "creating":
+            self.status = "pending"
+
+        mailbox = Mailbox.objects.get(name="oks-dellin")
+        self.email = mailbox.record_outgoing_message(email.message())
+        self.save()
+
+    def to_work(self, request_num: int):
+        """
+        If current status is "pending", sets order's status to "work", sets external request number.
+        Usually called upon manager's answer about order acceptation.
+        :param request_num: external request id from manager's database.
+        """
+        if self.status == "pending":
+            self.status = "work"
+            self.number = request_num
+            self.save()
+            print(f"Successfully moved order {self} to work.")
+
+    def finish(self):
+        """Processes order to finished state."""
+        self.finished = True
+        self.status = "finished"
+        self.date_finished = datetime.now()
+
+    def roll_back(self):
+        """Processes order from finished state to work state."""
+        self.finished = False
+        self.status = "work"
+        self.date_finished = None
+
+    def save(self, *args, **kwargs):
+        # Make corrections only if it's not the initial save and object is not being restored
+        if self.pk and not self.restoring:
+            prev_values = Order.objects.get(pk=self.pk)
+            if self.finished is not prev_values.finished:
+                if self.finished and not prev_values.finished:
+                    self.finish()
+                elif prev_values.finished and not self.finished:
+                    self.roll_back()
+        super().save(*args, **kwargs)
+
+    def delete(self, using=None, keep_parents=False):
+        self.roll_back()
+        return super().delete(using, keep_parents)
 
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -113,116 +199,41 @@ class Supply(BackupableModel):
         return super().delete(using, keep_parents)
 
 
-class Order(BackupableModel):
+class Order(EmailRequestModel):
     """
     Order to cartridges provider, used to fulfill the cartridges stock when needed. \n
     Instance is tied with it's outgoing email message to manager, has 'html_message' property field with email body
     and 'send_to_manager' method that would send the email.
     """
-    status = models.CharField(max_length=10, choices=choices.ORDER_STATUS, default="creating", verbose_name="Статус")
-    date = models.DateTimeField(default=timezone.now, blank=True, verbose_name="Дата создания")
-    destination = models.CharField(max_length=100, blank=True, default="2 подъезд от КПП (АБЧ 2), Этаж 2, кабинет 14")
-    edited_at = models.DateTimeField(auto_now=True, verbose_name="Дата редактирования")
-    date_finished = models.DateTimeField(blank=True, null=True, verbose_name="Дата выполнения")
-    number = models.PositiveIntegerField(default=0, blank=True, verbose_name="Номер заявки")
-    finished = models.BooleanField(default=False, verbose_name="Выполнен")
     cartridge = models.ForeignKey(Cartridge, related_name="orders", on_delete=models.CASCADE, verbose_name="Картридж")
     take_old_away = models.BooleanField(default=False, verbose_name="Забрать израсходованные картриджи")
     supply = models.OneToOneField(Supply, related_name="order", on_delete=models.CASCADE, blank=True, null=True,
                                   verbose_name="Перемещение")
     count = models.PositiveIntegerField(verbose_name="Количество")
-    email = models.OneToOneField(Message, on_delete=models.SET_NULL, related_name="order", null=True, blank=True)
-
-    @property
-    def html_message(self):
-        return render_to_string('OutlookOrder.html', {'order': self})
-
-    class Meta:
-        ordering = ['-date']
 
     def __str__(self):
         return (
             f"{format(self.date, settings.DATETIME_FORMAT)} {self.get_status_display()} {self.cartridge} {self.count}"
         )
 
-    def send_to_manager(self, address_list):
-        """
-        Makes the email message from html template, sends it to specified addresses, records the message to
-        django-mailbox.
-        :param address_list: list of email addresses as strings.
-        :type address_list: list
-        """
-        html_message = self.html_message
-        plain_message = strip_tags(html_message)
-        email = EmailMultiAlternatives(
-            f'Картриджи {self.cartridge}, ООО "Деловые Линии"',
-            plain_message,
-            settings.DEFAULT_FROM_EMAIL,
-            address_list,
-        )
-        email.attach_alternative(html_message, "text/html")
-        email.encoding = "UTF-8"
-        email.extra_headers['Message-ID'] = make_msgid()
-        email.send()
-        if self.status == "creating":
-            self.status = "pending"
-
-        mailbox = Mailbox.objects.get(name="oks-dellin")
-        self.email = mailbox.record_outgoing_message(email.message())
-        self.save()
-
-    def to_work(self, request_num: int):
-        """
-        If current status is "pending", sets order's status to "work", sets external request number.
-        Usually called upon manager's answer about order acceptation.
-        :param request_num: external request id from manager's database.
-        """
-        if self.status == "pending":
-            self.status = "work"
-            self.number = request_num
-            self.save()
-            print(f"Successfully moved order {self} to work.")
+    def get_email_subject(self):
+        return f'Картриджи {self.cartridge}, ООО "Деловые Линии"'
 
     def finish(self):
-        """Processes order to finished state."""
-        self.finished = True
-        self.status = "finished"
-        self.date_finished = datetime.now()
+        super().finish()
         self.supply = Supply.objects.create(out=False, cartridge=self.cartridge, count=self.count,
                                             comment=f"По заказу №{self.pk} от {format(self.date, 'd E Y')}")
 
     def roll_back(self):
-        """Processes order from finished state to work state."""
-        self.finished = False
-        self.status = "work"
-        self.date_finished = None
+        super().roll_back()
         if self.supply:
             self.supply.delete()
             self.supply = None
 
-    def save(self, *args, **kwargs):
-        # Make corrections only if it's not the initial save and object is not being restored
-        if self.pk and not self.restoring:
-            prev_values = Order.objects.get(pk=self.pk)
-            if self.finished is not prev_values.finished:
-                if self.finished and not prev_values.finished:
-                    self.finish()
-                elif prev_values.finished and not self.finished:
-                    self.roll_back()
-        super().save(*args, **kwargs)
 
-    def delete(self, using=None, keep_parents=False):
-        self.roll_back()
-        return super().delete(using, keep_parents)
+class Service(EmailRequestModel):
+    printer = models.CharField(max_length=100, verbose_name="Принтер")
+    inv_number = models.CharField(max_length=100, blank=True, verbose_name="Инвентарный номер")
 
-
-class Service(BackupableModel):
-    status = models.CharField(max_length=10, choices=choices.ORDER_STATUS, default="creating", verbose_name="Статус")
-    date = models.DateTimeField(default=timezone.now, blank=True, verbose_name="Дата создания")
-    destination = models.CharField(max_length=100, blank=True, default="2 подъезд от КПП (АБЧ 2), Этаж 2, кабинет 14")
-    edited_at = models.DateTimeField(auto_now=True, verbose_name="Дата редактирования")
-    date_finished = models.DateTimeField(blank=True, null=True, verbose_name="Дата выполнения")
-    finished = models.BooleanField(default=False, verbose_name="Выполнен")
-    printer = models.CharField(max_length=100, blank=True, verbose_name="Принтер")
-    inv_number = models.CharField(max_length=100, verbose_name="Инвентарный номер")
-    email = models.OneToOneField(Message, on_delete=models.SET_NULL, related_name="order", null=True, blank=True)
+    def get_email_subject(self):
+        return f'Неисправность принтера {self.printer}, ООО "Деловые Линии"'
