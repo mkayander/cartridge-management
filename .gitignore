@@ -21,6 +21,7 @@ mailbox_attachments/
 *$py.class
 
 .idea
+.idea/*
 
 # User-specific stuff
 .idea/**/workspace.xml
