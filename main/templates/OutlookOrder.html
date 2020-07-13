@@ -111,10 +111,17 @@
             <br>
             PNK Парк Валищево +7 (916) 5654206 142143, Московская обл, Подольск г, Валищево д, промышленного парка Валищево тер, дом № 2, стр 1
             <br>
-            Требуются картриджи типа {{ order.cartridge }} в количестве {{ order.count }} штук.
-            <br>
-            {% if order.take_old_away %}
-                Также просьба забрать израсходованные картриджи по тому же адресу.
+            {% if order.cartridge %}
+                Требуются картриджи типа {{ order.cartridge }} в количестве {{ order.count }} штук.
+                <br>
+                {% if order.take_old_away %}
+                    Также просьба забрать израсходованные картриджи по тому же адресу.
+                    <br>
+                {% endif %}
+            {% else %}
+                {{ order.printer }}
+                <br>
+                {{ order.defect_description }}
                 <br>
             {% endif %}
             {{ order.destination }}

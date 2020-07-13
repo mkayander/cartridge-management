@@ -47,7 +47,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
         fields = ["id", "status", "date", "destination", "edited_at", "date_finished", "number", "finished",
-                  "printer", "inv_number", "email", "email_is_sent", "html_message"]
+                  "printer", "inv_number", "email", "email_is_sent", "defect_description", "html_message"]
 
 class MailSerializer(serializers.ModelSerializer):
     # decoded_body = serializers.SerializerMethodField()
