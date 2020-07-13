@@ -5,7 +5,7 @@ from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from django_mailbox.models import Message
 from django_mailbox.signals import message_received
 
-from main.models import Order, Cartridge
+from main.models import Order, Cartridge, Service
 from main.tasks import notify_admins
 
 
@@ -103,10 +103,14 @@ def mail_received(message, **kwargs):
                 request_id = text_id or subject_id
                 if request_id:
                     order.to_work(request_id)
-                    notify_admins.delay(f"Получен ответ на заказ {order}",
-                                        f"Заказ на {order.count} картриджей {order.cartridge} принят в работу",
-                                        f"присвоен номер {order.number}",
-                                        answer_str)
+                    if isinstance(order, Service):
+                        print("service")
+                    else:
+                        print(order.printer)
+                        notify_admins.delay(f"Получен ответ на заказ {order}",
+                                            f"Заказ на {order.count} картриджей {order.cartridge} принят в работу",
+                                            f"присвоен номер {order.number}",
+                                            answer_str)
                 else:
                     notify_admins \
                         .delay("Ошибка обработки входящего письма",
