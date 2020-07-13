@@ -2,7 +2,7 @@ from django_mailbox.models import Message
 from rest_framework import serializers
 
 from chat.models import ChatMessage
-from main.models import Cartridge, Supply, Order
+from main.models import Cartridge, Supply, Order, Service
 
 
 class CartridgeSerializer(serializers.HyperlinkedModelSerializer):
@@ -34,6 +34,20 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ["id", "status", "date", "destination", "edited_at", "date_finished", "number", "finished", "count",
                   "cartridge", "take_old_away", "supply", "email", "email_is_sent", "html_message"]
 
+
+class ServiceSerializer(serializers.ModelSerializer):
+    email_is_sent = serializers.SerializerMethodField()
+
+    # def get_html_message(self):
+    #     return self.html_message()
+
+    def get_email_is_sent(self, obj):
+        return obj.email is not None
+
+    class Meta:
+        model = Service
+        fields = ["id", "status", "date", "destination", "edited_at", "date_finished", "number", "finished",
+                  "printer", "inv_number", "email", "email_is_sent", "html_message"]
 
 class MailSerializer(serializers.ModelSerializer):
     # decoded_body = serializers.SerializerMethodField()

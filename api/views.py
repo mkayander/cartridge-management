@@ -8,9 +8,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from api.serializers import CartridgeSerializer, SupplySerializer, OrderSerializer, ChatMessageSerializer, \
-    MailSerializer
+    MailSerializer, ServiceSerializer
 from chat.models import ChatMessage
-from main.models import Cartridge, Supply, Order
+from main.models import Cartridge, Supply, Order, Service
 
 
 class CartridgeViewSet(viewsets.ModelViewSet):
@@ -30,6 +30,11 @@ class SupplyViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
+
+class ServiceViewSet(viewsets.ModelViewSet):
+    queryset = Service.objects.all()
+    serializer_class = ServiceSerializer
 
     # def initialize_request(self, request, *args, **kwargs):
     #     # print(request, '\n', request.headers, request.body)
@@ -70,7 +75,8 @@ def home_data_view(request):
                                      context={"request": request}).data,
         "orders": OrderSerializer(Order.objects.all(), many=True, context={"request": request}).data,
         "chatMessage": ChatMessageSerializer(ChatMessage.objects.all()[:50], many=True,
-                                             context={"request": request}).data
+                                             context={"request": request}).data,
+        "service": ServiceSerializer(Service.objects.all(), many=True, context={"request": request}).data,
     })
 
 

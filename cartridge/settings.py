@@ -81,7 +81,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-CONSTANCE_BACKEND = 'constance.backends.redis.RedisBackend'
+CONSTANCE_BACKEND = 'constance.backends.redisd.RedisBackend'
 CONSTANCE_REDIS_CONNECTION = {
     'host': 'localhost',
     'port': 6379,
