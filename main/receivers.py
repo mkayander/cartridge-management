@@ -69,7 +69,9 @@ def mail_received(message, **kwargs):
     if message.in_reply_to_id:
         # Trying to get the order
         try:
-            order = Order.objects.get(email__pk=message.in_reply_to_id)
+            outgoing_message = Message.objects.get(pk=message.in_reply_to_id)
+            order = outgoing_message.order
+
             answer_str = message.text[0: message.text.find(message.mailbox.from_email)]  # Strip the quote part
 
             if "заявка принята" in answer_str.lower():
