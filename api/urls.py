@@ -6,6 +6,7 @@ router = routers.DefaultRouter()
 router.register('cartridges', views.CartridgeViewSet)
 router.register('supplies', views.SupplyViewSet)
 router.register('orders', views.OrderViewSet)
+router.register('service', views.ServiceViewSet)
 router.register('emails', views.MailViewSet)
 router.register('chatMessage', views.ChatMessageViewSet)
 

@@ -110,7 +110,7 @@ class EmailRequestModel(BackupableModel):
     def save(self, *args, **kwargs):
         # Make corrections only if it's not the initial save and object is not being restored
         if self.pk and not self.restoring:
-            prev_values = Order.objects.get(pk=self.pk)
+            prev_values = self.__class__.objects.get(pk=self.pk)
             if self.finished is not prev_values.finished:
                 if self.finished and not prev_values.finished:
                     self.finish()
@@ -239,8 +239,9 @@ class Order(EmailRequestModel):
 
 
 class Service(EmailRequestModel):
-    printer = models.CharField(max_length=100, verbose_name="Принтер")
+    printer = models.CharField(max_length=100, choices=choices.PRINTERS, verbose_name="Принтер")
     inv_number = models.CharField(max_length=100, blank=True, verbose_name="Инвентарный номер")
+    defect_description = models.TextField(default="", blank=False, verbose_name="Причина неисправности")
 
     def get_email_subject(self):
         return f'Неисправность принтера {self.printer}, ООО "Деловые Линии"'

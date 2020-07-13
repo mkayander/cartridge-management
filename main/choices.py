@@ -11,6 +11,13 @@ ORDER_STATUS = (
     ("finished", "Завершён")
 )
 
+PRINTERS = (
+    ("HP LaserJet Pro MFP M227fdn", "HP LaserJet Pro MFP M227fdn"),
+    ("HP LaserJet Pro MFP M426fdn", "HP LaserJet Pro MFP M426fdn"),
+    ("Kyocera FS-1030MFP", "Kyocera FS-1030MFP"),
+    ("Kyocera FS-1035MFP", "Kyocera FS-1035MFP")
+)
+
 SUPPLY_TYPE_BOOLEAN = (
     (True, "Выдача"),
     (False, "Поступление")
