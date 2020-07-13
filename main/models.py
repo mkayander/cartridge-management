@@ -1,4 +1,6 @@
 from datetime import datetime
+from email.utils import make_msgid
+
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.db import models
@@ -8,12 +10,13 @@ from django.utils.dateformat import format
 from django.utils.html import strip_tags
 from django_mailbox.models import Mailbox
 from django_mailbox.models import Message
-from email.utils import make_msgid
+
 from main import choices
 
 
 class BackupableModel(models.Model):
     """
+    Abstract model.
     Introduces 'restoring' boolean object-only field that is needed to skip various actions on model's 'save()' method.
     """
     restoring = False
@@ -28,6 +31,11 @@ class BackupableModel(models.Model):
 
 
 class EmailRequestModel(BackupableModel):
+    """
+    Abstract model. Used to create a certain order type. (I.e cartridges, printer etc.)
+    It is tied with it's outgoing email message to manager, has 'html_message' property field with email body
+    and 'send_to_manager' method that would send the email.
+    """
     status = models.CharField(max_length=10, choices=choices.ORDER_STATUS, default="creating",
                               verbose_name="Статус")
     date = models.DateTimeField(default=timezone.now, blank=True, verbose_name="Дата создания")
@@ -201,9 +209,8 @@ class Supply(BackupableModel):
 
 class Order(EmailRequestModel):
     """
-    Order to cartridges provider, used to fulfill the cartridges stock when needed. \n
-    Instance is tied with it's outgoing email message to manager, has 'html_message' property field with email body
-    and 'send_to_manager' method that would send the email.
+    Order to cartridges provider, used to fulfill the cartridges stock when needed.
+
     """
     cartridge = models.ForeignKey(Cartridge, related_name="orders", on_delete=models.CASCADE, verbose_name="Картридж")
     take_old_away = models.BooleanField(default=False, verbose_name="Забрать израсходованные картриджи")

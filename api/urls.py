@@ -13,5 +13,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('all', views.home_data_view, name="api_home_data"),
     path('auth/', include('rest_framework.urls')),
-    path('action/send-order/<int:order_pk>', views.send_order_view)
+    path('action/send-order/<str:pk_str>', views.send_order_view)
 ]

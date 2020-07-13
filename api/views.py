@@ -1,16 +1,15 @@
 # from mailbox import Message
-import json
 
 from constance import config
 from django_mailbox.models import Message
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from api.serializers import CartridgeSerializer, SupplySerializer, OrderSerializer, ChatMessageSerializer, \
     MailSerializer
 from chat.models import ChatMessage
-from main.models import Cartridge, Supply, Order
+from main.models import Cartridge, Supply, Order, Service
 
 
 class CartridgeViewSet(viewsets.ModelViewSet):
@@ -74,18 +73,33 @@ def home_data_view(request):
     })
 
 
+# TODO: Move these constants to a better place
+CARTRIDGE_ORDER_TYPE = 'c'
+SERVICE_ORDER_TYPE = 's'
+
+
 @api_view(["POST"])
 # @permission_classes([permissions.IsAuthenticated])
-def send_order_view(request, order_pk):
-    # if request.is_ajax():
+def send_order_view(request, pk_str: str):
+    """
+    :param request: Regular django HttpRequest POST
+    :param pk_str: Type and pk string, i.e.: "c24" "s12"
+    """
+    order_type, order_pk = pk_str[0], int(pk_str[1:])
     try:
-        order = Order.objects.get(pk=order_pk)
+        if order_type == CARTRIDGE_ORDER_TYPE:
+            order = Order.objects.get(pk=order_pk)
+        elif order_type == SERVICE_ORDER_TYPE:
+            order = Service.objects.get(pk=order_pk)
+        else:
+            return Response({"result": "Invalid order type"}, status=400)
+
         if not order.email or config.EMAIL_ALLOW_RESEND:
-            if "take_old_away" in request.data and request.data["take_old_away"] is True and not order.take_old_away:
+            if "take_old_away" in request.data:
                 order.take_old_away = True
 
             order.send_to_manager([config.EMAIL_MANAGER_ADDRESS])
             return Response({"result": "sent"})
         return Response({"result": "Email already sent"}, status=400)
-    except Order.DoesNotExist:
+    except (Order.DoesNotExist, Service.DoesNotExist):
         return Response({"result": f"Order with pk = {order_pk} does not exist."}, status=400)
