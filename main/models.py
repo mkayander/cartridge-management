@@ -45,7 +45,7 @@ class EmailRequestModel(BackupableModel):
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name="Дата выполнения")
     number = models.PositiveIntegerField(default=0, blank=True, verbose_name="Номер заявки")
     finished = models.BooleanField(default=False, verbose_name="Выполнен")
-    email = models.OneToOneField(Message, on_delete=models.SET_NULL, related_name="%(app_label)s_%(class)s_related", null=True, blank=True)
+    email = models.OneToOneField(Message, on_delete=models.SET_NULL, related_name="%(class)s", null=True, blank=True)
 
     @property
     def html_message(self):
@@ -55,6 +55,7 @@ class EmailRequestModel(BackupableModel):
         return None
 
     class Meta:
+        abstract = True
         ordering = ['-date']
 
     def send_to_manager(self, address_list):
