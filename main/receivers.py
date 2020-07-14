@@ -1,12 +1,16 @@
 from constance import config
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from django_mailbox.models import Message
 from django_mailbox.signals import message_received
 
-from main.models import Order, Cartridge, Service
+from main.models import Order, Cartridge, Service, Supply
 from main.tasks import notify_admins
+
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+import json
 
 
 def request_id_is_valid(id_string: str):
@@ -16,6 +20,20 @@ def request_id_is_valid(id_string: str):
     :param id_string: string that is a numeric id
     """
     return len(id_string) == 4 and id_string.isnumeric()
+
+
+@receiver([post_save, post_delete], sender=Cartridge)
+@receiver([post_save, post_delete], sender=Supply)
+@receiver([post_save, post_delete], sender=Order)
+@receiver([post_save, post_delete], sender=Service)
+def group_sender(sender, **kwargs):
+    channel_layer = get_channel_layer()
+    print(sender)
+    print(sender.__name__)
+    async_to_sync(channel_layer.group_send)("liveData", {
+        "type": 'refresh_data',
+        'refresh': sender.__name__,
+    })
 
 
 @receiver(post_save, sender=Cartridge)
@@ -32,6 +50,7 @@ def check_cartridge_count(instance, **kwargs):
                        f"""Количество картриджей {instance} стало меньше минимума ({config.CARTRIDGE_MIN_COUNT}) - 
                           их {instance.count} шт. Был создан новый заказ на {config.CARTRIDGE_DEF_AMOUNT} шт.""",
                        f"Требуется подтвердить отправку письма менеджеру - http://it-vlshv.dellin.local/?orderId={order.id}")
+
 
 
 @receiver(post_save, sender=Order)
@@ -70,7 +89,9 @@ def mail_received(message, **kwargs):
         # Trying to get the order
         try:
             outgoing_message = Message.objects.get(pk=message.in_reply_to_id)
-            order = outgoing_message.order
+            print(hasattr(outgoing_message, "service"))
+            print(hasattr(outgoing_message, "order"))
+            order = outgoing_message.service if hasattr(outgoing_message, "service") else outgoing_message.order
 
             answer_str = message.text[0: message.text.find(message.mailbox.from_email)]  # Strip the quote part
 
@@ -103,14 +124,10 @@ def mail_received(message, **kwargs):
                 request_id = text_id or subject_id
                 if request_id:
                     order.to_work(request_id)
-                    if isinstance(order, Service):
-                        print("service")
-                    else:
-                        print(order.printer)
-                        notify_admins.delay(f"Получен ответ на заказ {order}",
-                                            f"Заказ на {order.count} картриджей {order.cartridge} принят в работу",
-                                            f"присвоен номер {order.number}",
-                                            answer_str)
+                    notify_admins.delay(f"Получен ответ на заказ {order}",
+                                        f"Заказ на {order.count} картриджей {order.cartridge} принят в работу",
+                                        f"присвоен номер {order.number}",
+                                        answer_str)
                 else:
                     notify_admins \
                         .delay("Ошибка обработки входящего письма",
