@@ -8,6 +8,8 @@ from django_mailbox.signals import message_received
 from main.models import Order, Cartridge, Service
 from main.tasks import notify_admins
 
+from main.messages import NOTIFY_MESSAGES, get_notify_answer
+
 
 def request_id_is_valid(id_string: str):
     """
@@ -64,73 +66,71 @@ def mail_received(message, **kwargs):
     Main incoming email callback. Checks if message is the answer to any local Order, tries to get the external id from
     the message and set's it to the order if found, with Order status also changed to "work".
     """
-    print(f"I just received a message titled {message.subject} from a mailbox named {message.mailbox.name}")
 
-    if message.in_reply_to_id:
-        # Trying to get the order
-        try:
-            outgoing_message = Message.objects.get(pk=message.in_reply_to_id)
-            order = outgoing_message.order
+    if not message.in_reply_to_id:
+        # We only need messages that are replies to our's
+        return
 
-            answer_str = message.text[0: message.text.find(message.mailbox.from_email)]  # Strip the quote part
+    # Trying to get the order
+    try:
+        out_message = Message.objects.get(pk=message.in_reply_to_id)
+        # order = outgoing_message.order
+        order = out_message.order if hasattr(out_message, "order") else out_message.service
+        notifications = NOTIFY_MESSAGES[order.__class__.__name__]  # Get notification texts dictionary for current model
 
-            if "заявка принята" in answer_str.lower():
-                subject_id = text_id = None
-                # Try to get request id from email subject:
-                subject_id_string = message.subject.split()[-1]
-                if request_id_is_valid(subject_id_string):
-                    subject_id = int(subject_id_string)
+        answer_str = message.text[0: message.text.find(message.mailbox.from_email)]  # Strip the quote part
 
-                # Try to get request id from email text:
-                num_index = answer_str.find('№')
-                if num_index != -1:
-                    if answer_str[num_index + 1].isspace():  # if there's a space after '№' remove it
-                        answer_str = answer_str[:num_index + 1] + answer_str[num_index + 2:]
-                    id_string = answer_str[num_index + 1: num_index + 5]
+        if "заявка принята" in answer_str.lower():
+            subject_id = text_id = None
+            # Try to get request id from email subject:
+            subject_id_string = message.subject.split()[-1]
+            if request_id_is_valid(subject_id_string):
+                subject_id = int(subject_id_string)
+
+            # Try to get request id from email text:
+            num_index = answer_str.find('№')
+            if num_index != -1:
+                if answer_str[num_index + 1].isspace():  # if there's a space after '№' remove it
+                    answer_str = answer_str[:num_index + 1] + answer_str[num_index + 2:]
+                id_string = answer_str[num_index + 1: num_index + 5]
+                if request_id_is_valid(id_string):
+                    text_id = int(id_string)
+            else:
+                try:
+                    text_arr = answer_str.split()
+                    index = text_arr.index("заявки")
+                    id_string = text_arr[index + 1].strip().strip('.')
                     if request_id_is_valid(id_string):
                         text_id = int(id_string)
-                else:
-                    try:
-                        text_arr = answer_str.split()
-                        index = text_arr.index("заявки")
-                        id_string = text_arr[index + 1].strip().strip('.')
-                        if request_id_is_valid(id_string):
-                            text_id = int(id_string)
-                        # TODO: Try to make this pattern repeat less
-                    except ValueError as e:
-                        print(e)
+                    # TODO: Try to make this pattern repeat less
+                except ValueError as e:
+                    print(e)
 
-                request_id = text_id or subject_id
-                if request_id:
-                    order.to_work(request_id)
-                    if isinstance(order, Service):
-                        print("service")
-                    else:
-                        print(order.printer)
-                        notify_admins.delay(f"Получен ответ на заказ {order}",
-                                            f"Заказ на {order.count} картриджей {order.cartridge} принят в работу",
-                                            f"присвоен номер {order.number}",
-                                            answer_str)
-                else:
-                    notify_admins \
-                        .delay("Ошибка обработки входящего письма",
-                               f"Был получен ответ на письмо от заказа {order}, но не удалось извлеч номер заказа",
-                               message.subject,
-                               message.text,
-                               answer_str)
-                    print("Failed to retrieve external request id from email subject and text")
-
+            request_id = text_id or subject_id
+            if request_id:
+                order.to_work(request_id)
+                notify_admins.delay(*get_notify_answer(order),
+                                    answer_str)
             else:
-                notify_admins.delay("Ошибка обработки входящего письма",
-                                    f"Получен ответ на заказ {order}, но отсутствует ключевое слово.",
-                                    message.text)
-                print("Keyword not found in email text")
+                notify_admins \
+                    .delay("Ошибка обработки входящего письма",
+                           f"Был получен ответ на письмо от заказа {order}, но не удалось извлеч номер заказа",
+                           message.subject,
+                           message.text,
+                           answer_str)
+                print("Failed to retrieve external request id from email subject and text")
 
-        except Order.DoesNotExist as exception:
-            print(f'There is no order with email pk being set to {message.in_reply_to_id}',
-                  exception, sep='\n')
+        else:
             notify_admins.delay("Ошибка обработки входящего письма",
-                                f"""Входящее письмо было ответом на {Message.objects.get(id=message.in_reply_to_id)} 
-                                К этому письму не привязан ни один заказ.""",
-                                message.subject,
+                                f"Получен ответ на заказ {order}, но отсутствует ключевое слово.",
                                 message.text)
+            print("Keyword not found in email text")
+
+    except AttributeError as exception:
+        print(f'There is no order with email pk being set to {message.in_reply_to_id}',
+              exception, sep='\n')
+        notify_admins.delay("Ошибка обработки входящего письма",
+                            f"""Входящее письмо было ответом на {Message.objects.get(id=message.in_reply_to_id)} 
+                            К этому письму не привязан ни один заказ.""",
+                            message.subject,
+                            message.text)
