@@ -1,16 +1,11 @@
 import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-from .models import ChatMessage
 
 
-class ChatConsumer(WebsocketConsumer):
+class LiveDataConsumer(WebsocketConsumer):
     def connect(self):
-        # self.room_name = self.scope['url_route']['kwargs']['room_name']
-        # self.room_name = self.scope['url_route']['kwargs']
-        # self.room_group_name = 'chat_%s' % self.room_name
-        self.room_group_name = 'chat'
-
+        self.room_group_name = 'liveData'
 
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
@@ -28,31 +23,28 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     # Receive message from WebSocket
-    def receive(self, text_data):
+    def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-        user = text_data_json['user']
-        ChatMessage.objects.create(user=user, message=message)
 
-        print(f"{user} message --- {message}")
+        print(f"message --- {message}")
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
-                'type': 'chat_message',
-                'user': user,
+                'type': 'refresh_data',
                 'message': message
             }
         )
 
     # Receive message from room group
-    def chat_message(self, event):
-        message = event['message']
-        user = event['user']
-
+    def refresh_data(self, event):
+        '''
+        Call back function to send message to the browser
+        '''
+        message = event['refresh']
         # Send message to WebSocket
         self.send(text_data=json.dumps({
-            'message': message,
-            'user': user,
+            'message': message
         }))

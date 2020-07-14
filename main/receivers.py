@@ -1,12 +1,16 @@
 from constance import config
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from django_mailbox.models import Message
 from django_mailbox.signals import message_received
 
-from main.models import Order, Cartridge, Service
+from main.models import Order, Cartridge, Service, Supply
 from main.tasks import notify_admins
+
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+import json
 
 from main.messages import NOTIFY_MESSAGES, get_notify_answer
 
@@ -18,6 +22,20 @@ def request_id_is_valid(id_string: str):
     :param id_string: string that is a numeric id
     """
     return len(id_string) == 4 and id_string.isnumeric()
+
+
+@receiver([post_save, post_delete], sender=Cartridge)
+@receiver([post_save, post_delete], sender=Supply)
+@receiver([post_save, post_delete], sender=Order)
+@receiver([post_save, post_delete], sender=Service)
+def group_sender(sender, **kwargs):
+    channel_layer = get_channel_layer()
+    print(sender)
+    print(sender.__name__)
+    async_to_sync(channel_layer.group_send)("liveData", {
+        "type": 'refresh_data',
+        'refresh': sender.__name__,
+    })
 
 
 @receiver(post_save, sender=Cartridge)
