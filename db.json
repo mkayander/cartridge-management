@@ -1,13 +1,13 @@
 {
     "Cartridge": [
         {
-            "count": 6,
+            "count": 4,
             "manufacturer": "HP",
             "name": "26X",
             "restoring": true
         },
         {
-            "count": 8,
+            "count": 5,
             "manufacturer": "HP",
             "name": "30A",
             "restoring": true
@@ -19,7 +19,7 @@
             "restoring": true
         },
         {
-            "count": 6,
+            "count": 7,
             "manufacturer": "HP",
             "name": "78A",
             "restoring": true
@@ -37,7 +37,7 @@
             "restoring": true
         },
         {
-            "count": 7,
+            "count": 6,
             "manufacturer": "HP",
             "name": "83X",
             "restoring": true
@@ -55,33 +55,98 @@
             "restoring": true
         },
         {
-            "count": 1,
+            "count": 4,
             "manufacturer": "Kyocera",
-            "name": "TK1140",
+            "name": "TK1130",
             "restoring": true
         },
         {
-            "count": 0,
+            "count": 3,
             "manufacturer": "Kyocera",
-            "name": "TK1145",
+            "name": "TK1140",
             "restoring": true
         }
     ],
     "Order": [
+        {
+            "cartridge_id": "TK1130",
+            "count": 4,
+            "date": "2020-07-13T06:29:37.848Z",
+            "date_finished": "2020-07-13T13:44:34.888Z",
+            "destination": "2 \u043f\u043e\u0434\u044a\u0435\u0437\u0434 \u043e\u0442 \u041a\u041f\u041f (\u0410\u0411\u0427 2), \u042d\u0442\u0430\u0436 2, \u043a\u0430\u0431\u0438\u043d\u0435\u0442 14",
+            "edited_at": "2020-07-14T08:01:31.565Z",
+            "email_id": 675,
+            "finished": true,
+            "id": 18,
+            "number": 2435,
+            "restoring": true,
+            "status": "finished",
+            "supply_id": 34,
+            "take_old_away": false
+        },
+        {
+            "cartridge_id": "78A",
+            "count": 6,
+            "date": "2020-07-10T07:42:22.780Z",
+            "date_finished": "2020-07-13T13:44:38.080Z",
+            "destination": "2 \u043f\u043e\u0434\u044a\u0435\u0437\u0434 \u043e\u0442 \u041a\u041f\u041f (\u0410\u0411\u0427 2), \u042d\u0442\u0430\u0436 2, \u043a\u0430\u0431\u0438\u043d\u0435\u0442 14",
+            "edited_at": "2020-07-13T13:44:38.155Z",
+            "email_id": 672,
+            "finished": true,
+            "id": 17,
+            "number": 2433,
+            "restoring": true,
+            "status": "finished",
+            "supply_id": 35,
+            "take_old_away": false
+        },
+        {
+            "cartridge_id": "26X",
+            "count": 6,
+            "date": "2020-06-26T07:03:37.439Z",
+            "date_finished": "2020-07-06T11:14:41.527Z",
+            "destination": "2 \u043f\u043e\u0434\u044a\u0435\u0437\u0434 \u043e\u0442 \u041a\u041f\u041f (\u0410\u0411\u0427 2), \u042d\u0442\u0430\u0436 2, \u043a\u0430\u0431\u0438\u043d\u0435\u0442 14",
+            "edited_at": "2020-07-06T11:14:41.605Z",
+            "email_id": 665,
+            "finished": true,
+            "id": 16,
+            "number": 2385,
+            "restoring": true,
+            "status": "finished",
+            "supply_id": 26,
+            "take_old_away": false
+        },
+        {
+            "cartridge_id": "TK1140",
+            "count": 3,
+            "date": "2020-06-24T08:15:45.990Z",
+            "date_finished": "2020-06-25T10:50:08.926Z",
+            "destination": "2 \u043f\u043e\u0434\u044a\u0435\u0437\u0434 \u043e\u0442 \u041a\u041f\u041f (\u0410\u0411\u0427 2), \u042d\u0442\u0430\u0436 2, \u043a\u0430\u0431\u0438\u043d\u0435\u0442 14",
+            "edited_at": "2020-06-25T10:50:09.039Z",
+            "email_id": 659,
+            "finished": true,
+            "id": 13,
+            "number": 2377,
+            "restoring": true,
+            "status": "finished",
+            "supply_id": 19,
+            "take_old_away": true
+        },
         {
             "cartridge_id": "78A",
             "count": 6,
             "date": "2020-06-15T06:48:58.734Z",
             "date_finished": "2020-06-17T12:12:44.240Z",
             "destination": "2 \u043f\u043e\u0434\u044a\u0435\u0437\u0434 \u043e\u0442 \u041a\u041f\u041f (\u0410\u0411\u0427 2), \u042d\u0442\u0430\u0436 2, \u043a\u0430\u0431\u0438\u043d\u0435\u0442 14",
-            "edited_at": "2020-06-17T12:12:44.475Z",
+            "edited_at": "2020-06-20T23:54:03.257Z",
             "email_id": null,
             "finished": true,
             "id": 5,
             "number": 0,
             "restoring": true,
             "status": "finished",
-            "supply_id": 16
+            "supply_id": 16,
+            "take_old_away": false
         },
         {
             "cartridge_id": "26X",
@@ -96,7 +161,8 @@
             "number": 0,
             "restoring": true,
             "status": "finished",
-            "supply_id": 15
+            "supply_id": 15,
+            "take_old_away": false
         },
         {
             "cartridge_id": "30A",
@@ -111,7 +177,8 @@
             "number": 2312,
             "restoring": true,
             "status": "finished",
-            "supply_id": 8
+            "supply_id": 8,
+            "take_old_away": false
         },
         {
             "cartridge_id": "26X",
@@ -126,7 +193,8 @@
             "number": 0,
             "restoring": true,
             "status": "finished",
-            "supply_id": 2
+            "supply_id": 2,
+            "take_old_away": false
         },
         {
             "cartridge_id": "30A",
@@ -141,10 +209,191 @@
             "number": 0,
             "restoring": true,
             "status": "finished",
-            "supply_id": 3
+            "supply_id": 3,
+            "take_old_away": false
         }
     ],
     "Supply": [
+        {
+            "cartridge_id": "78A",
+            "comment": "\u041f\u043e \u0437\u0430\u043a\u0430\u0437\u0443 \u211617 \u043e\u0442 10 \u0438\u044e\u043b\u044f 2020",
+            "count": 6,
+            "date": "2020-07-13T13:44:38.081Z",
+            "edited_at": "2020-07-14T08:02:17.575Z",
+            "id": 35,
+            "out": false,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "TK1130",
+            "comment": "\u041f\u043e \u0437\u0430\u043a\u0430\u0437\u0443 \u211618 \u043e\u0442 13 \u0438\u044e\u043b\u044f 2020",
+            "count": 4,
+            "date": "2020-07-13T13:44:34.889Z",
+            "edited_at": "2020-07-13T13:44:35.022Z",
+            "id": 34,
+            "out": false,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "78A",
+            "comment": "",
+            "count": 1,
+            "date": "2020-07-10T07:43:58.035Z",
+            "edited_at": "2020-07-10T07:43:58.097Z",
+            "id": 32,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "78A",
+            "comment": "10 \u043a\u0430\u0431\u0438\u043d\u0435\u0442",
+            "count": 2,
+            "date": "2020-07-10T07:42:22.731Z",
+            "edited_at": "2020-07-10T07:42:23.045Z",
+            "id": 31,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "26X",
+            "comment": "\u0422\u0421\u0414\u0435\u0448\u043d\u0430\u044f",
+            "count": 1,
+            "date": "2020-07-09T05:29:08.256Z",
+            "edited_at": "2020-07-14T08:02:05.667Z",
+            "id": 30,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "78A",
+            "comment": "\u041a\u041f\u041f",
+            "count": 1,
+            "date": "2020-07-07T13:36:21.299Z",
+            "edited_at": "2020-07-08T09:00:02.765Z",
+            "id": 29,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "30A",
+            "comment": "12 \u043a\u0430\u0431\u0438\u043d\u0435\u0442",
+            "count": 1,
+            "date": "2020-07-07T10:26:27.345Z",
+            "edited_at": "2020-07-14T08:01:39.597Z",
+            "id": 28,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "26X",
+            "comment": "14 \u043a\u0430\u0431\u0438\u043d\u0435\u0442",
+            "count": 1,
+            "date": "2020-07-07T06:24:44.331Z",
+            "edited_at": "2020-07-14T08:02:31.664Z",
+            "id": 27,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "26X",
+            "comment": "\u041f\u043e \u0437\u0430\u043a\u0430\u0437\u0443 \u211616 \u043e\u0442 26 \u0438\u044e\u043d\u044f 2020",
+            "count": 6,
+            "date": "2020-07-06T11:14:41.528Z",
+            "edited_at": "2020-07-06T11:14:41.585Z",
+            "id": 26,
+            "out": false,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "26X",
+            "comment": "\u0422\u0421\u0414\u0448\u043d\u0430\u044f",
+            "count": 1,
+            "date": "2020-07-06T06:59:43.223Z",
+            "edited_at": "2020-07-06T06:59:43.328Z",
+            "id": 25,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "26X",
+            "comment": "\u0421\u043a\u043b\u0430\u0434",
+            "count": 1,
+            "date": "2020-07-03T07:32:54.328Z",
+            "edited_at": "2020-07-03T07:32:54.389Z",
+            "id": 24,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "TK1140",
+            "comment": "9 \u043a\u0430\u0431.",
+            "count": 1,
+            "date": "2020-07-03T07:25:11.400Z",
+            "edited_at": "2020-07-03T07:33:04.150Z",
+            "id": 23,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "30A",
+            "comment": "25 \u043a\u0430\u0431.",
+            "count": 2,
+            "date": "2020-06-29T08:34:40.991Z",
+            "edited_at": "2020-06-29T08:34:41.517Z",
+            "id": 22,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "26X",
+            "comment": "\u0421\u043a\u043b\u0430\u0434",
+            "count": 2,
+            "date": "2020-06-26T07:03:37.343Z",
+            "edited_at": "2020-06-26T07:03:37.814Z",
+            "id": 21,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "78A",
+            "comment": "10 \u043a\u0430\u0431.",
+            "count": 2,
+            "date": "2020-06-26T06:14:21.125Z",
+            "edited_at": "2020-06-26T06:14:21.553Z",
+            "id": 20,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "TK1140",
+            "comment": "\u041f\u043e \u0437\u0430\u043a\u0430\u0437\u0443 \u211613 \u043e\u0442 24 \u0438\u044e\u043d\u044f 2020",
+            "count": 3,
+            "date": "2020-06-25T10:50:08.928Z",
+            "edited_at": "2020-06-25T10:50:09.020Z",
+            "id": 19,
+            "out": false,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "26X",
+            "comment": "12 \u043a\u0430\u0431.",
+            "count": 1,
+            "date": "2020-06-24T12:19:33.261Z",
+            "edited_at": "2020-06-24T12:19:33.704Z",
+            "id": 18,
+            "out": true,
+            "restoring": true
+        },
+        {
+            "cartridge_id": "26X",
+            "comment": "\u0442\u0441\u0434",
+            "count": 1,
+            "date": "2020-06-18T09:36:24.539Z",
+            "edited_at": "2020-06-18T09:36:24.682Z",
+            "id": 17,
+            "out": true,
+            "restoring": true
+        },
         {
             "cartridge_id": "78A",
             "comment": "\u041f\u043e \u0437\u0430\u043a\u0430\u0437\u0443 \u21165 \u043e\u0442 15 \u0438\u044e\u043d\u044f 2020",
