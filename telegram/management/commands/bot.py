@@ -51,7 +51,7 @@ dp = Dispatcher(bot=bot)
 state_delete = []
 
 
-@dp.message_handler(commands=["del"], commands_prefix=[".", "/"])
+@dp.message_handler(commands=["delete", "del", "d"], commands_prefix=[".", "/"])
 async def confirm_delete(message):
     if message.reply_to_message:
         state_delete.append(message.message_id)
