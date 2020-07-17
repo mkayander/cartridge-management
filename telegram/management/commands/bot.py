@@ -9,7 +9,7 @@ from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButt
 
 from pyzbar.pyzbar import decode
 from PIL import Image
-from main.models import Service
+from telegram.models import EquipMovement
 
 
 def detect_barcode(img):
@@ -78,8 +78,11 @@ async def collect_photo(message):
         img = Image.open(download_image)
         bool_bar, barcode = detect_barcode(img)
         if bool_bar:
-            await sync_to_async(Service.objects.update_or_create)(printer="asdasdasd", inv_number=barcode, defect_description=message.caption, image_barcode=img)
-            await bot.send_message(message.chat.id, f"Ваш ID {message.from_user.id}\nХуйня со штрихкодом {barcode} сохранена как {message.message_id}.")
+            await sync_to_async(EquipMovement.objects.update_or_create)(telegram_user_id=message.from_user.id,
+                                                                        inv_number=barcode, comment=message.caption,
+                                                                        inv_image=img)
+            await bot.send_message(message.chat.id,
+                                   f"Ваш ID {message.from_user.id}\nХуйня со штрихкодом {barcode} сохранена как {message.message_id}.")
         else:
             await bot.send_message(message.chat.id, barcode)
 
