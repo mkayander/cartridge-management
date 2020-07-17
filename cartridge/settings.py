@@ -220,6 +220,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+MEDIA_URL = '/telegram/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'telegram/media')
+
 DEBUG_TOOLBAR_CONFIG = {
     # Toolbar options
     # 'RESULTS_CACHE_SIZE': 3,
