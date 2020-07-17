@@ -1,4 +1,6 @@
+import asyncio
 import logging
+from datetime import datetime
 from typing import Tuple
 
 import PIL
@@ -44,11 +46,21 @@ inline_kb_full.add(inline_btn_del, inline_btn_cancel)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+loop = asyncio.get_event_loop()
+
 bot = Bot(
-    token=settings.TELEGRAM_BOT_TOKEN
+    token=settings.TELEGRAM_BOT_TOKEN,
+    loop=loop
 )
+
 dp = Dispatcher(bot=bot)
 state_delete = []
+
+
+async def print_time():
+    while True:
+        print(datetime.now())
+        await asyncio.sleep(1)
 
 
 @dp.message_handler(commands=["delete", "del", "d"], commands_prefix=[".", "/"])
@@ -65,6 +77,7 @@ async def confirm_delete(message):
 @dp.callback_query_handler()
 async def callback_inline_button(callback_query: types.CallbackQuery):
     code = callback_query.data
+    print(callback_query.id)
     if code == 'delete':
         try:
             em = await sync_to_async(EquipMovement.objects.get)(message_id=state_delete[1])
@@ -120,12 +133,13 @@ async def collect_photo(message):
 @dp.message_handler()
 async def collect_message(message):
     print(message.as_json)
+    await message.chat.do("typing")
     # await bot.send_message(message.chat.id, message.as_json)
 
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        print("bot start")
 
+        asyncio.ensure_future(print_time(), loop=loop)
         executor.start_polling(dispatcher=dp)
