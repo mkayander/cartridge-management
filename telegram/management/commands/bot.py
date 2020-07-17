@@ -1,19 +1,21 @@
 import asyncio
 import logging
 from typing import Tuple
+import emoji
 
 import PIL
 from PIL import Image
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types import ContentType
+from aiogram.types import ContentType, ParseMode
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton
-from asgiref.sync import sync_to_async
+from asgiref.sync import sync_to_async, async_to_sync
 from django.conf import settings
 from django.core.management import BaseCommand
 from pyzbar.pyzbar import decode
+from datetime import datetime
 
-from telegram.models import EquipMovement
+from telegram.models import EquipMovement, UploadPhoto
 
 
 def get_inv_number(image: PIL.Image) -> Tuple[bool, str]:
@@ -28,7 +30,6 @@ def get_inv_number(image: PIL.Image) -> Tuple[bool, str]:
         if inv_number[0:3] == "600":
             inv_number = "ДТ" + inv_number.split("600")[1]
             return True, inv_number
-
         return False, f"{inv_number} не является инвентарным номером"
 
 
@@ -57,17 +58,27 @@ bot = Bot(
 
 dp = Dispatcher(bot=bot)
 state_delete = []
-
+state_old_bot_message = []
 user_photos = []
 
 
-async def print_time():
+async def add_more_photo():
     while True:
-        await asyncio.sleep(5)
+        if len(state_old_bot_message) >= 1:
+            await bot.delete_message(state_old_bot_message[0].chat.id, state_old_bot_message[0].message_id)
+            state_old_bot_message.pop(0)
         if len(user_photos) > 0:
             for message in user_photos:
                 movement = await sync_to_async(EquipMovement.objects.get)(message_id=message.reply_to_message)
-                movement.inv_image = message
+                image_id, image_path = await get_image(message)
+                await download_image(image_id, image_path)
+                await sync_to_async(UploadPhoto.objects.create)(em=movement, image=image_path,
+                                                                message_id=message.message_id)
+            print("Upload photo")
+            await bot.send_message(user_photos[0].chat.id,
+                                   "Фотки добавлены" if len(user_photos) >= 2 else "Фото добавлено")
+            user_photos.clear()
+        await asyncio.sleep(5)
 
 
 @dp.message_handler(commands=["delete", "del", "d"], commands_prefix=[".", "/"])
@@ -79,6 +90,7 @@ async def confirm_delete(message):
     else:
         await message.reply(text="Вызывать .del можно только в ответ на сообщение с фотографией, тупой что ли?")
         await bot.delete_message(message.chat.id, message.message_id)
+        state_old_bot_message.append(message.message_id+1)
 
 
 @dp.callback_query_handler()
@@ -108,14 +120,7 @@ async def send_menu(message: types.Message):
 
 @dp.message_handler(content_types=ContentType.PHOTO)
 async def handle_photo(message):
-    if not message.caption and not message.reply_to_message:
-        await bot.delete_message(message.chat.id, message.message_id)
-        print("Photo is deleted")
-
-    elif message.reply_to_message:
-        user_photos.append(message)
-
-    else:
+    if message.caption and not message.reply_to_message:
         image_id, image_path = await get_image(message)
         await download_image(image_id, image_path)
         img = Image.open(image_path)
@@ -130,6 +135,13 @@ async def handle_photo(message):
         else:
             await bot.send_message(message.chat.id, barcode)
 
+    elif hasattr(message, 'reply_to_message') and message.reply_to_message.caption:
+        user_photos.append(message)
+
+    else:
+        await bot.delete_message(message.chat.id, message.message_id)
+        print("Photo is deleted")
+
 
 async def get_image(message):
     image_id = await bot.get_file(message.photo[-1].file_id)
@@ -143,12 +155,15 @@ async def download_image(image_id, path):
 
 @dp.message_handler()
 async def collect_message(message):
-    print(message.as_json)
-    # await bot.send_message(message.chat.id, message.as_json)
+    text = 'Не спамить! Какашка 😜' + '\nВсе сообщения только по делу!'
+    await message.reply(text=text, parse_mode=ParseMode.MARKDOWN)
+
+    await bot.delete_message(message.chat.id, message.message_id)
+    state_old_bot_message.append(message.message_id+1)
 
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        asyncio.ensure_future(print_time(), loop=loop)
+        asyncio.ensure_future(add_more_photo(), loop=loop)
         executor.start_polling(dispatcher=dp)

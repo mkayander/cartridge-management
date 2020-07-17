@@ -4,7 +4,7 @@ from django.db import models
 class EquipMovement(models.Model):
     # profile = models.ForeignKey(to='telegram.Profile', verbose_name="Profile", on_delete=models.PROTECT)
     message_id = models.PositiveIntegerField(verbose_name="ИД сообщения")
-    telegram_user_id = models.PositiveIntegerField(verbose_name="Имя пользователя")
+    telegram_user_id = models.PositiveIntegerField(verbose_name="ИД пользователя")
     inv_number = models.CharField(max_length=20, verbose_name="Инвентарник")
     comment = models.TextField(verbose_name="Коментарий")
     inv_image = models.ImageField(verbose_name="Фото инвентарника", blank=True)
@@ -15,3 +15,9 @@ class EquipMovement(models.Model):
 
     class Meta:
         verbose_name = "Пермещение техники"
+
+
+class UploadPhoto(models.Model):
+    em = models.ForeignKey(EquipMovement, verbose_name="EquipMovement", on_delete=models.CASCADE)
+    message_id = models.PositiveIntegerField(verbose_name="ИД сообщения")
+    image = models.ImageField(verbose_name="Дополнительное фото", blank=True)
