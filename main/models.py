@@ -243,6 +243,7 @@ class Service(EmailRequestModel):
     printer = models.CharField(max_length=100, choices=choices.PRINTERS, verbose_name="Принтер")
     inv_number = models.CharField(max_length=100, blank=True, verbose_name="Инвентарный номер")
     defect_description = models.TextField(default="", blank=False, verbose_name="Причина неисправности")
+    image_barcode = models.ImageField(verbose_name="Фото штрих кода", blank=True)
 
     def get_email_subject(self):
         return f'Неисправность принтера {self.printer}, ООО "Деловые Линии"'

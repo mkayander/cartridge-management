@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'channels',
     'main',
     'api',
+    'telegram',
     'rest_framework',
     'crispy_forms',
     'corsheaders',
@@ -232,3 +233,5 @@ CELERY_BROKER_URL = 'redis://localhost:6379/1'
 CELERY_CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # CELERY_TASK_ALWAYS_EAGER = True
 # CELERY_IMPORTS = ("main.receivers","main.models")
+
+TELEGRAM_BOT_URL = 'https://api.telegram.org/bot'
