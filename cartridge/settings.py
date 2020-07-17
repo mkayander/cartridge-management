@@ -238,3 +238,4 @@ CELERY_CELERYBEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # CELERY_IMPORTS = ("main.receivers","main.models")
 
 TELEGRAM_BOT_URL = 'https://api.telegram.org/bot'
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_VLSHV_BOT_TOKEN")
