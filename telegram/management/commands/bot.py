@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from datetime import datetime
 from typing import Tuple
 
 import PIL
@@ -32,8 +31,9 @@ def get_inv_number(image: PIL.Image) -> Tuple[bool, str]:
 
         return False, f"{inv_number} не является инвентарным номером"
 
+
 bot_help_description = "Привет, че забыл команды?\n\nНапоминаю вызвать их \nможно через . или /" + \
-                        "\n\n.d .del .delete - удаляет фото с комментарием из базы и чата"
+                       "\n\n.d .del .delete - удаляет фото с комментарием из базы и чата"
 
 button_delete = KeyboardButton('.delete')
 
@@ -58,11 +58,16 @@ bot = Bot(
 dp = Dispatcher(bot=bot)
 state_delete = []
 
+user_photos = []
+
 
 async def print_time():
     while True:
-        print(datetime.now())
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
+        if len(user_photos) > 0:
+            for message in user_photos:
+                movement = await sync_to_async(EquipMovement.objects.get)(message_id=message.reply_to_message)
+                movement.inv_image = message
 
 
 @dp.message_handler(commands=["delete", "del", "d"], commands_prefix=[".", "/"])
@@ -94,6 +99,7 @@ async def callback_inline_button(callback_query: types.CallbackQuery):
     await bot.delete_message(callback_query.message.chat.id, state_delete[0] + 1)
     state_delete.clear()
 
+
 @dp.message_handler(lambda message: message.text.lower() == "help")
 @dp.message_handler(commands=["Help", "?", "h"], commands_prefix=[".", "/"])
 async def send_menu(message: types.Message):
@@ -101,27 +107,38 @@ async def send_menu(message: types.Message):
 
 
 @dp.message_handler(content_types=ContentType.PHOTO)
-async def collect_photo(message):
+async def handle_photo(message):
     if not message.caption and not message.reply_to_message:
         await bot.delete_message(message.chat.id, message.message_id)
-        print("Photo is delete")
+        print("Photo is deleted")
+
     elif message.reply_to_message:
-        await bot.send_message(message.chat.id, "Фото добавлено")
+        user_photos.append(message)
+
     else:
-        get_image_id = await bot.get_file(message.photo[-1].file_id)
-        img_path = f"telegram/media/{get_image_id.file_unique_id}.jpg"
-        await bot.download_file(get_image_id['file_path'], img_path)
-        img = Image.open(img_path)
+        image_id, image_path = await get_image(message)
+        await download_image(image_id, image_path)
+        img = Image.open(image_path)
         bool_bar, barcode = get_inv_number(img)
         if bool_bar:
-            await sync_to_async(EquipMovement.objects.update_or_create)(telegram_user_id=message.from_user.id,
-                                                                        inv_number=barcode, comment=message.caption,
-                                                                        inv_image=img_path,
-                                                                        message_id=message.message_id)
+            await sync_to_async(EquipMovement.objects.create)(telegram_user_id=message.from_user.id,
+                                                              inv_number=barcode, comment=message.caption,
+                                                              inv_image=image_path,
+                                                              message_id=message.message_id)
             await bot.send_message(message.chat.id,
                                    f"Ваш ID {message.from_user.id}\nХуйня со штрихкодом {barcode} сохранена как {message.message_id}.")
         else:
             await bot.send_message(message.chat.id, barcode)
+
+
+async def get_image(message):
+    image_id = await bot.get_file(message.photo[-1].file_id)
+    image_path = f"telegram/media/{image_id.file_unique_id}.jpg"
+    return image_id, image_path
+
+
+async def download_image(image_id, path):
+    await bot.download_file(image_id['file_path'], path)
 
 
 @dp.message_handler()
@@ -133,6 +150,5 @@ async def collect_message(message):
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-
         asyncio.ensure_future(print_time(), loop=loop)
         executor.start_polling(dispatcher=dp)
