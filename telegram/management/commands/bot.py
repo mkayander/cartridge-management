@@ -32,6 +32,8 @@ def get_inv_number(image: PIL.Image) -> Tuple[bool, str]:
 
         return False, f"{inv_number} не является инвентарным номером"
 
+bot_help_description = "Привет, че забыл команды?\n\nНапоминаю вызвать их \nможно через . или /" + \
+                        "\n\n.d .del .delete - удаляет фото с комментарием из базы и чата"
 
 button_delete = KeyboardButton('.delete')
 
@@ -70,40 +72,32 @@ async def confirm_delete(message):
         state_delete.append(message.reply_to_message.message_id)
         await message.reply(text="Удаляем к хуям?", reply_markup=inline_kb_full)
     else:
-        await message.reply(text="Вызывать .del можно только в ответ на сообщение с фотографией")
+        await message.reply(text="Вызывать .del можно только в ответ на сообщение с фотографией, тупой что ли?")
         await bot.delete_message(message.chat.id, message.message_id)
 
 
 @dp.callback_query_handler()
 async def callback_inline_button(callback_query: types.CallbackQuery):
     code = callback_query.data
-    print(callback_query.id)
     if code == 'delete':
         try:
             em = await sync_to_async(EquipMovement.objects.get)(message_id=state_delete[1])
             await bot.delete_message(callback_query.message.chat.id, em.message_id + 1)
             await sync_to_async(em.delete)()
             await bot.delete_message(callback_query.message.chat.id, state_delete[1])
-            await bot.answer_callback_query(callback_query.id, text="Сделано, не благадари =)")
+            await bot.answer_callback_query(callback_query.id, text="Сделано, не благодари =)")
         except EquipMovement.DoesNotExist:
-            await bot.answer_callback_query(callback_query.id, text="Не нашел в базе!")
+            await bot.answer_callback_query(callback_query.id, text="Не нашел в базе! Поэтому не удалю!")
     else:
         await bot.answer_callback_query(callback_query.id, text="Ну как хочешь =(")
     await bot.delete_message(callback_query.message.chat.id, state_delete[0])
     await bot.delete_message(callback_query.message.chat.id, state_delete[0] + 1)
     state_delete.clear()
 
-
+@dp.message_handler(lambda message: message.text.lower() == "help")
 @dp.message_handler(commands=["Help", "?", "h"], commands_prefix=[".", "/"])
 async def send_menu(message: types.Message):
-    await message.reply(text='''
-        Вот что есть на данный момент
-        ''', reply_markup=greet_kb)
-
-
-@dp.message_handler(lambda message: message.text.lower() == "help")
-async def command_answer(message):
-    await bot.send_message(message.chat.id, "my commands")
+    await message.reply(text=bot_help_description, reply_markup=greet_kb)
 
 
 @dp.message_handler(content_types=ContentType.PHOTO)
@@ -133,7 +127,6 @@ async def collect_photo(message):
 @dp.message_handler()
 async def collect_message(message):
     print(message.as_json)
-    await message.chat.do("typing")
     # await bot.send_message(message.chat.id, message.as_json)
 
 
