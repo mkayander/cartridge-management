@@ -65,7 +65,7 @@ user_photos = []
 async def add_more_photo():
     while True:
         if len(state_old_bot_message) >= 1:
-            await bot.delete_message(state_old_bot_message[0].chat.id, state_old_bot_message[0].message_id)
+            await bot.delete_message(state_old_bot_message[0].chat.id, state_old_bot_message[0].message_id+1)
             state_old_bot_message.pop(0)
         if len(user_photos) > 0:
             for message in user_photos:
@@ -90,7 +90,7 @@ async def confirm_delete(message):
     else:
         await message.reply(text="Вызывать .del можно только в ответ на сообщение с фотографией, тупой что ли?")
         await bot.delete_message(message.chat.id, message.message_id)
-        state_old_bot_message.append(message.message_id+1)
+        state_old_bot_message.append(message)
 
 
 @dp.callback_query_handler()
@@ -159,7 +159,7 @@ async def collect_message(message):
     await message.reply(text=text, parse_mode=ParseMode.MARKDOWN)
 
     await bot.delete_message(message.chat.id, message.message_id)
-    state_old_bot_message.append(message.message_id+1)
+    state_old_bot_message.append(message)
 
 
 class Command(BaseCommand):
