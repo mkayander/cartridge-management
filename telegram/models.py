@@ -15,6 +15,7 @@ class Profile():
 
 class EquipMovement(models.Model):
     # profile = models.ForeignKey(to='telegram.Profile', verbose_name="Profile", on_delete=models.PROTECT)
+    message_id = models.PositiveIntegerField(verbose_name="ИД сообщения")
     telegram_user_id = models.PositiveIntegerField(verbose_name="Имя пользователя")
     inv_number = models.CharField(max_length=20, verbose_name="Инвентарник")
     comment = models.TextField(verbose_name="Коментарий")

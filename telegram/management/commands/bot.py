@@ -74,13 +74,14 @@ async def collect_photo(message):
         await bot.send_message(message.chat.id, "Фото добавлено")
     else:
         get_image_id = await bot.get_file(message.photo[-1].file_id)
-        download_image = await bot.download_file(get_image_id['file_path'])
-        img = Image.open(download_image)
+        img_path = f"telegram/media/{get_image_id.file_unique_id}.jpg"
+        await bot.download_file(get_image_id['file_path'], img_path)
+        img = Image.open(img_path)
         bool_bar, barcode = detect_barcode(img)
         if bool_bar:
             await sync_to_async(EquipMovement.objects.update_or_create)(telegram_user_id=message.from_user.id,
                                                                         inv_number=barcode, comment=message.caption,
-                                                                        inv_image=img)
+                                                                        inv_image=img_path, message_id=message.message_id)
             await bot.send_message(message.chat.id,
                                    f"Ваш ID {message.from_user.id}\nХуйня со штрихкодом {barcode} сохранена как {message.message_id}.")
         else:
