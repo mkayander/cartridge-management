@@ -4,8 +4,6 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 import chat.routing
 import main.routing
 
-print(chat.routing.websocket_urlpatterns)
-print(main.routing.websocket_urlpatterns)
 application = ProtocolTypeRouter({
     # (http->django views is added by default)
     'websocket': AuthMiddlewareStack(
@@ -20,4 +18,3 @@ application = ProtocolTypeRouter({
     #     )
     # ),
 })
-

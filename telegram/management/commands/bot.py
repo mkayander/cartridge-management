@@ -11,6 +11,8 @@ from pyzbar.pyzbar import decode
 from PIL import Image
 from telegram.models import EquipMovement
 
+from django.conf import settings
+
 
 def detect_barcode(img):
     d = decode(img)
@@ -40,7 +42,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 bot = Bot(
-    token="1172169860:AAEUBKrahktWDq4VLc1myG6yLt9XImOwLSY"
+    token=settings.TELEGRAM_BOT_TOKEN
 )
 dp = Dispatcher(bot=bot)
 state_delete = []
