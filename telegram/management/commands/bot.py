@@ -46,11 +46,32 @@ dp = Dispatcher(bot=bot)
 state_delete = []
 
 
-@dp.message_handler(lambda message: message.reply_to_message.message_id, commands=["delete"], commands_prefix=[".", "/"])
+@dp.message_handler(lambda message: message.reply_to_message.message_id, commands=["del"], commands_prefix=[".", "/"])
 async def confirm_delete(message):
     state_delete.append(message.message_id)
     state_delete.append(message.reply_to_message.message_id)
     await message.reply(text="Удаляем к хуям?", reply_markup=inline_kb_full)
+
+
+@dp.callback_query_handler()
+async def callback_inline_button(callback_query: types.CallbackQuery):
+    code = callback_query.data
+    if code == 'delete':
+        try:
+            em = await sync_to_async(EquipMovement.objects.get)(message_id=state_delete[1])
+            await sync_to_async(em.delete)()
+            await bot.delete_message(callback_query.message.chat.id, state_delete[1])
+            await bot.answer_callback_query(callback_query.id, text="Сделано, не благадари =)")
+        except EquipMovement.DoesNotExist:
+            await bot.answer_callback_query(callback_query.id, text="Не нашел в базе!")
+    else:
+        await bot.answer_callback_query(callback_query.id, text="Ну как хочешь =(")
+    await bot.delete_message(callback_query.message.chat.id, state_delete[0])
+    await bot.delete_message(callback_query.message.chat.id, state_delete[0]+1)
+    state_delete.clear()
+    #     await bot.answer_callback_query(
+    #         callback_query.id,
+    #         text=f'Нажата кнопка с номером {code}.\nА этот текст может быть длиной до 200 символов :wink:', show_alert=True)
 
 
 @dp.message_handler(commands=["Help", "?", "h"], commands_prefix=[".", "/"])
@@ -86,22 +107,6 @@ async def collect_photo(message):
                                    f"Ваш ID {message.from_user.id}\nХуйня со штрихкодом {barcode} сохранена как {message.message_id}.")
         else:
             await bot.send_message(message.chat.id, barcode)
-
-
-@dp.callback_query_handler()
-async def callback_inline_button(callback_query: types.CallbackQuery):
-    code = callback_query.data
-    if code == 'delete':
-        await bot.delete_message(callback_query.message.chat.id, state_delete[1])
-        await bot.answer_callback_query(callback_query.id, text="Сделано, не благадари")
-    else:
-        await bot.answer_callback_query(callback_query.id, text="Ну как хочешь =(")
-    await bot.delete_message(callback_query.message.chat.id, state_delete[0])
-    await bot.delete_message(callback_query.message.chat.id, state_delete[0]+1)
-    state_delete.clear()
-    #     await bot.answer_callback_query(
-    #         callback_query.id,
-    #         text=f'Нажата кнопка с номером {code}.\nА этот текст может быть длиной до 200 символов :wink:', show_alert=True)
 
 
 @dp.message_handler()
