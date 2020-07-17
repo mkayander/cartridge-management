@@ -61,6 +61,7 @@ async def callback_inline_button(callback_query: types.CallbackQuery):
     if code == 'delete':
         try:
             em = await sync_to_async(EquipMovement.objects.get)(message_id=state_delete[1])
+            await bot.delete_message(callback_query.message.chat.id, em.message_id+1)
             await sync_to_async(em.delete)()
             await bot.delete_message(callback_query.message.chat.id, state_delete[1])
             await bot.answer_callback_query(callback_query.id, text="Сделано, не благадари =)")
