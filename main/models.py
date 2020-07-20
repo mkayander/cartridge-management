@@ -247,3 +247,28 @@ class Service(EmailRequestModel):
 
     def get_email_subject(self):
         return f'Неисправность принтера {self.printer}, ООО "Деловые Линии"'
+
+
+class Equipment(BackupableModel):
+    inv_number = models.CharField(verbose_name="Инвентарный №", primary_key=True, max_length=30)
+    name = models.CharField(verbose_name="Наименование", max_length=100)
+    type = models.CharField(verbose_name="Тип ОС", max_length=70)
+    group = models.CharField(verbose_name="Группа ОС", max_length=70)
+    model = models.CharField(verbose_name="Марка & Модель", max_length=70, blank=True)
+    serial_number = models.CharField(verbose_name="Серийный номер", max_length=40, blank=True)
+    registration_date = models.CharField(verbose_name="Дата постановки на учет", max_length=20)
+    location_department = models.CharField(verbose_name="Отдел местоположения", max_length=100)
+    responsible_employee = models.CharField(verbose_name="Ответственный", max_length=100)
+    initial_price = models.FloatField(verbose_name="Первоначальная стоимость с НДС", default=0, blank=True)
+    residual_price = models.FloatField(verbose_name="Остаточная стоимость с НДС", default=0, blank=True)
+    useful_life = models.PositiveIntegerField(verbose_name="Срок пол. использования", default=0, blank=True)
+
+    def __str__(self):
+        return self.inv_number
+
+    class Meta:
+        ordering = ['inv_number']
+
+    # def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+    #     self.residual_price = 0 if self.residual_price == "null" else self.residual_price
+    #     self.initial_price = 0 if self.initial_price == "null" else self.initial_price

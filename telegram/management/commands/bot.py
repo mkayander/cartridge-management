@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from typing import Tuple
-import emoji
 
 import PIL
 from PIL import Image
@@ -13,9 +12,10 @@ from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.management import BaseCommand
 from django.db.models.signals import post_delete, post_save
-from pyzbar.pyzbar import decode
 from django.dispatch import receiver
+from pyzbar.pyzbar import decode
 
+from main.models import Equipment
 from telegram.models import EquipMovement, AdditionalPhoto
 
 
@@ -63,11 +63,17 @@ state_old_bot_message = []
 user_photos = []
 
 
+def signal_test(instance):
+    print("signal_test: ", instance)
+    bot.send_message()
+
+
 async def add_more_photo():
     while True:
         if len(state_old_bot_message) > 1:
-            await bot.delete_message(state_old_bot_message[0].chat.id, state_old_bot_message[0].message_id+1)
-            state_old_bot_message.pop(0)
+            message = state_old_bot_message.pop(0)
+            await bot.delete_message(message.chat.id, message.message_id)
+
         if len(user_photos) > 0:
             for message in user_photos:
                 movement = await sync_to_async(EquipMovement.objects.get)(message_id=message.reply_to_message)
@@ -79,6 +85,7 @@ async def add_more_photo():
             await bot.send_message(user_photos[0].chat.id,
                                    "Фотки добавлены" if len(user_photos) >= 2 else "Фото добавлено")
             user_photos.clear()
+
         await asyncio.sleep(5)
 
 
@@ -89,14 +96,15 @@ async def confirm_delete(message):
         state_delete.append(message.reply_to_message.message_id)
         await message.reply(text="Удаляем к хуям?", reply_markup=inline_kb_full)
     else:
-        await message.reply(text="Вызывать .del можно только в ответ на сообщение с фотографией, тупой что ли?")
+        answer = await message.reply(
+            text="Вызывать .del можно только в ответ на сообщение с фотографией, тупой что ли?")
         await bot.delete_message(message.chat.id, message.message_id)
-        state_old_bot_message.append(message)
+        state_old_bot_message.append(answer)
 
 
 @receiver([post_save, post_delete], sender=EquipMovement)
-async def print_test(instance, **kwargs):
-    await print("работает")
+def print_test(instance, **kwargs):
+    print("работает", instance)
 
 
 @dp.callback_query_handler()
@@ -113,6 +121,7 @@ async def remove_photo(callback_query: types.CallbackQuery, **kwargs):
             await bot.answer_callback_query(callback_query.id, text="Не нашел в базе! Поэтому не удалю!")
     else:
         await bot.answer_callback_query(callback_query.id, text="Ну как хочешь =(")
+
     await bot.delete_message(callback_query.message.chat.id, state_delete[0])
     await bot.delete_message(callback_query.message.chat.id, state_delete[0] + 1)
     state_delete.clear()
@@ -121,7 +130,8 @@ async def remove_photo(callback_query: types.CallbackQuery, **kwargs):
 @dp.message_handler(lambda message: message.text.lower() == "help")
 @dp.message_handler(commands=["Help", "?", "h"], commands_prefix=[".", "/"])
 async def send_help_message(message: types.Message):
-    await message.reply(text=bot_help_description, reply_markup=greet_kb)
+    # await message.reply(text=bot_help_description, reply_markup=ReplyKeyboardRemove())
+    await message.reply(text=bot_help_description)
 
 
 @dp.message_handler(content_types=ContentType.PHOTO)
@@ -145,8 +155,17 @@ async def handle_photo(message):
         user_photos.append(message)
 
     else:
-        await bot.delete_message(message.chat.id, message.message_id)
-        print("Photo is deleted")
+        image_id, image_path = await get_image(message)
+        await download_image(image_id, image_path)
+        img = Image.open(image_path)
+        bool_bar, barcode = get_inv_number(img)
+        data = await sync_to_async(Equipment.objects.first)()
+        print(f"{barcode} ----- {data}")
+        data1 = await sync_to_async(Equipment.objects.get)(inv_number=barcode)
+        print(data1.values())
+        # await message.reply(data.values())
+        # await bot.delete_message(message.chat.id, message.message_id)
+        # print("Photo is deleted")
 
 
 async def get_image(message):
@@ -162,10 +181,10 @@ async def download_image(image_id, path):
 @dp.message_handler()
 async def collect_message(message):
     text = 'Не спамить! Какашка 😜' + '\nВсе сообщения только по делу!'
-    await message.reply(text=text, parse_mode=ParseMode.MARKDOWN)
+    answer = await message.reply(text=text, parse_mode=ParseMode.MARKDOWN)
+    state_old_bot_message.append(answer)
 
     await bot.delete_message(message.chat.id, message.message_id)
-    state_old_bot_message.append(message)
 
 
 class Command(BaseCommand):
