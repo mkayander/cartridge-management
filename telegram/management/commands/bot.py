@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from typing import Tuple
-import emoji
 
 import PIL
 from PIL import Image
@@ -9,13 +8,12 @@ from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ContentType, ParseMode
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton
-from asgiref.sync import sync_to_async, async_to_sync
+from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.management import BaseCommand
 from pyzbar.pyzbar import decode
-from datetime import datetime
 
-from telegram.models import EquipMovement, UploadPhoto
+from telegram.models import EquipMovement, AdditionalPhoto
 
 
 def get_inv_number(image: PIL.Image) -> Tuple[bool, str]:
@@ -65,15 +63,15 @@ user_photos = []
 async def add_more_photo():
     while True:
         if len(state_old_bot_message) >= 1:
-            await bot.delete_message(state_old_bot_message[0].chat.id, state_old_bot_message[0].message_id+1)
+            await bot.delete_message(state_old_bot_message[0].chat.id, state_old_bot_message[0].message_id + 1)
             state_old_bot_message.pop(0)
         if len(user_photos) > 0:
             for message in user_photos:
                 movement = await sync_to_async(EquipMovement.objects.get)(message_id=message.reply_to_message)
                 image_id, image_path = await get_image(message)
                 await download_image(image_id, image_path)
-                await sync_to_async(UploadPhoto.objects.create)(em=movement, image=image_path,
-                                                                message_id=message.message_id)
+                await sync_to_async(AdditionalPhoto.objects.create)(movement=movement, image=image_path,
+                                                                    message_id=message.message_id)
             print("Upload photo")
             await bot.send_message(user_photos[0].chat.id,
                                    "Фотки добавлены" if len(user_photos) >= 2 else "Фото добавлено")
@@ -98,9 +96,9 @@ async def callback_inline_button(callback_query: types.CallbackQuery):
     code = callback_query.data
     if code == 'delete':
         try:
-            em = await sync_to_async(EquipMovement.objects.get)(message_id=state_delete[1])
-            await bot.delete_message(callback_query.message.chat.id, em.message_id + 1)
-            await sync_to_async(em.delete)()
+            movement = await sync_to_async(EquipMovement.objects.get)(message_id=state_delete[1])
+            await bot.delete_message(callback_query.message.chat.id, movement.message_id + 1)
+            await sync_to_async(movement.delete)()
             await bot.delete_message(callback_query.message.chat.id, state_delete[1])
             await bot.answer_callback_query(callback_query.id, text="Сделано, не благодари =)")
         except EquipMovement.DoesNotExist:
