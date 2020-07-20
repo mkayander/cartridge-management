@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from typing import Tuple
-import emoji
 
 import PIL
 from PIL import Image
@@ -12,8 +11,9 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, \
 from asgiref.sync import sync_to_async, async_to_sync
 from django.conf import settings
 from django.core.management import BaseCommand
+from django.db.models.signals import post_delete, post_save
 from pyzbar.pyzbar import decode
-from datetime import datetime
+from django.dispatch import receiver
 
 from telegram.models import EquipMovement, UploadPhoto
 
@@ -64,7 +64,7 @@ user_photos = []
 
 async def add_more_photo():
     while True:
-        if len(state_old_bot_message) >= 1:
+        if len(state_old_bot_message) > 1:
             await bot.delete_message(state_old_bot_message[0].chat.id, state_old_bot_message[0].message_id+1)
             state_old_bot_message.pop(0)
         if len(user_photos) > 0:
@@ -93,8 +93,13 @@ async def confirm_delete(message):
         state_old_bot_message.append(message)
 
 
+@receiver([post_save, post_delete], sender=EquipMovement)
+async def print_test(instance, **kwargs):
+    await print("работает")
+
+
 @dp.callback_query_handler()
-async def callback_inline_button(callback_query: types.CallbackQuery):
+async def remove_photo(callback_query: types.CallbackQuery, **kwargs):
     code = callback_query.data
     if code == 'delete':
         try:
@@ -114,7 +119,7 @@ async def callback_inline_button(callback_query: types.CallbackQuery):
 
 @dp.message_handler(lambda message: message.text.lower() == "help")
 @dp.message_handler(commands=["Help", "?", "h"], commands_prefix=[".", "/"])
-async def send_menu(message: types.Message):
+async def send_help_message(message: types.Message):
     await message.reply(text=bot_help_description, reply_markup=greet_kb)
 
 
@@ -135,7 +140,7 @@ async def handle_photo(message):
         else:
             await bot.send_message(message.chat.id, barcode)
 
-    elif hasattr(message, 'reply_to_message') and message.reply_to_message.caption:
+    elif message.reply_to_message and message.reply_to_message.caption:
         user_photos.append(message)
 
     else:
