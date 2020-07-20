@@ -143,7 +143,8 @@ class Cartridge(BackupableModel):
 
     class Meta:
         ordering = ['manufacturer', 'name']
-        # ordering = ['name']
+        verbose_name = "Картридж"
+        verbose_name_plural = "Картриджи"
 
 
 class Supply(BackupableModel):
@@ -168,6 +169,8 @@ class Supply(BackupableModel):
 
     class Meta:
         ordering = ['-date']
+        verbose_name = "Перемещение картриджей"
+        verbose_name_plural = "Перемещения картриджей"
 
     def update_cartridge_count(self, value):
         """
@@ -238,6 +241,10 @@ class Order(EmailRequestModel):
             self.supply.delete()
             self.supply = None
 
+    class Meta:
+        verbose_name = "Заказ картриджей"
+        verbose_name_plural = "Заказы картриджей"
+
 
 class Service(EmailRequestModel):
     printer = models.CharField(max_length=100, choices=choices.PRINTERS, verbose_name="Принтер")
@@ -248,8 +255,15 @@ class Service(EmailRequestModel):
     def get_email_subject(self):
         return f'Неисправность принтера {self.printer}, ООО "Деловые Линии"'
 
+    class Meta:
+        verbose_name = "Заявка на ремонт"
+        verbose_name_plural = "Заявки на ремонт"
+
 
 class Equipment(BackupableModel):
+    created_at = models.DateTimeField(auto_now_add=True)
+    edited_at = models.DateTimeField(auto_now=True)
+
     inv_number = models.CharField(verbose_name="Инвентарный №", primary_key=True, max_length=30)
     name = models.CharField(verbose_name="Наименование", max_length=100)
     type = models.CharField(verbose_name="Тип ОС", max_length=70)
@@ -268,6 +282,8 @@ class Equipment(BackupableModel):
 
     class Meta:
         ordering = ['inv_number']
+        verbose_name = "Оборудование"
+        verbose_name_plural = "Оборудование"
 
     # def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
     #     self.residual_price = 0 if self.residual_price == "null" else self.residual_price

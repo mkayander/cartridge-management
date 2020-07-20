@@ -22,3 +22,7 @@ class AdditionalPhoto(models.Model):
     movement = models.ForeignKey(EquipMovement, verbose_name="EquipMovement", on_delete=models.CASCADE)
     message_id = models.PositiveIntegerField(verbose_name="ИД сообщения")
     image = models.ImageField(verbose_name="Дополнительное фото", blank=True)
+
+    class Meta:
+        verbose_name = "Дополнительно фото"
+        verbose_name_plural = "Дополнительные фото"

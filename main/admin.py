@@ -1,7 +1,6 @@
 from django.contrib import admin
 
 from main.models import Cartridge, Supply, Order, Service, Equipment
-from telegram.models import EquipMovement
 
 
 class CartridgeAdmin(admin.ModelAdmin):
@@ -24,10 +23,9 @@ class ServiceAdmin(admin.ModelAdmin):
 
 
 class EquipmentAdmin(admin.ModelAdmin):
-    # list_display = ["date", "status", "date_finished", "finished"]
+    list_display = ["inv_number", "serial_number", "type", "model", "responsible_employee"]
     search_fields = ["inv_number"]
-    pass
-
+    list_filter = ["type"]
 
 # class ProfileAdmin(admin.ModelAdmin):
 #     list_display = ["id", "external_id", "name"]

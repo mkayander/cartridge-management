@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.management import BaseCommand
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+from django.utils.dateformat import format
 from pyzbar.pyzbar import decode
 
 from main.models import Equipment
@@ -159,13 +160,33 @@ async def handle_photo(message):
         await download_image(image_id, image_path)
         img = Image.open(image_path)
         bool_bar, barcode = get_inv_number(img)
-        data = await sync_to_async(Equipment.objects.first)()
-        print(f"{barcode} ----- {data}")
-        data1 = await sync_to_async(Equipment.objects.get)(inv_number=barcode)
-        print(data1.values())
-        # await message.reply(data.values())
+        if bool_bar:
+            try:
+                data = await sync_to_async(Equipment.objects.get)(inv_number=barcode)
+                print(get_detail_message(data))
+                await bot.send_message(message.chat.id, get_detail_message(data), parse_mode=ParseMode.MARKDOWN)
+            except Equipment.DoesNotExist:
+                await message.reply(f"Оборудование с ОС {barcode} не найдено!")
+        else:
+            await message.reply(barcode)
         # await bot.delete_message(message.chat.id, message.message_id)
         # print("Photo is deleted")
+
+
+def get_detail_message(obj: Equipment):
+    return f"""_Информация от {format(obj.created_at, "d E Y")}:_
+*{Equipment._meta.get_field("inv_number").verbose_name} :* `{obj.inv_number}`
+*{Equipment._meta.get_field("type").verbose_name} :* `{obj.type}`
+*{Equipment._meta.get_field("group").verbose_name} :* `{obj.group}`
+*{Equipment._meta.get_field("model").verbose_name} :* `{obj.model}`
+*{Equipment._meta.get_field("serial_number").verbose_name} :* `{obj.serial_number}`
+*{Equipment._meta.get_field("registration_date").verbose_name} :* `{obj.registration_date}`
+*{Equipment._meta.get_field("location_department").verbose_name} :* `{obj.location_department}`
+*{Equipment._meta.get_field("responsible_employee").verbose_name} :* `{obj.responsible_employee}`
+*{Equipment._meta.get_field("initial_price").verbose_name} :* `{obj.initial_price}`
+*{Equipment._meta.get_field("residual_price").verbose_name} :* `{obj.residual_price}`
+*{Equipment._meta.get_field("useful_life").verbose_name} :* `{obj.useful_life}`
+"""
 
 
 async def get_image(message):

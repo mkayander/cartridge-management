@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from django.core.management import BaseCommand
 from openpyxl import load_workbook
 
@@ -41,7 +39,7 @@ def get_value(column_name, raw_value):
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        wb = load_workbook('main/management/commands/Список ОС Валищево.xlsx')
+        wb = load_workbook('main/management/commands/os-data.xlsx')
         ws = wb.active
 
         print(wb.get_sheet_names())
@@ -64,8 +62,6 @@ class Command(BaseCommand):
                             objects_list[index][column_names[name]] = get_value(name, value)
 
         print('-----')
-
-        pprint(objects_list[:20])
 
         Equipment.objects.bulk_create([Equipment(**item) for item in objects_list])
 
