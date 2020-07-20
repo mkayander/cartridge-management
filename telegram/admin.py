@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from telegram.models import EquipMovement, UploadPhoto
+from telegram.models import EquipMovement, AdditionalPhoto
 
 
 class EquipMovementAdmin(admin.ModelAdmin):
@@ -11,5 +11,5 @@ class UploadPhotoAdmin(admin.ModelAdmin):
     list_display = ["em", "image"]
 
 
-admin.site.register(UploadPhoto, UploadPhotoAdmin)
+admin.site.register(AdditionalPhoto, UploadPhotoAdmin)
 admin.site.register(EquipMovement, EquipMovementAdmin)

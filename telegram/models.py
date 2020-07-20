@@ -14,10 +14,11 @@ class EquipMovement(models.Model):
         return f'{self.created_at} ---- {self.inv_number} ----- {self.comment}'
 
     class Meta:
-        verbose_name = "Пермещение техники"
+        verbose_name = "Перемещение техники"
+        verbose_name_plural = "Перемещения техники"
 
 
-class UploadPhoto(models.Model):
-    em = models.ForeignKey(EquipMovement, verbose_name="EquipMovement", on_delete=models.CASCADE)
+class AdditionalPhoto(models.Model):
+    movement = models.ForeignKey(EquipMovement, verbose_name="EquipMovement", on_delete=models.CASCADE)
     message_id = models.PositiveIntegerField(verbose_name="ИД сообщения")
     image = models.ImageField(verbose_name="Дополнительное фото", blank=True)
