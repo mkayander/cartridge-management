@@ -23,6 +23,9 @@ mailbox_attachments/
 .idea
 .idea/*
 
+*.xls
+*.xlsx
+
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
