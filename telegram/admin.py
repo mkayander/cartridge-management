@@ -7,9 +7,9 @@ class EquipMovementAdmin(admin.ModelAdmin):
     list_display = ["created_at", "telegram_user_id", "inv_number", "comment", "inv_image"]
 
 
-class UploadPhotoAdmin(admin.ModelAdmin):
-    list_display = ["em", "image"]
+class AdditionalPhotoAdmin(admin.ModelAdmin):
+    list_display = ["movement", "image"]
 
 
-admin.site.register(AdditionalPhoto, UploadPhotoAdmin)
+admin.site.register(AdditionalPhoto, AdditionalPhotoAdmin)
 admin.site.register(EquipMovement, EquipMovementAdmin)
