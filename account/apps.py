@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class AccountConfig(AppConfig):
-    name = 'account'
+    name = "account"
+    verbose_name = "Пользователи"

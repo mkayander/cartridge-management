@@ -175,7 +175,7 @@ async def handle_photo(message):
 
 def get_detail_message(obj: Equipment) -> str:
     """
-        Converts Equipment instance to a multi-line representation (detail) string.
+    Converts Equipment instance to a multi-line representation (detail) string.
     :param obj: Equipment instance to get values from
     :return: Multi-line string with Markdown formatting
     """

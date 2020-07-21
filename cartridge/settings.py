@@ -48,12 +48,16 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
-INSTALLED_APPS = [
-    'chat',
-    'channels',
+LOCAL_APPS = [
     'main',
-    'api',
+    'account',
     'telegram',
+    'api',
+    'chat',
+]
+
+THIRD_PARTY_APPS = [
+    'channels',
     'rest_framework',
     'crispy_forms',
     'corsheaders',
@@ -61,13 +65,20 @@ INSTALLED_APPS = [
     'django_mailbox',
     'constance',
     'django_celery_beat',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'phonenumber_field'
 ]
+
+INSTALLED_APPS = \
+    LOCAL_APPS + \
+    THIRD_PARTY_APPS + \
+    [
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+    ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -200,6 +211,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'account.Account'
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -222,9 +235,19 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/telegram/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, '')
 
+
+def show_toolbar(request):
+    # disable debug toolbar for built in admin app urls only
+    if request.path.startswith('/admin'):
+        return False
+    else:
+        return True
+
+
 DEBUG_TOOLBAR_CONFIG = {
     # Toolbar options
     # 'RESULTS_CACHE_SIZE': 3,
+    'SHOW_TOOLBAR_CALLBACK': show_toolbar,
     'SHOW_COLLAPSED': True,
     # Panel options
     'SQL_WARNING_THRESHOLD': 100,  # milliseconds
