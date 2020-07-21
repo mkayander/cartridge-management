@@ -141,6 +141,7 @@ async def start_bot(message):
 
     else:
         old_bot_message.append(await message.reply("/start можно писать только в личные сообщения боту!"))
+        await bot.delete_message(message.chat.id, message.message_id)
 
 
 @dp.message_handler(content_types=ContentType.CONTACT)
