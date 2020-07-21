@@ -14,6 +14,7 @@ from django.core.management import BaseCommand
 from django.utils.dateformat import format
 from pyzbar.pyzbar import decode
 
+from account.models import Account
 from main.models import Equipment
 from telegram.models import EquipMovement, AdditionalPhoto
 
@@ -52,11 +53,53 @@ bot = Bot(
 )
 
 dp = Dispatcher(bot=bot)
+
+# -- Data Cache Variables --
 bot_answer_delete = {}
 bot_answer = {}
 old_bot_message = []
 user_photos = {}
 bot_answer_phone_number = {}
+valid_users = []
+# -- --
+
+
+async def validate_user_at_database(user_id: int) -> bool:
+    """
+    Tries to find a user with given Telegram id at Database, checks if he's allowed to use the bot.\n
+    Appends the given user id to "valid_users" array on success and returns True, otherwise returns False.
+    :param user_id: Telegram user id
+    :return: True if user is valid, False otherwise.
+    """
+    try:
+        user = await sync_to_async(Account.objects.get)(telegram_user_id=user_id)
+        if user.can_use_bot:
+            valid_users.append(user_id)
+            return True
+        else:
+            return False
+
+    except Account.DoesNotExist:
+        return False
+
+
+def valid_users_only(func):
+    """
+    Decorator for async aiogram functions
+    :param func: Async Aiogram function
+    :return: Function wrapper
+    """
+    def wrapper(message, **kwargs):
+        if message.from_user.id in valid_users:
+            return func(message, **kwargs)
+        elif validate_user_at_database(message.from_user.id):
+            print(kwargs)
+            print(kwargs["state"])
+            return func(message)
+        else:
+            return message.reply("У вас нет прав на выполнение данного действия!")
+
+    return wrapper
 
 
 async def add_more_photo():
@@ -84,7 +127,7 @@ async def add_more_photo():
 
 
 @dp.message_handler(commands='start')
-async def get_phone_number(message):
+async def start_bot(message):
     markup_request = ReplyKeyboardMarkup(resize_keyboard=True).add(
         KeyboardButton('Отправить свой контакт ☎️', request_contact=True))
     answer = await message.reply("Для пользования ботом необходим номер телефона",
@@ -93,7 +136,7 @@ async def get_phone_number(message):
 
 
 @dp.message_handler(content_types=ContentType.CONTACT)
-async def is_user_valid(message):
+async def register_user_contact(message):
     if message.contact.user_id in bot_answer_phone_number:
         print(message.contact.phone_number)
         bot_answer_phone_number.clear()
@@ -226,6 +269,7 @@ async def download_image(image_id, path):
 
 
 @dp.message_handler()
+@valid_users_only
 async def collect_message(message):
     text = 'Не спамить! Какашка 😜' + '\nВсе сообщения только по делу!'
     answer = await message.reply(text=text, parse_mode=ParseMode.MARKDOWN)

@@ -37,13 +37,14 @@ class AccountManager(BaseUserManager):
 
 
 class Account(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(verbose_name="E-Mail", max_length=100, unique=True)
+    email = models.EmailField(verbose_name="E-Mail", max_length=100, blank=True, null=True, unique=True)
     phone_number = PhoneNumberField(verbose_name="Номер телефона", unique=True)
     username = models.CharField(verbose_name="Доменное имя пользователя", max_length=30, unique=True)
-    first_name = models.CharField(verbose_name="Имя", max_length=30)
-    last_name = models.CharField(verbose_name="Фамилия", max_length=30)
+    first_name = models.CharField(verbose_name="Имя", max_length=30, blank=True)
+    last_name = models.CharField(verbose_name="Фамилия", max_length=30, blank=True)
 
-    telegram_user_id = models.PositiveIntegerField(verbose_name="ID пользователя в Telegram", blank=True, null=True)
+    telegram_user_id = models.PositiveIntegerField(verbose_name="ID пользователя в Telegram", blank=True, null=True,
+                                                   unique=True)
 
     date_joined = models.DateTimeField(verbose_name='Дата создания', auto_now_add=True)
     last_login = models.DateTimeField(verbose_name='Дата последнего входа', auto_now=True)
