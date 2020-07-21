@@ -204,7 +204,12 @@ async def handle_photo(message):
         # print("Photo is deleted")
 
 
-def get_detail_message(obj: Equipment):
+def get_detail_message(obj: Equipment) -> str:
+    """
+        Converts Equipment instance to a multi-line representation (detail) string.
+    :param obj: Equipment instance to get values from
+    :return: Multi-line string with Markdown formatting
+    """
     return f"""_Информация от {format(obj.created_at, "d E Y")}:_
 *{Equipment._meta.get_field("inv_number").verbose_name} :* `{obj.inv_number}`
 *{Equipment._meta.get_field("type").verbose_name} :* `{obj.type}`
