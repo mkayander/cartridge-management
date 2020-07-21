@@ -7,7 +7,7 @@ from PIL import Image
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ContentType, ParseMode
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, \
-    InlineKeyboardMarkup, InlineKeyboardButton
+    InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.management import BaseCommand
@@ -18,22 +18,6 @@ from account.models import Account
 
 from main.models import Equipment
 from telegram.models import EquipMovement, AdditionalPhoto
-
-
-def get_inv_number(image: PIL.Image) -> Tuple[bool, str]:
-    inv_number = decode(image)
-    if not inv_number:
-        return False, "Штрих код не распознан"
-    else:
-        inv_number = inv_number[0].data.decode("utf-8")
-        if inv_number[0:3] == "296":
-            inv_number = "ОС" + inv_number.split("296")[1]
-            return True, inv_number
-        if inv_number[0:3] == "600":
-            inv_number = "ДТ" + inv_number.split("600")[1]
-            return True, inv_number
-        return False, f"{inv_number} не является инвентарным номером"
-
 
 bot_help_description = "Привет, че забыл команды?\n\nНапоминаю вызвать их \nможно через . или /" + \
                        "\n\n.d .del .delete - удаляет фото с комментарием из базы и чата"
@@ -59,6 +43,22 @@ bot_answer = {}
 old_bot_message = []
 user_photos = {}
 bot_answer_phone_number = {}
+valid_users = []
+
+
+def get_inv_number(image: PIL.Image) -> Tuple[bool, str]:
+    inv_number = decode(image)
+    if not inv_number:
+        return False, "Штрих код не распознан"
+    else:
+        inv_number = inv_number[0].data.decode("utf-8")
+        if inv_number[0:3] == "296":
+            inv_number = "ОС" + inv_number.split("296")[1]
+            return True, inv_number
+        if inv_number[0:3] == "600":
+            inv_number = "ДТ" + inv_number.split("600")[1]
+            return True, inv_number
+        return False, f"{inv_number} не является инвентарным номером"
 
 
 async def add_more_photo():
@@ -85,8 +85,9 @@ async def add_more_photo():
         await asyncio.sleep(5)
 
 
-@dp.message_handler(lambda message: False if message.chat.id else True, commands='start')
+@dp.message_handler(lambda message: False if message.chat.id < 0 else True, commands='start')
 async def get_phone_number(message):
+    print(message.chat.id)
     markup_request = ReplyKeyboardMarkup(resize_keyboard=True).add(
         KeyboardButton('Отправить свой контакт ☎️', request_contact=True))
     answer = await message.reply("Для пользования ботом необходим номер телефона",
@@ -101,6 +102,8 @@ async def is_user_valid(message):
             user = await sync_to_async(Account.objects.get)(phone_number="+" + str(message.contact.phone_number))
             user.telegram_user_id = message.contact.user_id
             await sync_to_async(user.save)()
+            await message.reply("Вы успешно прошли проверку! Каааак же я за вас рад 😒",
+                                reply_markup=ReplyKeyboardRemove())
         except Account.DoesNotExist:
             print("какашка")
         bot_answer_phone_number.clear()
