@@ -37,7 +37,7 @@ class AccountManager(BaseUserManager):
 
 
 class Account(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(verbose_name="E-Mail", max_length=100, unique=True)
+    email = models.EmailField(verbose_name="E-Mail", max_length=100, unique=True, null=True, blank=True)
     phone_number = PhoneNumberField(verbose_name="Номер телефона", unique=True)
     username = models.CharField(verbose_name="Доменное имя пользователя", max_length=30, unique=True)
     first_name = models.CharField(verbose_name="Имя", max_length=30)

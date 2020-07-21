@@ -8,13 +8,13 @@ from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ContentType, ParseMode
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton
-from asgiref.sync import sync_to_async, async_to_sync
+from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.management import BaseCommand
-from django.db.models.signals import post_delete, post_save
-from django.dispatch import receiver
 from django.utils.dateformat import format
 from pyzbar.pyzbar import decode
+
+from account.models import Account
 
 from main.models import Equipment
 from telegram.models import EquipMovement, AdditionalPhoto
@@ -98,7 +98,7 @@ async def add_more_photo():
         await asyncio.sleep(5)
 
 
-@dp.message_handler(commands='start')
+@dp.message_handler(lambda message: False if message.chat.id else True, commands='start')
 async def get_phone_number(message):
     markup_request = ReplyKeyboardMarkup(resize_keyboard=True).add(
         KeyboardButton('Отправить свой контакт ☎️', request_contact=True))
@@ -110,7 +110,12 @@ async def get_phone_number(message):
 @dp.message_handler(content_types=ContentType.CONTACT)
 async def is_user_valid(message):
     if message.contact.user_id in bot_answer_phone_number:
-        print(message.contact.phone_number)
+        try:
+            user = await sync_to_async(Account.objects.get)(phone_number="+" + str(message.contact.phone_number))
+            user.telegram_user_id = message.contact.user_id
+            await sync_to_async(user.save)()
+        except Account.DoesNotExist:
+            print("какашка")
         bot_answer_phone_number.clear()
 
 
