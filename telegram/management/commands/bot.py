@@ -43,7 +43,6 @@ button_delete = KeyboardButton('.delete')
 greet_kb = ReplyKeyboardMarkup()
 greet_kb.add(button_delete)
 
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -59,6 +58,7 @@ bot_answer_delete = {}
 bot_answer = {}
 old_bot_message = []
 user_photos = {}
+bot_answer_phone_number = {}
 
 
 async def add_more_photo():
@@ -98,11 +98,28 @@ async def add_more_photo():
         await asyncio.sleep(5)
 
 
+@dp.message_handler(commands='start')
+async def get_phone_number(message):
+    markup_request = ReplyKeyboardMarkup(resize_keyboard=True).add(
+        KeyboardButton('Отправить свой контакт ☎️', request_contact=True))
+    answer = await message.reply("Для пользования ботом необходим номер телефона",
+                                 reply_markup=markup_request)
+    bot_answer_phone_number[message.from_user.id] = answer.message_id
+
+
+@dp.message_handler(content_types=ContentType.CONTACT)
+async def is_user_valid(message):
+    if message.contact.user_id in bot_answer_phone_number:
+        print(message.contact.phone_number)
+        bot_answer_phone_number.clear()
+
+
 @dp.message_handler(commands=["delete", "del", "d"], commands_prefix=[".", "/"])
 async def confirm_delete(message):
     if message.reply_to_message:
         inline_kb_full = InlineKeyboardMarkup(row_width=2)
-        inline_btn_del = InlineKeyboardButton('Удалить', callback_data=f'delete*{message.message_id}*{message.reply_to_message.message_id}')
+        inline_btn_del = InlineKeyboardButton('Удалить',
+                                              callback_data=f'delete*{message.message_id}*{message.reply_to_message.message_id}')
         inline_btn_cancel = InlineKeyboardButton('Отмена', callback_data=f'cancel*{message.message_id}')
         inline_kb_full.add(inline_btn_del, inline_btn_cancel)
         answer = await message.reply(text="Удаляем к хуям?", reply_markup=inline_kb_full)
@@ -165,7 +182,7 @@ async def handle_photo(message):
         bool_bar, barcode = get_inv_number(img)
         if bool_bar:
             answer = await bot.send_message(message.chat.id,
-                                   f"Ваш ID {message.from_user.id}\nХуйня со штрихкодом {barcode} сохранена как {message.message_id}.")
+                                            f"Ваш ID {message.from_user.id}\nХуйня со штрихкодом {barcode} сохранена как {message.message_id}.")
             await sync_to_async(EquipMovement.objects.create)(telegram_user_id=message.from_user.id,
                                                               inv_number=barcode, comment=message.caption,
                                                               inv_image=image_path,
