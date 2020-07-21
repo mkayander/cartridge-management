@@ -244,6 +244,11 @@ async def handle_photo(message):
             user_photos[message.chat.id] = {message.reply_to_message.message_id: [message]}
         print(user_photos)
 
+    elif message.chat.id < 0:
+        answer = await message.reply("Данная функция доступна только в личной переписке с ботом!")
+        await bot.delete_message(message.chat.id, message.message_id)
+        old_bot_message.append(answer)
+
     else:
         image_id, image_path = await get_image(message)
         await download_image(image_id, image_path)
