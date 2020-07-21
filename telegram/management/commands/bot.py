@@ -8,7 +8,7 @@ from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ContentType, ParseMode
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton
-from asgiref.sync import sync_to_async
+from asgiref.sync import sync_to_async, async_to_sync
 from django.conf import settings
 from django.core.management import BaseCommand
 from django.db.models.signals import post_delete, post_save
@@ -43,10 +43,6 @@ button_delete = KeyboardButton('.delete')
 greet_kb = ReplyKeyboardMarkup()
 greet_kb.add(button_delete)
 
-inline_kb_full = InlineKeyboardMarkup(row_width=2)
-inline_btn_del = InlineKeyboardButton('Удалить', callback_data='delete')
-inline_btn_cancel = InlineKeyboardButton('Отмена', callback_data='cancel')
-inline_kb_full.add(inline_btn_del, inline_btn_cancel)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -59,33 +55,45 @@ bot = Bot(
 )
 
 dp = Dispatcher(bot=bot)
-state_delete = []
-state_old_bot_message = []
-user_photos = []
-
-
-def signal_test(instance):
-    print("signal_test: ", instance)
-    bot.send_message()
+bot_answer_delete = {}
+bot_answer = {}
+old_bot_message = []
+user_photos = {}
 
 
 async def add_more_photo():
     while True:
-        if len(state_old_bot_message) > 1:
-            message = state_old_bot_message.pop(0)
+        if len(old_bot_message) > 1:
+            message = old_bot_message.pop(0)
             await bot.delete_message(message.chat.id, message.message_id)
 
-        if len(user_photos) > 0:
-            for message in user_photos:
-                movement = await sync_to_async(EquipMovement.objects.get)(message_id=message.reply_to_message)
-                image_id, image_path = await get_image(message)
-                await download_image(image_id, image_path)
-                await sync_to_async(AdditionalPhoto.objects.create)(movement=movement, image=image_path,
-                                                                    message_id=message.message_id)
-            print("Upload photo")
-            await bot.send_message(user_photos[0].chat.id,
-                                   "Фотки добавлены" if len(user_photos) >= 2 else "Фото добавлено")
-            user_photos.clear()
+        for chat_id in user_photos.keys():
+            print(chat_id)
+            for message_id, messages in user_photos[chat_id].items():
+                print(message_id)
+                movement = await sync_to_async(EquipMovement.objects.get)(message_id=message_id)
+                for message in messages:
+                    image_id, image_path = await get_image(message)
+                    await download_image(image_id, image_path)
+                    await sync_to_async(AdditionalPhoto.objects.create)(movement=movement, image=image_path,
+                                                                        message_id=message.message_id,
+                                                                        chat_id=message.chat.id)
+                answer = await bot.send_message(chat_id, "Фотки добавлены")
+                bot_answer[chat_id] = {message_id: answer.message_id}
+        user_photos.clear()
+        # if len(user_photos) > 0:
+        #     for message in user_photos:
+        #         movement = await sync_to_async(EquipMovement.objects.get)(message_id=message.reply_to_message)
+        #         image_id, image_path = await get_image(message)
+        #         await download_image(image_id, image_path)
+        #         await sync_to_async(AdditionalPhoto.objects.create)(movement=movement, image=image_path,
+        #                                                             message_id=message.message_id,
+        #                                                             chat_id=message.chat.id)
+        #     print("Upload photo")
+        #     answer = await bot.send_message(user_photos[0].chat.id,
+        #                            "Фотки добавлены" if len(user_photos) >= 2 else "Фото добавлено")
+        #     bot_answer[str(message)]
+        #     user_photos.clear()
 
         await asyncio.sleep(5)
 
@@ -93,39 +101,52 @@ async def add_more_photo():
 @dp.message_handler(commands=["delete", "del", "d"], commands_prefix=[".", "/"])
 async def confirm_delete(message):
     if message.reply_to_message:
-        state_delete.append(message.message_id)
-        state_delete.append(message.reply_to_message.message_id)
-        await message.reply(text="Удаляем к хуям?", reply_markup=inline_kb_full)
+        inline_kb_full = InlineKeyboardMarkup(row_width=2)
+        inline_btn_del = InlineKeyboardButton('Удалить', callback_data=f'delete*{message.message_id}*{message.reply_to_message.message_id}')
+        inline_btn_cancel = InlineKeyboardButton('Отмена', callback_data=f'cancel*{message.message_id}')
+        inline_kb_full.add(inline_btn_del, inline_btn_cancel)
+        answer = await message.reply(text="Удаляем к хуям?", reply_markup=inline_kb_full)
+        bot_answer_delete[str(message.message_id)] = answer.message_id
     else:
         answer = await message.reply(
             text="Вызывать .del можно только в ответ на сообщение с фотографией, тупой что ли?")
         await bot.delete_message(message.chat.id, message.message_id)
-        state_old_bot_message.append(answer)
+        old_bot_message.append(answer)
 
 
-@receiver([post_save, post_delete], sender=EquipMovement)
-def print_test(instance, **kwargs):
-    print("работает", instance)
+# def photo_form_db(movement):
+#     photos = movement.photos.all()
+#     photos_db = []
+#     if not photos:
+#         for photo in photos:
+#             photos_db.append(photo)
+#         return photos_db
 
 
 @dp.callback_query_handler()
 async def remove_photo(callback_query: types.CallbackQuery, **kwargs):
-    code = callback_query.data
-    if code == 'delete':
+    code = callback_query.data.split('*')
+    if code[0] == 'delete':
         try:
-            movement = await sync_to_async(EquipMovement.objects.get)(message_id=state_delete[1])
-            await bot.delete_message(callback_query.message.chat.id, movement.message_id + 1)
+            movement = await sync_to_async(EquipMovement.objects.get)(message_id=int(code[2]))
+            await bot.delete_message(callback_query.message.chat.id, movement.bot_answer_message_id)
+            await bot.delete_message(callback_query.message.chat.id, movement.message_id)
+            photos = await sync_to_async(list)(movement.photos.values())
+            for photo in photos:
+                await bot.delete_message(photo['chat_id'], photo['message_id'])
+            answer = bot_answer[movement.chat_id][movement.message_id]
+            await bot.delete_message(movement.chat_id, answer)
+            bot_answer[movement.chat_id].pop(movement.message_id)
             await sync_to_async(movement.delete)()
-            await bot.delete_message(callback_query.message.chat.id, state_delete[1])
             await bot.answer_callback_query(callback_query.id, text="Сделано, не благодари =)")
         except EquipMovement.DoesNotExist:
             await bot.answer_callback_query(callback_query.id, text="Не нашел в базе! Поэтому не удалю!")
     else:
         await bot.answer_callback_query(callback_query.id, text="Ну как хочешь =(")
 
-    await bot.delete_message(callback_query.message.chat.id, state_delete[0])
-    await bot.delete_message(callback_query.message.chat.id, state_delete[0] + 1)
-    state_delete.clear()
+    await bot.delete_message(callback_query.message.chat.id, code[1])
+    await bot.delete_message(callback_query.message.chat.id, bot_answer_delete[code[1]])
+    bot_answer_delete.pop(code[1])
 
 
 @dp.message_handler(lambda message: message.text.lower() == "help")
@@ -143,17 +164,27 @@ async def handle_photo(message):
         img = Image.open(image_path)
         bool_bar, barcode = get_inv_number(img)
         if bool_bar:
+            answer = await bot.send_message(message.chat.id,
+                                   f"Ваш ID {message.from_user.id}\nХуйня со штрихкодом {barcode} сохранена как {message.message_id}.")
             await sync_to_async(EquipMovement.objects.create)(telegram_user_id=message.from_user.id,
                                                               inv_number=barcode, comment=message.caption,
                                                               inv_image=image_path,
-                                                              message_id=message.message_id)
-            await bot.send_message(message.chat.id,
-                                   f"Ваш ID {message.from_user.id}\nХуйня со штрихкодом {barcode} сохранена как {message.message_id}.")
+                                                              message_id=message.message_id,
+                                                              bot_answer_message_id=answer.message_id,
+                                                              chat_id=message.chat.id)
+
         else:
             await bot.send_message(message.chat.id, barcode)
 
     elif message.reply_to_message and message.reply_to_message.caption:
-        user_photos.append(message)
+        if message.chat.id in user_photos:
+            if message.reply_to_message.message_id in user_photos[message.chat.id]:
+                user_photos[message.chat.id][message.reply_to_message.message_id].append(message)
+            else:
+                user_photos[message.chat.id][message.reply_to_message.message_id] = [message]
+        else:
+            user_photos[message.chat.id] = {message.reply_to_message.message_id: [message]}
+        print(user_photos)
 
     else:
         image_id, image_path = await get_image(message)
@@ -208,7 +239,7 @@ async def download_image(image_id, path):
 async def collect_message(message):
     text = 'Не спамить! Какашка 😜' + '\nВсе сообщения только по делу!'
     answer = await message.reply(text=text, parse_mode=ParseMode.MARKDOWN)
-    state_old_bot_message.append(answer)
+    old_bot_message.append(answer)
 
     await bot.delete_message(message.chat.id, message.message_id)
 
