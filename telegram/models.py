@@ -28,5 +28,5 @@ class AdditionalPhoto(models.Model):
     image = models.ImageField(verbose_name="Дополнительное фото", blank=True)
 
     class Meta:
-        verbose_name = "Дополнительно фото"
+        verbose_name = "Дополнительное фото"
         verbose_name_plural = "Дополнительные фото"

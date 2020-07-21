@@ -1,29 +1,34 @@
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
+from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class AccountManager(BaseUserManager):
-    def create_user(self, email, username, password=None):
-        if not email:
-            raise ValueError("User must have an email address")
+    def create_user(self, username, phone_number, password=None):
+        # if not email:
+        #     raise ValueError("User must have an email address")
         if not username:
             raise ValueError("Users must have a username")
 
         user = self.model(
-            email=self.normalize_email(email),
-            username=username
+            # email=self.normalize_email(email),
+            username=username,
+            phone_number=phone_number
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, password):
+    def create_superuser(self, username, phone_number, password):
         user = self.create_user(
-            email=self.normalize_email(email),
+            # email=self.normalize_email(email),
             password=password,
-            username=username
+            username=username,
+            phone_number=phone_number
         )
+
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
@@ -31,25 +36,35 @@ class AccountManager(BaseUserManager):
         return user
 
 
-class Account(AbstractBaseUser):
+class Account(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(verbose_name="E-Mail", max_length=100, unique=True)
-    telephone_num = models.PositiveIntegerField(verbose_name="Номер телефона", unique=True)
+    phone_number = PhoneNumberField(verbose_name="Номер телефона", unique=True)
     username = models.CharField(verbose_name="Доменное имя пользователя", max_length=30, unique=True)
     first_name = models.CharField(verbose_name="Имя", max_length=30)
     last_name = models.CharField(verbose_name="Фамилия", max_length=30)
 
+    telegram_user_id = models.PositiveIntegerField(verbose_name="ID пользователя в Telegram", blank=True, null=True)
+
     date_joined = models.DateTimeField(verbose_name='Дата создания', auto_now_add=True)
     last_login = models.DateTimeField(verbose_name='Дата последнего входа', auto_now=True)
 
-    is_admin = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
+    is_admin = models.BooleanField(verbose_name="Администратор", default=False)
+    is_active = models.BooleanField(verbose_name="Включен", default=True)
+    is_staff = models.BooleanField(verbose_name="Сотрудник", default=False)
+    is_superuser = models.BooleanField(verbose_name="Супер-пользователь", default=False)
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['username']
+    can_use_bot = models.BooleanField(verbose_name="Пользователь бота", default=False)
+    can_edit_data = models.BooleanField(verbose_name="Может редактировать данные", default=False)
+
+    USERNAME_FIELD = "username"
+    EMAIL_FIELD = "email"
+    REQUIRED_FIELDS = ["phone_number"]
 
     objects = AccountManager()
+
+    class Meta:
+        verbose_name = "Аккаунт"
+        verbose_name_plural = "Аккаунты"
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"

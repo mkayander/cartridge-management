@@ -27,6 +27,7 @@ class EquipmentAdmin(admin.ModelAdmin):
     search_fields = ["inv_number"]
     list_filter = ["type"]
 
+
 # class ProfileAdmin(admin.ModelAdmin):
 #     list_display = ["id", "external_id", "name"]
 #     form = ProfileForm
