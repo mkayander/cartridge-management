@@ -113,9 +113,7 @@ async def add_more_photo():
             await bot.delete_message(message.chat.id, message.message_id)
 
         for chat_id in user_photos.keys():
-            print(chat_id)
             for message_id, messages in user_photos[chat_id].items():
-                print(message_id)
                 movement = await sync_to_async(EquipMovement.objects.get)(message_id=message_id)
                 for message in messages:
                     image_id, image_path = await get_image(message)
@@ -124,7 +122,13 @@ async def add_more_photo():
                                                                         message_id=message.message_id,
                                                                         chat_id=message.chat.id)
                 answer = await bot.send_message(chat_id, "Фотки добавлены")
-                bot_answer[chat_id] = {message_id: answer.message_id}
+                if chat_id in bot_answer:
+                    if message_id in bot_answer[chat_id]:
+                        bot_answer[chat_id][message_id].append(answer.message_id)
+                    else:
+                        bot_answer[chat_id][message_id] = [answer.message_id]
+                else:
+                    bot_answer[chat_id] = {message_id: [answer.message_id]}
         user_photos.clear()
 
         await asyncio.sleep(5)
@@ -173,7 +177,7 @@ async def confirm_delete(message):
         inline_btn_cancel = InlineKeyboardButton('Отмена', callback_data=f'cancel*{message.message_id}')
         inline_kb_full.add(inline_btn_del, inline_btn_cancel)
         answer = await message.reply(text="Удаляем к хуям?", reply_markup=inline_kb_full)
-        bot_answer_delete[str(message.message_id)] = answer.message_id
+        bot_answer_delete[message.message_id] = answer.message_id
     else:
         answer = await message.reply(
             text="Вызывать .del можно только в ответ на сообщение с фотографией, тупой что ли?")
@@ -192,9 +196,9 @@ async def remove_photo(callback_query: types.CallbackQuery, **kwargs):
             photos = await sync_to_async(list)(movement.photos.values())
             for photo in photos:
                 await bot.delete_message(photo['chat_id'], photo['message_id'])
-            answer = bot_answer[movement.chat_id][movement.message_id]
-            await bot.delete_message(movement.chat_id, answer)
-            bot_answer[movement.chat_id].pop(movement.message_id)
+            answers = bot_answer[movement.chat_id].pop(movement.message_id)
+            for answer in answers:
+                await bot.delete_message(movement.chat_id, answer)
             await sync_to_async(movement.delete)()
             await bot.answer_callback_query(callback_query.id, text="Сделано, не благодари =)")
         except EquipMovement.DoesNotExist:
@@ -203,8 +207,8 @@ async def remove_photo(callback_query: types.CallbackQuery, **kwargs):
         await bot.answer_callback_query(callback_query.id, text="Ну как хочешь =(")
 
     await bot.delete_message(callback_query.message.chat.id, code[1])
-    await bot.delete_message(callback_query.message.chat.id, bot_answer_delete[code[1]])
-    bot_answer_delete.pop(code[1])
+    await bot.delete_message(callback_query.message.chat.id, bot_answer_delete[int(code[1])])
+    bot_answer_delete.pop(int(code[1]))
 
 
 @dp.message_handler(lambda message: message.text.lower() == "help")
@@ -250,7 +254,11 @@ async def handle_photo(message):
                 user_photos[message.chat.id][message.reply_to_message.message_id] = [message]
         else:
             user_photos[message.chat.id] = {message.reply_to_message.message_id: [message]}
-        print(user_photos)
+
+    elif message.chat.id < 0:
+        answer = await message.reply("Данная функция доступна только в личной переписке с ботом!")
+        await bot.delete_message(message.chat.id, message.message_id)
+        old_bot_message.append(answer)
 
     else:
         image_id, image_path = await get_image(message)
