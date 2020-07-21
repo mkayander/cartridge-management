@@ -8,11 +8,9 @@ from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ContentType, ParseMode
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton
-from asgiref.sync import sync_to_async, async_to_sync
+from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.management import BaseCommand
-from django.db.models.signals import post_delete, post_save
-from django.dispatch import receiver
 from django.utils.dateformat import format
 from pyzbar.pyzbar import decode
 
@@ -81,19 +79,6 @@ async def add_more_photo():
                 answer = await bot.send_message(chat_id, "Фотки добавлены")
                 bot_answer[chat_id] = {message_id: answer.message_id}
         user_photos.clear()
-        # if len(user_photos) > 0:
-        #     for message in user_photos:
-        #         movement = await sync_to_async(EquipMovement.objects.get)(message_id=message.reply_to_message)
-        #         image_id, image_path = await get_image(message)
-        #         await download_image(image_id, image_path)
-        #         await sync_to_async(AdditionalPhoto.objects.create)(movement=movement, image=image_path,
-        #                                                             message_id=message.message_id,
-        #                                                             chat_id=message.chat.id)
-        #     print("Upload photo")
-        #     answer = await bot.send_message(user_photos[0].chat.id,
-        #                            "Фотки добавлены" if len(user_photos) >= 2 else "Фото добавлено")
-        #     bot_answer[str(message)]
-        #     user_photos.clear()
 
         await asyncio.sleep(5)
 
@@ -131,15 +116,6 @@ async def confirm_delete(message):
         old_bot_message.append(answer)
 
 
-# def photo_form_db(movement):
-#     photos = movement.photos.all()
-#     photos_db = []
-#     if not photos:
-#         for photo in photos:
-#             photos_db.append(photo)
-#         return photos_db
-
-
 @dp.callback_query_handler()
 async def remove_photo(callback_query: types.CallbackQuery, **kwargs):
     code = callback_query.data.split('*')
@@ -169,7 +145,6 @@ async def remove_photo(callback_query: types.CallbackQuery, **kwargs):
 @dp.message_handler(lambda message: message.text.lower() == "help")
 @dp.message_handler(commands=["Help", "?", "h"], commands_prefix=[".", "/"])
 async def send_help_message(message: types.Message):
-    # await message.reply(text=bot_help_description, reply_markup=ReplyKeyboardRemove())
     await message.reply(text=bot_help_description)
 
 
@@ -217,8 +192,6 @@ async def handle_photo(message):
                 await message.reply(f"Оборудование с ОС {barcode} не найдено!")
         else:
             await message.reply(barcode)
-        # await bot.delete_message(message.chat.id, message.message_id)
-        # print("Photo is deleted")
 
 
 def get_detail_message(obj: Equipment) -> str:
