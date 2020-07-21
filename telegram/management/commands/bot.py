@@ -45,6 +45,8 @@ old_bot_message = []
 user_photos = {}
 bot_answer_phone_number = {}
 valid_users = []
+
+
 # -- --
 
 
@@ -73,7 +75,7 @@ async def validate_user_at_database(user_id: int) -> bool:
     try:
         user = await sync_to_async(Account.objects.get)(telegram_user_id=user_id)
         if user.can_use_bot:
-            valid_users.append(user_id)
+            # valid_users.append(user_id)
             return True
         else:
             return False
@@ -84,19 +86,22 @@ async def validate_user_at_database(user_id: int) -> bool:
 
 def valid_users_only(func):
     """
-    Decorator for async aiogram functions
+    Decorator for async aiogram functions. Currently only passes through the "message" argument.
     :param func: Async Aiogram function
     :return: Function wrapper
     """
-    def wrapper(message, **kwargs):
-        if message.from_user.id in valid_users:
-            return func(message, **kwargs)
-        elif validate_user_at_database(message.from_user.id):
-            print(kwargs)
-            print(kwargs["state"])
-            return func(message)
+
+    async def wrapper(message, **kwargs):
+        # if message.from_user.id in valid_users:
+        #     return await func(message)
+        # elif await validate_user_at_database(message.from_user.id):
+        #     return await func(message)
+        if await validate_user_at_database(message.from_user.id):
+            return await func(message)
         else:
-            return message.reply("У вас нет прав на выполнение данного действия!")
+            answer = await message.reply("У вас нет прав на выполнение данного действия! Напишите /start для проверки.")
+            await bot.delete_message(message.chat.id, message.message_id)
+            old_bot_message.append(answer)
 
     return wrapper
 
@@ -125,13 +130,17 @@ async def add_more_photo():
         await asyncio.sleep(5)
 
 
-@dp.message_handler(lambda message: False if message.chat.id < 0 else True, commands='start')
+@dp.message_handler(commands='start')
 async def start_bot(message):
-    markup_request = ReplyKeyboardMarkup(resize_keyboard=True).add(
-        KeyboardButton('Отправить свой контакт ☎️', request_contact=True))
-    answer = await message.reply("Для пользования ботом необходим номер телефона",
-                                 reply_markup=markup_request)
-    bot_answer_phone_number[message.from_user.id] = answer.message_id
+    if message.chat.id > 0:
+        markup_request = ReplyKeyboardMarkup(resize_keyboard=True).add(
+            KeyboardButton('Отправить свой контакт ☎️', request_contact=True))
+        answer = await message.reply("Для пользования ботом необходим номер телефона",
+                                     reply_markup=markup_request)
+        bot_answer_phone_number[message.from_user.id] = answer.message_id
+
+    else:
+        old_bot_message.append(await message.reply("/start можно писать только в личные сообщения боту!"))
 
 
 @dp.message_handler(content_types=ContentType.CONTACT)
@@ -141,14 +150,20 @@ async def register_user_contact(message):
             user = await sync_to_async(Account.objects.get)(phone_number="+" + str(message.contact.phone_number))
             user.telegram_user_id = message.contact.user_id
             await sync_to_async(user.save)()
-            await message.reply("Вы успешно прошли проверку! Каааак же я за вас рад 😒",
-                                reply_markup=ReplyKeyboardRemove())
+            if user.can_use_bot:
+                await message.reply("Вы успешно прошли валидацию!",
+                                    reply_markup=ReplyKeyboardRemove())
+            else:
+                await message.reply("Пользователь записан в базе, но у Вас нет прав на использование бота!",
+                                    reply_markup=ReplyKeyboardRemove())
         except Account.DoesNotExist:
-            pass
+            await message.reply("Пользователь с данным номером телефона не зарегестрирован в базе!",
+                                reply_markup=ReplyKeyboardRemove())
         bot_answer_phone_number.clear()
 
 
 @dp.message_handler(commands=["delete", "del", "d"], commands_prefix=[".", "/"])
+@valid_users_only
 async def confirm_delete(message):
     if message.reply_to_message:
         inline_kb_full = InlineKeyboardMarkup(row_width=2)
@@ -193,11 +208,13 @@ async def remove_photo(callback_query: types.CallbackQuery, **kwargs):
 
 @dp.message_handler(lambda message: message.text.lower() == "help")
 @dp.message_handler(commands=["Help", "?", "h"], commands_prefix=[".", "/"])
+@valid_users_only
 async def send_help_message(message: types.Message):
     await message.reply(text=bot_help_description)
 
 
 @dp.message_handler(content_types=ContentType.PHOTO)
+@valid_users_only
 async def handle_photo(message):
     if message.caption and not message.reply_to_message:
         image_id, image_path = await get_image(message)
@@ -235,7 +252,6 @@ async def handle_photo(message):
         if bool_bar:
             try:
                 data = await sync_to_async(Equipment.objects.get)(inv_number=barcode)
-                print(get_detail_message(data))
                 await bot.send_message(message.chat.id, get_detail_message(data), parse_mode=ParseMode.MARKDOWN)
             except Equipment.DoesNotExist:
                 await message.reply(f"Оборудование с ОС {barcode} не найдено!")
@@ -277,7 +293,7 @@ async def download_image(image_id, path):
 @dp.message_handler()
 @valid_users_only
 async def collect_message(message):
-    text = 'Не спамить! Какашка 😜' + '\nВсе сообщения только по делу!'
+    text = 'Не спамить!' + '\nВсе сообщения только по делу!'
     answer = await message.reply(text=text, parse_mode=ParseMode.MARKDOWN)
     old_bot_message.append(answer)
 
