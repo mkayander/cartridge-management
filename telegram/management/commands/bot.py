@@ -214,6 +214,13 @@ async def send_help_message(message: types.Message):
     await message.reply(text=bot_help_description)
 
 
+@dp.message_handler(commands=['history'])
+async def movement_history_command(message: types.Message):
+    args = message.get_args()
+    for movement in await sync_to_async(EquipMovement.objects.filter)(inv_number=args):
+        await bot.send_photo(message.chat.id, movement.inv_image, str(movement))
+
+
 @dp.message_handler(content_types=ContentType.PHOTO)
 @valid_users_only
 async def handle_photo(message):
