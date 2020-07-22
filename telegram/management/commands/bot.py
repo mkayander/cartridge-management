@@ -1,16 +1,17 @@
 import asyncio
 import logging
-from typing import Tuple
+from typing import Tuple, List
 
 import PIL
 from PIL import Image
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types import ContentType, ParseMode
+from aiogram.types import ContentType, ParseMode, InputFile
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.management import BaseCommand
+from django.db.models import QuerySet
 from django.utils.dateformat import format
 from pyzbar.pyzbar import decode
 
@@ -48,6 +49,18 @@ valid_users = []
 
 
 # -- --
+
+async def sync_iter_to_async(iterator):
+    """
+    Used to loop through django QuerySet in an async context (function)
+    :param iterator:
+    """
+    while True:
+        try:
+            val = await sync_to_async(iterator.__next__)()
+            yield val
+        except (StopIteration, Exception):
+            break
 
 
 def get_inv_number(image: PIL.Image) -> Tuple[bool, str]:
@@ -193,12 +206,15 @@ async def remove_photo(callback_query: types.CallbackQuery, **kwargs):
             movement = await sync_to_async(EquipMovement.objects.get)(message_id=int(code[2]))
             await bot.delete_message(callback_query.message.chat.id, movement.bot_answer_message_id)
             await bot.delete_message(callback_query.message.chat.id, movement.message_id)
-            photos = await sync_to_async(list)(movement.photos.values())
-            for photo in photos:
-                await bot.delete_message(photo['chat_id'], photo['message_id'])
+
+            photo: AdditionalPhoto
+            for photo in await sync_to_async(list)(movement.photos.all()):
+                await bot.delete_message(photo.chat_id, photo.message_id)
+
             answers = bot_answer[movement.chat_id].pop(movement.message_id)
             for answer in answers:
                 await bot.delete_message(movement.chat_id, answer)
+
             await sync_to_async(movement.delete)()
             await bot.answer_callback_query(callback_query.id, text="Сделано, не благодари =)")
         except EquipMovement.DoesNotExist:
@@ -218,11 +234,38 @@ async def send_help_message(message: types.Message):
     await message.reply(text=bot_help_description)
 
 
-@dp.message_handler(commands=['history'])
+@dp.message_handler(commands=['history', 'hist', 'hi'])
+@valid_users_only
 async def movement_history_command(message: types.Message):
-    args = message.get_args()
-    for movement in await sync_to_async(EquipMovement.objects.filter)(inv_number=args):
-        await bot.send_photo(message.chat.id, movement.inv_image, str(movement))
+    args: List[str] = message.get_args().split(" ")
+
+    if not args[0]:
+        await types.ChatActions.typing()
+        equip_list = ""
+        movement_choices: List[EquipMovement] = await sync_to_async(list)(EquipMovement.objects.distinct("inv_number"))
+        for choice in movement_choices:
+            equip_list += f"`{choice.inv_number}`\n"
+        await message.reply(f"_Доступные ОС:_ \n{equip_list}", parse_mode=ParseMode.MARKDOWN)
+        return
+
+    qs: QuerySet = EquipMovement.objects.filter(inv_number=args[0])
+
+    movement: EquipMovement
+    for movement in await sync_to_async(list)(qs):
+        await types.ChatActions.upload_photo()
+        media = types.MediaGroup()
+        media.attach_photo(InputFile(movement.inv_image.path), get_movement_detail_message(movement))
+        # out_message = await bot.send_photo(message.chat.id, InputFile(movement.inv_image.path),
+        #                                    get_movement_detail_message(movement),
+        #                                    parse_mode=ParseMode.MARKDOWN)
+
+        photos: List[AdditionalPhoto] = await sync_to_async(list)(movement.photos.all())
+        if photos:
+
+            for photo in photos:
+                media.attach_photo(InputFile(photo.image.path))
+
+        await message.reply_media_group(media)
 
 
 @dp.message_handler(content_types=ContentType.PHOTO)
@@ -268,14 +311,14 @@ async def handle_photo(message):
         if bool_bar:
             try:
                 data = await sync_to_async(Equipment.objects.get)(inv_number=barcode)
-                await bot.send_message(message.chat.id, get_detail_message(data), parse_mode=ParseMode.MARKDOWN)
+                await bot.send_message(message.chat.id, get_equip_detail_message(data), parse_mode=ParseMode.MARKDOWN)
             except Equipment.DoesNotExist:
                 await message.reply(f"Оборудование с ОС {barcode} не найдено!")
         else:
             await message.reply(barcode)
 
 
-def get_detail_message(obj: Equipment) -> str:
+def get_equip_detail_message(obj: Equipment) -> str:
     """
     Converts Equipment instance to a multi-line representation (detail) string.
     :param obj: Equipment instance to get values from
@@ -293,6 +336,12 @@ def get_detail_message(obj: Equipment) -> str:
 *{Equipment._meta.get_field("initial_price").verbose_name} :* `{obj.initial_price}`
 *{Equipment._meta.get_field("residual_price").verbose_name} :* `{obj.residual_price}`
 *{Equipment._meta.get_field("useful_life").verbose_name} :* `{obj.useful_life}`
+"""
+
+
+def get_movement_detail_message(obj: EquipMovement) -> str:
+    return f"""{format(obj.created_at, "d E Y в H:m")} :
+{obj.comment}
 """
 
 
