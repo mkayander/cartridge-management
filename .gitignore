@@ -8,7 +8,7 @@ __pycache__/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-media
+telegram/media
 
 backups/
 
@@ -24,6 +24,9 @@ mailbox_attachments/
 
 .idea
 .idea/*
+
+*.xls
+*.xlsx
 
 # User-specific stuff
 .idea/**/workspace.xml
@@ -58,4 +61,3 @@ db.json
 # Gradle
 .idea/**/gradle.xml
 .idea/**/libraries
-

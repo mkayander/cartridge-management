@@ -143,7 +143,8 @@ class Cartridge(BackupableModel):
 
     class Meta:
         ordering = ['manufacturer', 'name']
-        # ordering = ['name']
+        verbose_name = "Картридж"
+        verbose_name_plural = "Картриджи"
 
 
 class Supply(BackupableModel):
@@ -168,6 +169,8 @@ class Supply(BackupableModel):
 
     class Meta:
         ordering = ['-date']
+        verbose_name = "Перемещение картриджей"
+        verbose_name_plural = "Перемещения картриджей"
 
     def update_cartridge_count(self, value):
         """
@@ -238,11 +241,50 @@ class Order(EmailRequestModel):
             self.supply.delete()
             self.supply = None
 
+    class Meta:
+        verbose_name = "Заказ картриджей"
+        verbose_name_plural = "Заказы картриджей"
+
 
 class Service(EmailRequestModel):
     printer = models.CharField(max_length=100, choices=choices.PRINTERS, verbose_name="Принтер")
     inv_number = models.CharField(max_length=100, blank=True, verbose_name="Инвентарный номер")
     defect_description = models.TextField(default="", blank=False, verbose_name="Причина неисправности")
+    image_barcode = models.ImageField(verbose_name="Фото штрих кода", blank=True)
 
     def get_email_subject(self):
         return f'Неисправность принтера {self.printer}, ООО "Деловые Линии"'
+
+    class Meta:
+        verbose_name = "Заявка на ремонт"
+        verbose_name_plural = "Заявки на ремонт"
+
+
+class Equipment(BackupableModel):
+    created_at = models.DateTimeField(auto_now_add=True)
+    edited_at = models.DateTimeField(auto_now=True)
+
+    inv_number = models.CharField(verbose_name="Инвентарный №", primary_key=True, max_length=30)
+    name = models.CharField(verbose_name="Наименование", max_length=100)
+    type = models.CharField(verbose_name="Тип ОС", max_length=70)
+    group = models.CharField(verbose_name="Группа ОС", max_length=70)
+    model = models.CharField(verbose_name="Марка & Модель", max_length=70, blank=True)
+    serial_number = models.CharField(verbose_name="Серийный номер", max_length=40, blank=True)
+    registration_date = models.CharField(verbose_name="Дата постановки на учет", max_length=20)
+    location_department = models.CharField(verbose_name="Отдел местоположения", max_length=100)
+    responsible_employee = models.CharField(verbose_name="Ответственный", max_length=100)
+    initial_price = models.FloatField(verbose_name="Первоначальная стоимость с НДС", default=0, blank=True)
+    residual_price = models.FloatField(verbose_name="Остаточная стоимость с НДС", default=0, blank=True)
+    useful_life = models.PositiveIntegerField(verbose_name="Срок пол. использования", default=0, blank=True)
+
+    def __str__(self):
+        return self.inv_number
+
+    class Meta:
+        ordering = ['inv_number']
+        verbose_name = "Оборудование"
+        verbose_name_plural = "Оборудование"
+
+    # def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+    #     self.residual_price = 0 if self.residual_price == "null" else self.residual_price
+    #     self.initial_price = 0 if self.initial_price == "null" else self.initial_price
