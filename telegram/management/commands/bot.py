@@ -97,6 +97,17 @@ async def validate_user_at_database(user_id: int) -> bool:
         return False
 
 
+# --- Decorators ---
+def private_chat_only(func):
+    def wrapper(message, **kwargs):
+        if message.chat.id > 0:
+            return func(message)
+        else:
+            return message.reply("Данная функция доступна только в личной переписке с ботом!")
+
+    return wrapper
+
+
 def valid_users_only(func):
     """
     Decorator for async aiogram functions. Currently only passes through the "message" argument.
@@ -117,6 +128,9 @@ def valid_users_only(func):
             old_bot_message.append(answer)
 
     return wrapper
+
+
+# ---  ---
 
 
 async def add_more_photo():
@@ -235,6 +249,7 @@ async def send_help_message(message: types.Message):
 
 
 @dp.message_handler(commands=['history', 'hist', 'hi'])
+@private_chat_only
 @valid_users_only
 async def movement_history_command(message: types.Message):
     args: List[str] = message.get_args().split(" ")
