@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Value, BooleanField
 
-from main.models import Cartridge, Supply, Order
+from main.models import Cartridge, Supply, Order, Service
 
 
 def get_item_key(obj):
@@ -23,7 +23,8 @@ class Command(BaseCommand):
             db = {
                 "Cartridge": list(Cartridge.objects.annotate(restoring=Value(True, BooleanField())).values()),
                 "Supply": list(Supply.objects.annotate(restoring=Value(True, BooleanField())).values()),
-                "Order": list(Order.objects.annotate(restoring=Value(True, BooleanField())).values())
+                "Order": list(Order.objects.annotate(restoring=Value(True, BooleanField())).values()),
+                "Service": list(Service.objects.annotate(restoring=Value(True, BooleanField())).values())
             }
 
             with open("db.json", 'w+') as outfile:
