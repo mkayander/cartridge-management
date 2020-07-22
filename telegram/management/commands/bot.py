@@ -88,7 +88,6 @@ async def validate_user_at_database(user_id: int) -> bool:
     try:
         user = await sync_to_async(Account.objects.get)(telegram_user_id=user_id)
         if user.can_use_bot:
-            # valid_users.append(user_id)
             return True
         else:
             return False
@@ -116,10 +115,6 @@ def valid_users_only(func):
     """
 
     async def wrapper(message, **kwargs):
-        # if message.from_user.id in valid_users:
-        #     return await func(message)
-        # elif await validate_user_at_database(message.from_user.id):
-        #     return await func(message)
         if await validate_user_at_database(message.from_user.id):
             return await func(message)
         else:
@@ -270,9 +265,6 @@ async def movement_history_command(message: types.Message):
         await types.ChatActions.upload_photo()
         media = types.MediaGroup()
         media.attach_photo(InputFile(movement.inv_image.path), get_movement_detail_message(movement))
-        # out_message = await bot.send_photo(message.chat.id, InputFile(movement.inv_image.path),
-        #                                    get_movement_detail_message(movement),
-        #                                    parse_mode=ParseMode.MARKDOWN)
 
         photos: List[AdditionalPhoto] = await sync_to_async(list)(movement.photos.all())
         if photos:
