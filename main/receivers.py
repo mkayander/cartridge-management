@@ -162,7 +162,8 @@ def update_email_order(sender, instance: EmailRequestModel, created, raw, **kwar
     Before save, get previous values. If status has changed, call the corresponding model methods.
     (I.e. got finished or rolled back)
     """
-    if not created and not raw and issubclass(sender, EmailRequestModel):
+    # Check if instance is not new, not being loaded from fixture and is a subclass of EmailRequestModel
+    if instance.pk and not raw and issubclass(sender, EmailRequestModel):
         prev_values = instance.__class__.objects.get(pk=instance.pk)
         if instance.finished is not prev_values.finished:
             if instance.finished and not prev_values.finished:
@@ -177,7 +178,7 @@ def prepare_supply(instance: Supply, created, raw, **kwargs):
     if raw:
         return
 
-    if created:
+    if not instance.pk:
         # If supply is new
         instance.update_cartridge_count(instance.count)
     else:
@@ -185,7 +186,7 @@ def prepare_supply(instance: Supply, created, raw, **kwargs):
         prev_supply = Supply.objects.get(pk=instance.pk)
 
         if prev_supply.out is not instance.out:
-            # If direction is changed, compensate that
+            # If direction has changed, compensate that
             prev_supply.count -= prev_supply.count
 
         count_difference = instance.count - prev_supply.count
