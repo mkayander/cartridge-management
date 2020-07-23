@@ -154,8 +154,14 @@ def mail_received(message, raw, **kwargs):
                             message.text)
 
 
+# --- Pre Save Receivers ---
 @receiver(pre_save)
-def update_email_order(sender, instance, created, raw, **kwargs):
+def update_email_order(sender, instance: EmailRequestModel, created, raw, **kwargs):
+    """
+    Polymorphic receiver that works with all models that inherit EmailRequestModel abstract base class.
+    Before save, get previous values. If status has changed, call the corresponding model methods.
+    (I.e. got finished or rolled back)
+    """
     if not created and not raw and issubclass(sender, EmailRequestModel):
         prev_values = instance.__class__.objects.get(pk=instance.pk)
         if instance.finished is not prev_values.finished:
@@ -163,3 +169,24 @@ def update_email_order(sender, instance, created, raw, **kwargs):
                 instance.finish()
             elif prev_values.finished and not instance.finished:
                 instance.roll_back()
+
+
+@receiver(pre_save, sender=Supply)
+def prepare_supply(instance: Supply, created, raw, **kwargs):
+    # If this is restoring from json, don't do any corrective actions, just save
+    if raw:
+        return
+
+    if created:
+        # If supply is new
+        instance.update_cartridge_count(instance.count)
+    else:
+        # If supply exists and got updated
+        prev_supply = Supply.objects.get(pk=instance.pk)
+
+        if prev_supply.out is not instance.out:
+            # If direction is changed, compensate that
+            prev_supply.count -= prev_supply.count
+
+        count_difference = instance.count - prev_supply.count
+        instance.update_cartridge_count(count_difference)

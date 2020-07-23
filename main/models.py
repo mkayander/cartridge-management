@@ -108,17 +108,6 @@ class EmailRequestModel(BackupableModel):
         self.status = "work"
         self.date_finished = None
 
-    # def save(self, *args, **kwargs):
-    #     # Make corrections only if it's not the initial save and object is not being restored
-    #     if self.pk and not self.restoring:
-    #         prev_values = self.__class__.objects.get(pk=self.pk)
-    #         if self.finished is not prev_values.finished:
-    #             if self.finished and not prev_values.finished:
-    #                 self.finish()
-    #             elif prev_values.finished and not self.finished:
-    #                 self.roll_back()
-    #     super().save(*args, **kwargs)
-
     def delete(self, using=None, keep_parents=False):
         self.roll_back()
         return super().delete(using, keep_parents)
@@ -174,7 +163,7 @@ class Supply(BackupableModel):
 
     def update_cartridge_count(self, value):
         """
-        Makes necessary changes to the count of cartridges.
+        Pre-save method. Makes necessary changes to the count of cartridges.
         :param value: Difference on count in supply compared to previous count.
         :type value: int
         """
@@ -187,24 +176,6 @@ class Supply(BackupableModel):
 
             print(f"{self.cartridge} new count is {self.cartridge.count}")
             self.cartridge.save()
-
-    def save(self, *args, **kwargs):
-        # If this is restoring from json, don't do any corrective actions, just save
-        if not self.restoring:
-            if self.pk is None or not Supply.objects.filter(pk=self.pk).exists():
-                # If supply is new
-                self.update_cartridge_count(self.count)
-            else:
-                # If supply exists and got updated
-                prev_supply = Supply.objects.get(pk=self.pk)
-
-                if prev_supply.out is not self.out:
-                    # If direction is changed, compensate that
-                    prev_supply.count -= prev_supply.count
-
-                count_difference = self.count - prev_supply.count
-                self.update_cartridge_count(count_difference)
-        super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):
         self.update_cartridge_count(self.count * -1)
@@ -284,7 +255,3 @@ class Equipment(BackupableModel):
         ordering = ['inv_number']
         verbose_name = "Оборудование"
         verbose_name_plural = "Оборудование"
-
-    # def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-    #     self.residual_price = 0 if self.residual_price == "null" else self.residual_price
-    #     self.initial_price = 0 if self.initial_price == "null" else self.initial_price
