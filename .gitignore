@@ -10,6 +10,8 @@ db.sqlite3
 db.sqlite3-journal
 telegram/media
 
+backups/
+
 mailbox_attachments/
 
 **/migrations/*
