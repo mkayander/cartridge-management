@@ -2,6 +2,7 @@ from django.core.mail import mail_admins
 from django.core.management import call_command
 from django.template.loader import render_to_string
 from django_mailbox.models import Mailbox
+from datetime import date
 
 from cartridge.celery import app
 from main.models import Order
@@ -41,6 +42,10 @@ def run_mailbox_getmail():
 def backup_db_to_json():
     call_command("backup", "all")
 
+
+@app.task
+def dumpdata():
+    call_command("dumpdata", "--exclude auth.permission", "--exclude contenttypes", f" > backups/{date.today()}.json")
 
 @app.task
 def notify_admins(subject: str, text: str, *args):
