@@ -156,7 +156,7 @@ def mail_received(message, raw, **kwargs):
 
 # --- Pre Save Receivers ---
 @receiver(pre_save)
-def update_email_order(sender, instance: EmailRequestModel, created, raw, **kwargs):
+def update_email_order(sender, instance: EmailRequestModel, raw, **kwargs):
     """
     Polymorphic receiver that works with all models that inherit EmailRequestModel abstract base class.
     Before save, get previous values. If status has changed, call the corresponding model methods.
@@ -173,7 +173,7 @@ def update_email_order(sender, instance: EmailRequestModel, created, raw, **kwar
 
 
 @receiver(pre_save, sender=Supply)
-def prepare_supply(instance: Supply, created, raw, **kwargs):
+def prepare_supply(instance: Supply, raw, **kwargs):
     # If this is restoring from json, don't do any corrective actions, just save
     if raw:
         return
