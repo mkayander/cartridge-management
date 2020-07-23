@@ -1,18 +1,15 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from constance import config
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from django_mailbox.models import Message
 from django_mailbox.signals import message_received
 
-from main.models import Order, Cartridge, Service, Supply
-from main.tasks import notify_admins
-
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-import json
-
 from main.messages import NOTIFY_MESSAGES, get_notify_answer
+from main.models import Order, Cartridge, Service, Supply, EmailRequestModel
+from main.tasks import notify_admins
 
 
 def request_id_is_valid(id_string: str):
@@ -152,3 +149,14 @@ def mail_received(message, **kwargs):
                             К этому письму не привязан ни один заказ.""",
                             message.subject,
                             message.text)
+
+
+@receiver(pre_save)
+def update_email_order(sender, instance, created, raw, **kwargs):
+    if not created and not raw and issubclass(sender, EmailRequestModel):
+        prev_values = instance.__class__.objects.get(pk=instance.pk)
+        if instance.finished is not prev_values.finished:
+            if instance.finished and not prev_values.finished:
+                instance.finish()
+            elif prev_values.finished and not instance.finished:
+                instance.roll_back()

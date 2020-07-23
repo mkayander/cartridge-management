@@ -108,16 +108,16 @@ class EmailRequestModel(BackupableModel):
         self.status = "work"
         self.date_finished = None
 
-    def save(self, *args, **kwargs):
-        # Make corrections only if it's not the initial save and object is not being restored
-        if self.pk and not self.restoring:
-            prev_values = self.__class__.objects.get(pk=self.pk)
-            if self.finished is not prev_values.finished:
-                if self.finished and not prev_values.finished:
-                    self.finish()
-                elif prev_values.finished and not self.finished:
-                    self.roll_back()
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     # Make corrections only if it's not the initial save and object is not being restored
+    #     if self.pk and not self.restoring:
+    #         prev_values = self.__class__.objects.get(pk=self.pk)
+    #         if self.finished is not prev_values.finished:
+    #             if self.finished and not prev_values.finished:
+    #                 self.finish()
+    #             elif prev_values.finished and not self.finished:
+    #                 self.roll_back()
+    #     super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):
         self.roll_back()
