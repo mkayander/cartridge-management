@@ -139,7 +139,6 @@ async def add_more_photo():
                 movement = await sync_to_async(EquipMovement.objects.get)(message_id=message_id)
                 for message in messages:
                     image_id, image_path = await get_image(message)
-                    await download_image(image_id, image_path)
                     await sync_to_async(AdditionalPhoto.objects.create)(movement=movement, image=image_path,
                                                                         message_id=message.message_id,
                                                                         chat_id=message.chat.id)
@@ -280,7 +279,6 @@ async def movement_history_command(message: types.Message):
 async def handle_photo(message):
     if message.caption and not message.reply_to_message:
         image_id, image_path = await get_image(message)
-        await download_image(image_id, image_path)
         img = Image.open(image_path)
         bool_bar, barcode = get_inv_number(img)
         if bool_bar:
@@ -312,7 +310,6 @@ async def handle_photo(message):
 
     else:
         image_id, image_path = await get_image(message)
-        await download_image(image_id, image_path)
         img = Image.open(image_path)
         bool_bar, barcode = get_inv_number(img)
         if bool_bar:
@@ -355,11 +352,8 @@ def get_movement_detail_message(obj: EquipMovement) -> str:
 async def get_image(message):
     image_id = await bot.get_file(message.photo[-1].file_id)
     image_path = f"telegram/media/{image_id.file_unique_id}.jpg"
+    await bot.download_file(image_id['file_path'], image_path)
     return image_id, image_path
-
-
-async def download_image(image_id, path):
-    await bot.download_file(image_id['file_path'], path)
 
 
 @dp.message_handler()
