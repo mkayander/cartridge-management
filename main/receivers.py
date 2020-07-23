@@ -39,11 +39,11 @@ def group_sender(sender, **kwargs):
 
 
 @receiver(post_save, sender=Cartridge)
-def check_cartridge_count(instance, **kwargs):
+def check_cartridge_count(instance, raw, **kwargs):
     """
     Creates a new Order if cartridge amount is less than required.
     """
-    if instance.count < config.CARTRIDGE_MIN_COUNT:
+    if instance.count < config.CARTRIDGE_MIN_COUNT and not raw:
         if not Order.objects.filter(cartridge=instance).exclude(status="finished").exists():
             print(f"Amount of {instance} is less then required and no active order is found, creating new.")
             order = Order.objects.create(cartridge=instance, count=config.CARTRIDGE_DEF_AMOUNT)
@@ -55,10 +55,13 @@ def check_cartridge_count(instance, **kwargs):
 
 
 @receiver(post_save, sender=Order)
-def check_if_waiting_email(**kwargs):
+def check_if_waiting_email(raw, **kwargs):
     """
     Makes the email refresh task run more often if there's at least one order that is waiting for the answer.
     """
+    if raw:
+        return
+
     print("Checking if orders waiting for email...")
     try:
         refresh_task = PeriodicTask.objects.get(name=config.EMAIL_REFRESH_TASK_NAME)
@@ -79,13 +82,13 @@ def check_if_waiting_email(**kwargs):
 
 
 @receiver(message_received)
-def mail_received(message, **kwargs):
+def mail_received(message, raw, **kwargs):
     """
     Main incoming email callback. Checks if message is the answer to any local Order, tries to get the external id from
     the message and set's it to the order if found, with Order status also changed to "work".
     """
 
-    if not message.in_reply_to_id:
+    if raw or not message.in_reply_to_id:
         # We only need messages that are replies to our's
         return
 
