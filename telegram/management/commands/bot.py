@@ -333,9 +333,10 @@ async def handle_photo(message):
 
 
 def check_is_inv_number(message: types.Message):
+    print(message.text.upper())
     if message.text.isnumeric() and 3 < len(message.text) < 7:
         return True
-    elif message.text[0:2].lower() == "кц":
+    elif message.text[0:2].upper() == "КЦ":
         return True
     else:
         return False
@@ -350,8 +351,8 @@ async def get_equip_detail_from_text_message(message: types.Message):
         inv_number = 'ОС00000' + message.text
     elif len(message.text) == 6:
         inv_number = 'ОС0000' + message.text
-    elif message.text[0:2] == 'КЦ':
-        inv_number = message.text
+    elif message.text[0:2].upper() == 'КЦ':
+        inv_number = message.text.upper()
     else:
         return
     try:
