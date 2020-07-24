@@ -327,7 +327,7 @@ async def handle_photo(message):
                 data = await sync_to_async(Equipment.objects.get)(inv_number=barcode)
                 await bot.send_message(message.chat.id, get_equip_detail_message(data), parse_mode=ParseMode.MARKDOWN)
             except Equipment.DoesNotExist:
-                await message.reply(f"Оборудование с ОС {barcode} не найдено!")
+                await message.reply(f"Оборудование с инв. номером {barcode} не найдено!")
         else:
             await message.reply(barcode)
 
