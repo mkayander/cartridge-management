@@ -107,6 +107,16 @@ def private_chat_only(func):
     return wrapper
 
 
+def group_chat_only(func):
+    def wrapper(message, **kwargs):
+        if message.chat.id > 0:
+            return
+        else:
+            return func(message)
+
+    return wrapper
+
+
 def valid_users_only(func):
     """
     Decorator for async aiogram functions. Currently only passes through the "message" argument.
@@ -322,6 +332,36 @@ async def handle_photo(message):
             await message.reply(barcode)
 
 
+def check_is_inv_number(message: types.Message):
+    print(message.text.upper())
+    if message.text.isnumeric() and 3 < len(message.text) < 7:
+        return True
+    elif message.text[0:2].upper() == "КЦ":
+        return True
+    else:
+        return False
+
+
+@dp.message_handler(lambda message: check_is_inv_number(message), content_types=ContentType.TEXT)
+@dp.message_handler(commands=['os', 'ос'], commands_prefix=[".", "/"])
+async def get_equip_detail_from_text_message(message: types.Message):
+    if len(message.text) == 4:
+        inv_number = 'ОС000000' + message.text
+    elif len(message.text) == 5:
+        inv_number = 'ОС00000' + message.text
+    elif len(message.text) == 6:
+        inv_number = 'ОС0000' + message.text
+    elif message.text[0:2].upper() == 'КЦ':
+        inv_number = message.text.upper()
+    else:
+        return
+    try:
+        data = await sync_to_async(Equipment.objects.get)(inv_number=inv_number)
+        await bot.send_message(message.chat.id, get_equip_detail_message(data), parse_mode=ParseMode.MARKDOWN)
+    except Equipment.DoesNotExist:
+        await message.reply(f"Оборудование с ОС {inv_number} не найдено!")
+
+
 def get_equip_detail_message(obj: Equipment) -> str:
     """
     Converts Equipment instance to a multi-line representation (detail) string.
@@ -357,6 +397,7 @@ async def get_image(message):
 
 
 @dp.message_handler()
+@group_chat_only
 @valid_users_only
 async def collect_message(message):
     text = 'Не спамить!' + '\nВсе сообщения только по делу!'
