@@ -240,7 +240,7 @@ class Equipment(BackupableModel):
     type = models.CharField(verbose_name="Тип ОС", max_length=70)
     group = models.CharField(verbose_name="Группа ОС", max_length=70)
     model = models.CharField(verbose_name="Марка & Модель", max_length=70, blank=True)
-    serial_number = models.CharField(verbose_name="Серийный номер", max_length=40, blank=True)
+    serial_number = models.CharField(verbose_name="Серийный номер", max_length=100, blank=True)
     registration_date = models.CharField(verbose_name="Дата постановки на учет", max_length=20)
     location_department = models.CharField(verbose_name="Отдел местоположения", max_length=100)
     responsible_employee = models.CharField(verbose_name="Ответственный", max_length=100)
