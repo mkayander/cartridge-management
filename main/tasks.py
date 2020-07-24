@@ -45,7 +45,7 @@ def backup_db_to_json():
 
 @app.task
 def dumpdata():
-    call_command("dumpdata", "--exclude auth.permission", "--exclude contenttypes", f" > backups/{date.today()}.json")
+    call_command("dumpdata", output=f"backups/{date.today()}.json")
 
 @app.task
 def notify_admins(subject: str, text: str, *args):

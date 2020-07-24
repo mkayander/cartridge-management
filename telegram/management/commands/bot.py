@@ -352,6 +352,7 @@ def get_movement_detail_message(obj: EquipMovement) -> str:
 async def get_image(message):
     image_id = await bot.get_file(message.photo[-1].file_id)
     image_path = f"telegram/media/{image_id.file_unique_id}.jpg"
+    print(f"get_image: {image_id['file_path']=} {image_path=}")
     await bot.download_file(image_id['file_path'], image_path)
     return image_id, image_path
 
