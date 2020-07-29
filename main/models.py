@@ -212,7 +212,7 @@ class Order(EmailRequestModel):
             self.supply.delete()
             self.supply = None
 
-    class Meta:
+    class Meta(EmailRequestModel.Meta):
         verbose_name = "Заказ картриджей"
         verbose_name_plural = "Заказы картриджей"
 
@@ -226,7 +226,7 @@ class Service(EmailRequestModel):
     def get_email_subject(self):
         return f'Неисправность принтера {self.printer}, ООО "Деловые Линии"'
 
-    class Meta:
+    class Meta(EmailRequestModel.Meta):
         verbose_name = "Заявка на ремонт"
         verbose_name_plural = "Заявки на ремонт"
 
