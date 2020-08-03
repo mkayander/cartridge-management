@@ -19,8 +19,13 @@ from account.models import Account
 from main.models import Equipment
 from telegram.models import EquipMovement, AdditionalPhoto
 
-bot_help_description = '''Команды можно вызывать через . или /
-                       .d .del .delete - удаляет фото с комментарием из базы и чата'''
+bot_help_description = \
+'''_Команды можно вызывать через_ *.* _или_ */*
+
+*.d .del .delete* - удаляет фото с комментарием из базы и чата
+*.hi .hist .history* _[ИНВ.НОМЕР]_ - выводит историю перемещений
+по указанному инв. номеру. Если не указать номер, выведет список
+инв. номеров, имеющих перемещения в базе.'''
 
 button_delete = KeyboardButton('.delete')
 
@@ -249,7 +254,7 @@ async def remove_photo(callback_query: types.CallbackQuery, **kwargs):
 @dp.message_handler(commands=["Help", "?", "h"], commands_prefix=[".", "/"])
 @valid_users_only
 async def send_help_message(message: types.Message):
-    await message.reply(text=bot_help_description)
+    await message.reply(text=bot_help_description, parse_mode=ParseMode.MARKDOWN)
 
 
 @dp.message_handler(commands=['history', 'hist', 'hi'])
