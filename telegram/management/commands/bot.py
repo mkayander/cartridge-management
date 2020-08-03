@@ -19,8 +19,8 @@ from account.models import Account
 from main.models import Equipment
 from telegram.models import EquipMovement, AdditionalPhoto
 
-bot_help_description = "Привет, че забыл команды?\n\nНапоминаю вызвать их \nможно через . или /" + \
-                       "\n\n.d .del .delete - удаляет фото с комментарием из базы и чата"
+bot_help_description = '''Команды можно вызывать через . или /
+                       .d .del .delete - удаляет фото с комментарием из базы и чата'''
 
 button_delete = KeyboardButton('.delete')
 
@@ -66,7 +66,7 @@ async def sync_iter_to_async(iterator):
 def get_inv_number(image: PIL.Image) -> Tuple[bool, str]:
     inv_number = decode(image)
     if not inv_number:
-        return False, "Штрих код не распознан"
+        return False, "Штрихкод не распознан"
     else:
         inv_number = inv_number[0].data.decode("utf-8")
         if inv_number[0:3] == "296":
@@ -75,7 +75,7 @@ def get_inv_number(image: PIL.Image) -> Tuple[bool, str]:
         if inv_number[0:3] == "600":
             inv_number = "ДТ" + inv_number.split("600")[1]
             return True, inv_number
-        return False, f"{inv_number} не является инвентарным номером"
+        return False, f"{inv_number} не является инвентарным номером!"
 
 
 async def validate_user_at_database(user_id: int) -> bool:
@@ -152,7 +152,7 @@ async def add_more_photo():
                     await sync_to_async(AdditionalPhoto.objects.create)(movement=movement, image=image_path,
                                                                         message_id=message.message_id,
                                                                         chat_id=message.chat.id)
-                answer = await bot.send_message(chat_id, "Фотки добавлены")
+                answer = await bot.send_message(chat_id, "Фотографии добавлены в базу")
                 if chat_id in bot_answer:
                     if message_id in bot_answer[chat_id]:
                         bot_answer[chat_id][message_id].append(answer.message_id)
@@ -207,11 +207,11 @@ async def confirm_delete(message):
                                               callback_data=f'delete*{message.message_id}*{message.reply_to_message.message_id}')
         inline_btn_cancel = InlineKeyboardButton('Отмена', callback_data=f'cancel*{message.message_id}')
         inline_kb_full.add(inline_btn_del, inline_btn_cancel)
-        answer = await message.reply(text="Удаляем к хуям?", reply_markup=inline_kb_full)
+        answer = await message.reply(text="Удалить запись из базы?", reply_markup=inline_kb_full)
         bot_answer_delete[message.message_id] = answer.message_id
     else:
         answer = await message.reply(
-            text="Вызывать .del можно только в ответ на сообщение с фотографией, тупой что ли?")
+            text="Вызывать .del можно только в ответ на сообщение с фотографией!")
         await bot.delete_message(message.chat.id, message.message_id)
         old_bot_message.append(answer)
 
@@ -234,11 +234,11 @@ async def remove_photo(callback_query: types.CallbackQuery, **kwargs):
                 await bot.delete_message(movement.chat_id, answer)
 
             await sync_to_async(movement.delete)()
-            await bot.answer_callback_query(callback_query.id, text="Сделано, не благодари =)")
+            await bot.answer_callback_query(callback_query.id, text="Удаление выполнено успешно.")
         except EquipMovement.DoesNotExist:
-            await bot.answer_callback_query(callback_query.id, text="Не нашел в базе! Поэтому не удалю!")
+            await bot.answer_callback_query(callback_query.id, text="Не нашел в базе!")
     else:
-        await bot.answer_callback_query(callback_query.id, text="Ну как хочешь =(")
+        await bot.answer_callback_query(callback_query.id, text="Удаление отменено.")
 
     await bot.delete_message(callback_query.message.chat.id, code[1])
     await bot.delete_message(callback_query.message.chat.id, bot_answer_delete[int(code[1])])
@@ -292,14 +292,16 @@ async def handle_photo(message):
         img = Image.open(image_path)
         bool_bar, barcode = get_inv_number(img)
         if bool_bar:
-            answer = await bot.send_message(message.chat.id,
-                                            f"Ваш ID {message.from_user.id}\nХуйня со штрихкодом {barcode} сохранена как {message.message_id}.")
             await sync_to_async(EquipMovement.objects.create)(telegram_user_id=message.from_user.id,
                                                               inv_number=barcode, comment=message.caption,
                                                               inv_image=image_path,
                                                               message_id=message.message_id,
                                                               bot_answer_message_id=answer.message_id,
                                                               chat_id=message.chat.id)
+
+            answer = await bot.send_message(message.chat.id,
+                                            f"Перемещение оборудования {barcode} успешно сохранено в базе.")
+
 
         else:
             await bot.send_message(message.chat.id, barcode)
@@ -359,7 +361,7 @@ async def get_equip_detail_from_text_message(message: types.Message):
         data = await sync_to_async(Equipment.objects.get)(inv_number=inv_number)
         await bot.send_message(message.chat.id, get_equip_detail_message(data), parse_mode=ParseMode.MARKDOWN)
     except Equipment.DoesNotExist:
-        await message.reply(f"Оборудование с ОС {inv_number} не найдено!")
+        await message.reply(f"Оборудование с номером {inv_number} не найдено!")
 
 
 def get_equip_detail_message(obj: Equipment) -> str:
@@ -401,7 +403,7 @@ async def get_image(message):
 @group_chat_only
 @valid_users_only
 async def collect_message(message):
-    text = 'Не спамить!' + '\nВсе сообщения только по делу!'
+    text = 'Команда не распознана, лишние сообщения не допускаются.'
     answer = await message.reply(text=text, parse_mode=ParseMode.MARKDOWN)
     old_bot_message.append(answer)
 
