@@ -79,13 +79,13 @@ def check_if_waiting_email(raw, **kwargs):
 
 
 @receiver(message_received)
-def mail_received(message, raw, **kwargs):
+def mail_received(message, **kwargs):
     """
     Main incoming email callback. Checks if message is the answer to any local Order, tries to get the external id from
     the message and set's it to the order if found, with Order status also changed to "work".
     """
 
-    if raw or not message.in_reply_to_id:
+    if not message.in_reply_to_id:
         # We only need messages that are replies to our's
         return
 
