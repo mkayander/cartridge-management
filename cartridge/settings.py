@@ -132,7 +132,7 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 EMAIL_SUBJECT_PREFIX = os.environ.get("EMAIL_SUBJECT_PREFIX")
 
 if os.environ.get("EMAIL_USE_ADMIN_NOTIF") == "yes":
-    ADMINS = [('Каяндер Максим', 'Maksim.Kayander@dellin.ru'), ('Тирских Никита', 'Nikita.Tirskih@dellin.ru')]
+    ADMINS = [('Каяндер Максим', 'Maksim.Kayander@dellin.ru'), ('Фуркало Дмитрий', 'Dmitriy.Furkalo@dellin.ru')]
 # ADMINS = [('Каяндер Максим', 'maxim.kayander1@gmail.com')]
 
 MIDDLEWARE = [

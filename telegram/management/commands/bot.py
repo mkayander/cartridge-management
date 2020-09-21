@@ -297,16 +297,14 @@ async def handle_photo(message):
         img = Image.open(image_path)
         bool_bar, barcode = get_inv_number(img)
         if bool_bar:
+            answer = await bot.send_message(message.chat.id,
+                                            f"Перемещение оборудования {barcode} успешно сохранено в базе.")
             await sync_to_async(EquipMovement.objects.create)(telegram_user_id=message.from_user.id,
                                                               inv_number=barcode, comment=message.caption,
                                                               inv_image=image_path,
                                                               message_id=message.message_id,
                                                               bot_answer_message_id=answer.message_id,
                                                               chat_id=message.chat.id)
-
-            answer = await bot.send_message(message.chat.id,
-                                            f"Перемещение оборудования {barcode} успешно сохранено в базе.")
-
 
         else:
             await bot.send_message(message.chat.id, barcode)
