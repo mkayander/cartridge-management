@@ -40,7 +40,7 @@ class EmailRequestModel(BackupableModel):
                               verbose_name="Статус")
     date = models.DateTimeField(default=timezone.now, blank=True, verbose_name="Дата создания")
     destination = models.CharField(max_length=100, blank=True,
-                                   default="2 подъезд от КПП (АБЧ 2), Этаж 2, кабинет 14")
+                                   default="2 подъезд от КПП (АБЧ 2), Этаж 2, Серверная")
     edited_at = models.DateTimeField(auto_now=True, verbose_name="Дата редактирования")
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name="Дата выполнения")
     number = models.PositiveIntegerField(default=0, blank=True, verbose_name="Номер заявки")
