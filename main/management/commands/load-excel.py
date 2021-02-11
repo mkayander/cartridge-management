@@ -66,7 +66,7 @@ class Command(BaseCommand):
             print('-----')
             # obj_list = [item for item in objects_list]
             for item in objects_list:
-                Equipment.objects.update_or_create(**item)
+                Equipment.objects.update_or_create(inv_number=item["inv_number"], defaults=item)
 
             # print(item for item in obj_list)
             # Equipment.objects.update_or_create(item for item in objects_list)
