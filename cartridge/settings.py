@@ -61,7 +61,7 @@ THIRD_PARTY_APPS = [
     'rest_framework',
     'crispy_forms',
     'corsheaders',
-    'debug_toolbar',
+    # 'debug_toolbar',
     'django_mailbox',
     'constance',
     'django_celery_beat',
@@ -139,7 +139,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -186,7 +186,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'django_db',
-        'USER': 'django',
+        'USER': 'django_cartridge',
         'PASSWORD': 'D123456d',
         'HOST': '127.0.0.1',
         'PORT': '5432',
@@ -244,14 +244,14 @@ def show_toolbar(request):
         return True
 
 
-DEBUG_TOOLBAR_CONFIG = {
-    # Toolbar options
-    # 'RESULTS_CACHE_SIZE': 3,
-    'SHOW_TOOLBAR_CALLBACK': show_toolbar,
-    'SHOW_COLLAPSED': True,
-    # Panel options
-    'SQL_WARNING_THRESHOLD': 100,  # milliseconds
-}
+# DEBUG_TOOLBAR_CONFIG = {
+#     # Toolbar options
+#     # 'RESULTS_CACHE_SIZE': 3,
+#     'SHOW_TOOLBAR_CALLBACK': show_toolbar,
+#     'SHOW_COLLAPSED': True,
+#     # Panel options
+#     'SQL_WARNING_THRESHOLD': 100,  # milliseconds
+# }
 
 # --- CELERY ---
 CELERY_BROKER_URL = 'redis://localhost:6379/1'
