@@ -35,7 +35,7 @@ kombu==5.0.2
 Markdown==3.3.3
 msgpack==1.0.2
 phonenumberslite==8.12.18
-Pillow==9.3.0
+Pillow==10.0.1
 prompt-toolkit==3.0.16
 psycopg2==2.8.6
 pyasn1==0.4.8
