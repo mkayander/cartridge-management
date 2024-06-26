@@ -26,7 +26,7 @@ django-filter==2.4.0
 django-mailbox==4.8.2
 django-phonenumber-field==5.0.0
 django-timezone-field==4.1.1
-djangorestframework==3.12.2
+djangorestframework==3.15.2
 hiredis==1.1.0
 hyperlink==21.0.0
 idna==3.7
