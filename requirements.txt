@@ -32,7 +32,7 @@ hyperlink==21.0.0
 idna==3.7
 incremental==17.5.0
 kombu==5.0.2
-Markdown==3.3.3
+Markdown==3.8.1
 msgpack==1.0.2
 phonenumberslite==8.12.18
 Pillow==12.1.1
